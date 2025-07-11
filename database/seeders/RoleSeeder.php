@@ -56,32 +56,30 @@ class RoleSeeder extends Seeder
             'view grades',
         ]);
 
-        // Create users and assign roles
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // -------- Admin --------
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('password'),
+        ]);
         $admin->assignRole($adminRole);
 
-        $teacher = User::firstOrCreate(
-            ['email' => 'teacher@example.com'],
-            [
-                'name' => 'Teacher User',
+        // -------- Teachers --------
+        foreach (range(1, 6) as $i) {
+            $teacher = User::create([
+                'name' => "Teacher_{$i} User",
+                'email' => "teacher{$i}@gmail.com",
                 'password' => Hash::make('password'),
-            ]
-        );
-        $teacher->assignRole($teacherRole);
+            ]);
+            $teacher->assignRole($teacherRole);
+        }
 
-        $parent = User::firstOrCreate(
-            ['email' => 'parent@example.com'],
-            [
-                'name' => 'Parent User',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // -------- Dummy Parent --------
+        $parent = User::create([
+            'name' => 'Parent User',
+            'email' => 'parent@gmail.com',
+            'password' => Hash::make('password'),
+        ]);
         $parent->assignRole($parentRole);
     }
 }

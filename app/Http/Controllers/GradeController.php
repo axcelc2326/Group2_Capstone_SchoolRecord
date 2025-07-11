@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Grade;
 use App\Models\Subject;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class GradeController extends Controller
@@ -58,6 +59,23 @@ class GradeController extends Controller
         }
 
         return redirect()->route('dashboard')->with('success', "Grades saved for {$quarter} quarter.");
+    }
+
+    public function viewGrades()
+    {
+        // Get the authenticated parent
+        $parent = Auth::user();
+
+        // Get the parent's students with grades and subjects
+        $students = Student::with([
+            'class',
+            'grades.subject',
+            'grades' => fn ($q) => $q->orderBy('quarter'),
+        ])->where('parent_id', $parent->id)->get();
+
+        return Inertia::render('Parent/ViewGrades', [
+            'students' => $students,
+        ]);
     }
 
 }

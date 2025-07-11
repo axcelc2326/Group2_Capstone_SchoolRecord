@@ -40,7 +40,11 @@ class TeacherController extends Controller
             ]);
         }
 
-        $students = $class->students()->with('grades')->get();
+        // Only fetch approved students
+        $students = $class->students()
+            ->where('approved_by_teacher', true) // ✅ only approved
+            ->with('grades')
+            ->get();
 
         return Inertia::render('Teacher/MyStudents', [
             'students' => $students,

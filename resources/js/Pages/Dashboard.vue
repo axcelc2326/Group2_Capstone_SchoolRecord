@@ -34,6 +34,11 @@ const roles = props.auth.user?.roles?.map(role => role.name) || [];
                 </Link>
               </li>
               <li>
+                <Link :href="route('parent.grades')" class="hover:underline">
+                  📚 View My Child's Grades
+                </Link>
+              </li>
+              <li>
                 <Link :href="route('announcements.index')" class="hover:underline">
                   📢 View Announcements
                 </Link>

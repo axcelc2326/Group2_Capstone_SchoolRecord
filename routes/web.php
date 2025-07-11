@@ -54,6 +54,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
     // Route::get('/parent/dashboard', [ParentController::class, 'index'])->name('parent.dashboard');
 
+    Route::middleware(['role:parent'])->get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
+
     Route::get('/students/register', [StudentController::class, 'create'])->name('students.create');
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
 
@@ -66,12 +68,11 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
-    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
+    // Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
 
     Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
     
-
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
 
@@ -86,7 +87,7 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    // Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
     Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
