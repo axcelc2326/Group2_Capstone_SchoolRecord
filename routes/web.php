@@ -10,7 +10,8 @@ use App\Http\Controllers\{
     AnalyticsController,
     ParentController,
     TeacherController,
-    AdminController
+    AdminController,
+    DashboardController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -28,15 +29,9 @@ Route::get('/', function () {
 });
 
 // ✅ Authenticated Dashboard
-Route::get('/dashboard', function () {
-    $user = Auth::user()->load('roles'); // load user roles (for frontend logic)
-
-    return Inertia::render('Dashboard', [
-        'auth' => [
-            'user' => $user,
-        ],
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 
 // ✅ Profile Routes

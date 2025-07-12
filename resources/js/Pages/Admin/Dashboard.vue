@@ -1,31 +1,45 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <Head title="Dashboard" />
+  <Head title="Admin Dashboard" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Admin Dashboard
-            </h2>
-            
-        </template>
+  <!-- Pass the title to layout for dynamic navbar -->
+  <AuthenticatedLayout title="Admin Dashboard">
+    <template #header>
+      <h2 class="text-xl font-bold text-gray-800">🛠️ Admin Dashboard</h2>
+    </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div
-                    class="overflow-hidden bg-white shadow-sm sm:rounded-lg"
-                >
-                    <div class="p-6 text-gray-900">
-                        You're logged in!
-                    </div>
-                </div>
-            </div>
+    <div class="py-12">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <div class="bg-white p-6 shadow sm:rounded-lg">
+          <h3 class="text-lg font-semibold mb-4">Management Tools</h3>
+          <ul class="space-y-3 text-blue-600 list-disc list-inside">
+            <li>
+              <Link :href="route('classes.create')" class="hover:underline">
+                🏫 Create Class
+              </Link>
+            </li>
+            <li>
+              <Link :href="route('admin.assign-teacher')" class="hover:underline">
+                🧑‍🏫 Assign Teacher to Class
+              </Link>
+            </li>
+            <li>
+              <Link :href="route('announcements.create')" class="hover:underline">
+                📢 Post Announcement
+              </Link>
+            </li>
+            <li>
+              <Link :href="route('analytics.index')" class="hover:underline">
+                📊 View Class Analytics
+              </Link>
+            </li>
+          </ul>
         </div>
-    </AuthenticatedLayout>
+      </div>
+    </div>
+  </AuthenticatedLayout>
 </template>

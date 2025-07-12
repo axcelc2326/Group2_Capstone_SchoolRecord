@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 
@@ -90,4 +90,4 @@ const roles = props.auth.user?.roles?.map(role => role.name) || [];
       </div>
     </div>
   </AuthenticatedLayout>
-</template>
+</template> -->
