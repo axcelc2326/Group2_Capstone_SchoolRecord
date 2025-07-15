@@ -50,4 +50,16 @@ class TeacherController extends Controller
             'students' => $students,
         ]);
     }
+
+    public function viewStudentGrades($studentId)
+    {
+        $student = \App\Models\Student::with([
+            'grades.subject',
+            'class',
+        ])->findOrFail($studentId);
+
+        return Inertia::render('Teacher/ViewStudentGrades', [
+            'student' => $student,
+        ]);
+    }
 }

@@ -67,6 +67,8 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 
     Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
+
+    Route::get('/teacher/student/{student}/grades', [TeacherController::class, 'viewStudentGrades'])->name('teacher.student.grades');
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');

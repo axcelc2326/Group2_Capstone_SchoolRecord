@@ -32,7 +32,11 @@ const props = defineProps({
             <tr v-for="(student, index) in students" :key="student.id" class="border-t text-sm">
               <td class="px-4 py-2">{{ index + 1 }}</td>
               <td class="px-4 py-2">{{ student.first_name }} {{ student.last_name }}</td>
-              <td class="px-4 py-2">
+              <td class="px-4 py-2 flex space-x-4">
+                <Link :href="route('teacher.student.grades', { student: student.id })"
+                      class="text-green-600 hover:underline">
+                  📊 View Grades
+                </Link>
                 <Link :href="route('grades.create', { student: student.id })"
                       class="text-blue-600 hover:underline">
                   📝 Input Grades

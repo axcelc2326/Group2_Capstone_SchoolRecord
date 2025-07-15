@@ -36,7 +36,7 @@ class AnnouncementController extends Controller
     {
         $announcements = Announcement::latest()->get();
 
-        return inertia('Parent/Announcements', [
+        return inertia('Announcement/Index', [
             'announcements' => $announcements
         ]);
     }
