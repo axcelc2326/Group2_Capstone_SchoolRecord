@@ -292,6 +292,16 @@ const isAdmin = computed(() => roles.includes('admin'));
                     </div>
                     <span class="font-medium">View Analytics</span>
                   </Link>
+                  <Link :href="route('admin.users.index')" 
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200 group border border-transparent hover:border-amber-200">
+                    <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 20h5v-2a4 4 0 00-5-4m-6 6H3v-2a4 4 0 015-4m6-4a4 4 0 11-8 0 4 4 0 018 0zm6 4a4 4 0 10-8 0 4 4 0 008 0z" />
+                      </svg>
+                    </div>
+                    <span class="font-medium">Manage Users</span>
+                  </Link>
                 </div>
               </div>
             </template>

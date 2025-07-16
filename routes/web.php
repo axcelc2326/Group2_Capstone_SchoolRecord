@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     ParentController,
     TeacherController,
     AdminController,
-    DashboardController
+    DashboardController,
+    UserManagementController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +48,6 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
-    // Route::get('/parent/dashboard', [ParentController::class, 'index'])->name('parent.dashboard');
-
     Route::middleware(['role:parent'])->get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
 
     Route::get('/students/register', [StudentController::class, 'create'])->name('students.create');
@@ -63,8 +62,6 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
-    // Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
-
     Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
 
@@ -84,8 +81,6 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
-    // Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-
     Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
     Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
 
@@ -94,6 +89,11 @@ Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
 
     Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+
+    Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/users/{user}', [UserManagementController::class, 'show'])->name('admin.users.show');
+    Route::put('/admin/users/{user}', [UserManagementController::class, 'update'])->name('admin.users.update');
+    Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 });
