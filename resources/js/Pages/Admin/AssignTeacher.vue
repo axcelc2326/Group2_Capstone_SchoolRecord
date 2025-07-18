@@ -28,7 +28,7 @@ const submit = () => form.post(route('admin.assign-teacher.submit'))
           <select v-model="form.class_id" class="w-full border rounded-lg p-2" required>
             <option value="" disabled>Select a class</option>
             <option v-for="cls in props.classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }} ({{ cls.grade_level ?? 'Grade ?' }}) — 
+              {{ cls.name }} ({{ 'Grade ' + cls.grade_level ?? 'Grade ?' }}) — 
               {{ cls.teacher?.name ? 'Current: ' + cls.teacher.name : 'No Teacher Assigned' }}
             </option>
           </select>

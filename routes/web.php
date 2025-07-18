@@ -64,8 +64,10 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
     Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
-
     Route::get('/teacher/student/{student}/grades', [TeacherController::class, 'viewStudentGrades'])->name('teacher.student.grades');
+
+    Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
+    Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
@@ -87,8 +89,8 @@ Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
     Route::get('/admin/classes/assign', [AdminController::class, 'assignTeacherForm'])->name('admin.assign-teacher');
     Route::post('/admin/classes/assign', [AdminController::class, 'assignTeacher'])->name('admin.assign-teacher.submit');
 
-    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/create', [AnnouncementController::class, 'createAdmin'])->name('announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'storeAdmin'])->name('announcements.store');
 
     Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserManagementController::class, 'show'])->name('admin.users.show');

@@ -77,7 +77,7 @@ class RoleSeeder extends Seeder
         // -------- Dummy Parent --------
         $parent = User::create([
             'name' => 'Parent User',
-            'email' => 'parent@gmail.com',
+            'email' => 'parent@example.com',
             'password' => Hash::make('password'),
         ]);
         $parent->assignRole($parentRole);

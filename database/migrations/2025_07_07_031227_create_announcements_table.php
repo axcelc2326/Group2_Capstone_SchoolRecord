@@ -16,9 +16,11 @@ return new class extends Migration
             $table->string('title');
             $table->text('body');
             $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('class_id')->nullable(); // ✅ Added for teacher-specific announcements
             $table->timestamps();
 
-            $table->foreign('created_by')->references('id')->on('users');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('class_id')->references('id')->on('classes')->onDelete('cascade');
         });
     }
 

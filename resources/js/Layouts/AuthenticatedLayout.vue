@@ -231,6 +231,15 @@ const isAdmin = computed(() => roles.includes('admin'));
                     </div>
                     <span class="font-medium">Approve Students</span>
                   </Link>
+                  <Link :href="route('teacher.announcements.create')" 
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-all duration-200 group border border-transparent hover:border-pink-200">
+                    <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                      <svg class="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                      </svg>
+                    </div>
+                    <span class="font-medium">Create Announcement</span>
+                  </Link>
                   <Link :href="route('sf5.download', { class: 1 })" 
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 group border border-transparent hover:border-teal-200">
                     <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center group-hover:bg-teal-200 transition-colors">

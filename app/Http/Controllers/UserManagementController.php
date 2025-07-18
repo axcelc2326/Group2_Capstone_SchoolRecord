@@ -18,7 +18,7 @@ class UserManagementController extends Controller
                     ->orWhere('email', 'like', "%$search%");
             })
             ->with('roles')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('name', 'asc')
             ->paginate(15)
             ->through(fn($user) => [
                 'id' => $user->id,

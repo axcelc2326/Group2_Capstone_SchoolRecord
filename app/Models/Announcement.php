@@ -7,15 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Announcement extends Model
 {
-    // ✅ Specify which fields can be mass-assigned
-    protected $fillable = ['title', 'body', 'created_by'];
+    protected $fillable = ['title', 'body', 'class_id', 'created_by'];
 
-
-    /**
-     * ✅ Each announcement is created by one user
-     */
-    public function user(): BelongsTo
+    // ✅ Reference to the user who created the announcement
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function class(): BelongsTo
+    {
+        return $this->belongsTo(ClassModel::class, 'class_id');
     }
 }
