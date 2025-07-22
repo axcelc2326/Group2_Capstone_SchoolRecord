@@ -8,24 +8,34 @@ use Inertia\Inertia;
 
 class AnalyticsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ✅ Fetch classes with students and their grades
-        $classes = ClassModel::with('students.grades')->get();
+        $perPage = 2;
 
-        $subjects = ['English', 'Filipino', 'Mathematics', 'Science', 'Araling Panlipunan', 'ESP', 'MAPEH', 'EPP/TLE'];
+        // ✅ Paginate classes with students and grades
+        $classes = ClassModel::with('students.grades')->paginate($perPage);
 
-        $analytics = $classes->map(function ($class) use ($subjects) {
+        $subjectNames = [
+            1 => 'English',
+            2 => 'Filipino',
+            3 => 'Mathematics',
+            4 => 'Science',
+            5 => 'Araling Panlipunan',
+            6 => 'ESP',
+            7 => 'MAPEH',
+            8 => 'EPP/TLE'
+        ];
 
+        // ✅ Map class data
+        $analytics = collect($classes->items())->map(function ($class) use ($subjectNames) {
             $subjectAverages = [];
 
-            foreach ($subjects as $subject) {
-                // ✅ Flatten all grades of students in the class for this subject
-                $grades = $class->students->flatMap(function($student) use ($subject) {
-                    return $student->grades->where('subject', $subject)->pluck('grade');
+            foreach ($subjectNames as $subjectId => $subjectName) {
+                $grades = $class->students->flatMap(function ($student) use ($subjectId) {
+                    return $student->grades->where('subject_id', $subjectId)->pluck('grade');
                 });
 
-                $subjectAverages[$subject] = $grades->avg() ?? 0;
+                $subjectAverages[$subjectName] = round($grades->avg() ?? 0, 2);
             }
 
             $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
@@ -40,8 +50,15 @@ class AnalyticsController extends Controller
             ];
         });
 
+        // ✅ Send paginated links and analytics data
         return Inertia::render('Analytics/Index', [
             'analytics' => $analytics,
+            'pagination' => [
+                'current_page' => $classes->currentPage(),
+                'last_page' => $classes->lastPage(),
+                'next_page_url' => $classes->nextPageUrl(),
+                'prev_page_url' => $classes->previousPageUrl(),
+            ],
         ]);
     }
 }
