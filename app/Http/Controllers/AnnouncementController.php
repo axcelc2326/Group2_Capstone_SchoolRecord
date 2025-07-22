@@ -69,28 +69,29 @@ class AnnouncementController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('parent')) {
-            $classId = $user->student->class_id ?? null;
+            // ✅ Get class_ids of all the parent's children
+            $classIds = $user->students->pluck('class_id')->toArray();
 
+            // ✅ Get global announcements or class-specific announcements matching any of the parent's children's class_id
             $announcements = Announcement::with('creator')
-                ->where(function ($query) use ($classId) {
+                ->where(function ($query) use ($classIds) {
                     $query->whereNull('class_id')
-                        ->orWhere('class_id', $classId);
+                        ->orWhereIn('class_id', $classIds);
                 })
                 ->latest()
                 ->get();
 
             return Inertia::render('Announcement/Index', [
                 'announcements' => $announcements,
-                'parentClassId' => $classId,
+                'classIds' => $classIds,
             ]);
         }
 
-        // ✅ Admin/Teacher see all announcements
+        // ✅ Admin and teachers see all announcements
         $announcements = Announcement::with('creator')->latest()->get();
 
         return Inertia::render('Announcement/Index', [
             'announcements' => $announcements,
-            'classId' => $classId, // optional renaming
         ]);
     }
 }

@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/vue3'
 
 const props = defineProps({
   announcements: Array,
-  parentClassId: Number
+  parentClassIds: Array, // ✅ Updated to array
 })
 </script>
 
@@ -18,8 +18,9 @@ const props = defineProps({
 
     <div class="py-8 max-w-4xl mx-auto space-y-4">
 
-      <div v-if="parentClassId" class="mb-4 text-sm text-gray-700">
-        🎓 You are viewing announcements for your child’s class (ID: {{ parentClassId }}) and global announcements.
+      <div v-if="parentClassIds?.length" class="mb-4 text-sm text-gray-700">
+        🎓 You are viewing announcements for your children’s classes 
+        (Class IDs: {{ parentClassIds.join(', ') }}) and global announcements.
       </div>
 
       <div v-if="announcements.length === 0" class="text-center text-gray-500">
