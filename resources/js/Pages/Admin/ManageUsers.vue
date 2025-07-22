@@ -45,14 +45,23 @@ watch(search, (value) => {
                     </div>
 
                     <div class="space-y-3 w-full md:w-1/3">
-                        <Link
-                            :href="route('admin.users.show', user.id)"
-                            class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded transition"
-                        >
-                            ✏️ Edit User
-                        </Link>
-
-                        <p v-if="user.role === 'admin'" class="text-xs text-gray-500 text-center">Admin role is locked</p>
+                        <!-- ✅ Conditional Edit -->
+                        <template v-if="user.role !== 'admin'">
+                            <Link
+                                :href="route('admin.users.show', user.id)"
+                                class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded transition"
+                            >
+                                ✏️ Edit User
+                            </Link>
+                        </template>
+                        <template v-else>
+                            <button
+                                disabled
+                                class="block text-center w-full bg-gray-300 text-gray-600 font-medium py-2 rounded cursor-not-allowed"
+                            >
+                                🔒 Admin Cannot be Edited
+                            </button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -60,13 +69,11 @@ watch(search, (value) => {
             <!-- ✅ Pagination Fixed -->
             <div v-if="users.links" class="flex flex-wrap gap-2 justify-center pt-6">
                 <template v-for="link in users.links" :key="link.label">
-                    <!-- ✅ Show dots -->
                     <span
                         v-if="link.url === null"
                         class="px-4 py-2 text-gray-500 text-sm"
                         v-html="link.label"
                     />
-                    <!-- ✅ Clickable page link -->
                     <Link
                         v-else
                         :href="link.url"
