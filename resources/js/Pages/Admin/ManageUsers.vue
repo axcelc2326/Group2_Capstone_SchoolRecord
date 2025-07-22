@@ -57,18 +57,26 @@ watch(search, (value) => {
                 </div>
             </div>
 
-            <!-- ✅ Pagination -->
+            <!-- ✅ Pagination Fixed -->
             <div v-if="users.links" class="flex flex-wrap gap-2 justify-center pt-6">
-                <Link
-                    v-for="link in users.links"
-                    :key="link.label"
-                    :href="link.url"
-                    v-html="link.label"
-                    :class="['px-4 py-2 rounded text-sm', {
-                        'bg-blue-500 text-white': link.active,
-                        'bg-gray-200 text-gray-800': !link.active
-                    }]"
-                />
+                <template v-for="link in users.links" :key="link.label">
+                    <!-- ✅ Show dots -->
+                    <span
+                        v-if="link.url === null"
+                        class="px-4 py-2 text-gray-500 text-sm"
+                        v-html="link.label"
+                    />
+                    <!-- ✅ Clickable page link -->
+                    <Link
+                        v-else
+                        :href="link.url"
+                        v-html="link.label"
+                        :class="[
+                            'px-4 py-2 rounded text-sm',
+                            link.active ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        ]"
+                    />
+                </template>
             </div>
         </div>
     </AuthenticatedLayout>

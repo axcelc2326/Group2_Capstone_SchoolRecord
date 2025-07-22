@@ -20,6 +20,7 @@ class UserManagementController extends Controller
             ->with('roles')
             ->orderBy('name', 'asc')
             ->paginate(15)
+            ->onEachSide(1)
             ->through(fn($user) => [
                 'id' => $user->id,
                 'name' => $user->name,

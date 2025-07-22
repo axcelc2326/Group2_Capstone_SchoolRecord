@@ -72,14 +72,15 @@ class AnnouncementController extends Controller
             // ✅ Get class_ids of all the parent's children
             $classIds = $user->students->pluck('class_id')->toArray();
 
-            // ✅ Get global announcements or class-specific announcements matching any of the parent's children's class_id
+            // ✅ Paginate global and class-specific announcements
             $announcements = Announcement::with('creator')
                 ->where(function ($query) use ($classIds) {
                     $query->whereNull('class_id')
                         ->orWhereIn('class_id', $classIds);
                 })
                 ->latest()
-                ->get();
+                ->paginate(5) // ✅ Pagination (5 per page)
+                ->withQueryString();
 
             return Inertia::render('Announcement/Index', [
                 'announcements' => $announcements,
@@ -87,8 +88,11 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        // ✅ Admin and teachers see all announcements
-        $announcements = Announcement::with('creator')->latest()->get();
+        // ✅ Admin and teachers see all announcements with pagination
+        $announcements = Announcement::with('creator')
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
 
         return Inertia::render('Announcement/Index', [
             'announcements' => $announcements,
