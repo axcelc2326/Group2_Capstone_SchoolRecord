@@ -72,7 +72,7 @@ class AnnouncementController extends Controller
             'created_by' => $teacher->id,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Class announcement posted.');
+        return redirect()->route('teacher.announcements.create')->with('success', 'Class announcement posted.');
     }
 
     public function index()
@@ -132,7 +132,7 @@ class AnnouncementController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function updateAdmin(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -151,7 +151,37 @@ class AnnouncementController extends Controller
         return redirect()->route('announcements.create')->with('success', 'Announcement updated.');
     }
 
-    public function destroy($id)
+        public function updateTeacher(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id())
+            ->firstOrFail();
+
+        $announcement->update([
+            'title' => $request->title,
+            'body' => $request->body,
+        ]);
+
+        return redirect()->route('teacher.announcements.create')->with('success', 'Announcement updated.');
+    }
+
+    public function destroyAdmin($id)
+    {
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id())
+            ->firstOrFail();
+
+        $announcement->delete();
+
+        return back()->with('success', 'Announcement deleted.');
+    }
+
+        public function destroyTeacher($id)
     {
         $announcement = Announcement::where('id', $id)
             ->where('created_by', auth()->id())

@@ -40,6 +40,6 @@ class AdminController extends Controller
         $class->teacher_id = $request->teacher_id;
         $class->save();
 
-        return redirect()->route('dashboard')->with('success', 'Teacher assigned successfully!');
+        return redirect()->route('admin.assign-teacher')->with('success', 'Teacher assigned successfully!');
     }
 }

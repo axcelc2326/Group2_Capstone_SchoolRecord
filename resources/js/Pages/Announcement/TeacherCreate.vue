@@ -29,7 +29,7 @@ const deleteAnnouncement = (id) => {
     confirmButtonText: 'Yes, delete it!',
   }).then((result) => {
     if (result.isConfirmed) {
-      router.delete(route('announcements.destroy', id));
+      router.delete(route('announcements.destroyTeacher', id));
     }
   });
 };

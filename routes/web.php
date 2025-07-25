@@ -68,9 +68,9 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 
     Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
     Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
-    Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'editTeacher'])->name('announcements.editTeacher');
-    Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
-    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    Route::get('/teacher/announcements/{id}/edit', [AnnouncementController::class, 'editTeacher'])->name('announcements.editTeacher');
+    Route::put('/teacher/{id}', [AnnouncementController::class, 'updateTeacher'])->name('announcements.updateTeacher');
+    Route::delete('/teacherDestroy/{id}', [AnnouncementController::class, 'destroyTeacher'])->name('announcements.destroyTeacher');
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
@@ -98,8 +98,8 @@ Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
     Route::get('/announcements/create', [AnnouncementController::class, 'createAdmin'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'storeAdmin'])->name('announcements.store');
     Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'editAdmin'])->name('announcements.editAdmin');
-    Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
-    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'updateAdmin'])->name('announcements.updateAdmin');
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroyAdmin'])->name('announcements.destroyAdmin');
 
     Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserManagementController::class, 'show'])->name('admin.users.show');

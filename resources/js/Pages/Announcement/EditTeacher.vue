@@ -12,7 +12,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.put(route('announcements.update', props.announcement.id))
+  form.put(route('announcements.updateTeacher', props.announcement.id))
 }
 </script>
 
@@ -26,7 +26,7 @@ const submit = () => {
 
       <!-- ✅ Fixed Back Button -->
       <Link
-        :href="route('announcements.create')"
+        :href="route('teacher.announcements.create')"
         class="inline-block text-sm text-gray-600 hover:text-blue-600 underline"
       >
         ← Back to Announcement List
