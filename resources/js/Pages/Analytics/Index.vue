@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ApexCharts from 'vue3-apexcharts';
 import { router } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
     analytics: Array,
@@ -114,6 +115,34 @@ const getPerformanceLevel = (average) => {
 const getOverallAverage = (classData) => {
   const values = Object.values(classData.subject_averages);
   return values.reduce((sum, val) => sum + val, 0) / values.length;
+};
+
+const pages = computed(() => {
+    if (!props.pagination) return [];
+
+    const current = props.pagination.current_page;
+    const last = props.pagination.last_page;
+    const pagesArray = [];
+
+    if (last <= 5) {
+        for (let i = 1; i <= last; i++) pagesArray.push(i);
+    } else {
+        if (current <= 3) {
+            pagesArray.push(1, 2, 3, 4, '...', last);
+        } else if (current >= last - 2) {
+            pagesArray.push(1, '...', last - 3, last - 2, last - 1, last);
+        } else {
+            pagesArray.push(1, '...', current - 1, current, current + 1, '...', last);
+        }
+    }
+
+    return pagesArray;
+});
+
+const pageUrl = (page) => {
+    if (page === '...') return null;
+    const baseUrl = props.pagination.path;
+    return `${baseUrl}?page=${page}`;
 };
 </script>
 
@@ -260,21 +289,42 @@ const getOverallAverage = (classData) => {
       <!-- Pagination Controls -->
       <div v-if="pagination" class="mt-8">
         <div class="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg p-6">
-          <div class="flex justify-center items-center space-x-4">
+          <div class="flex flex-wrap justify-center items-center space-x-1 gap-y-2">
+
+            <!-- Previous Button -->
             <button
               @click="goToPage(pagination.prev_page_url)"
               :disabled="!pagination.prev_page_url"
-              class="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+              class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Previous
             </button>
-            <div class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 font-medium">
-              Page {{ pagination.current_page }} of {{ pagination.last_page }}
-            </div>
+
+            <!-- Page Numbers with Dots -->
+            <template v-for="page in pages" :key="page">
+              <span
+                v-if="page === '...'"
+                class="px-4 py-2 text-gray-500"
+              >...</span>
+              <button
+                v-else
+                @click="goToPage(pageUrl(page))"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-md',
+                  page === pagination.current_page
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
+                ]"
+              >
+                {{ page }}
+              </button>
+            </template>
+
+            <!-- Next Button -->
             <button
               @click="goToPage(pagination.next_page_url)"
               :disabled="!pagination.next_page_url"
-              class="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+              class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Next
             </button>

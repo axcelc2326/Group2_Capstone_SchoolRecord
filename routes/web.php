@@ -68,6 +68,9 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 
     Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
     Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
+    Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'editTeacher'])->name('announcements.editTeacher');
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
@@ -83,14 +86,20 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
-    Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
+    Route::get('/classes', [ClassController::class, 'create'])->name('classes.create');
     Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
+    Route::get('/classes/{class}/edit', [ClassController::class, 'edit'])->name('classes.edit');
+    Route::put('/classes/{class}', [ClassController::class, 'update'])->name('classes.update');
+    Route::delete('/classes/{class}', [ClassController::class, 'destroy'])->name('classes.destroy');
 
     Route::get('/admin/classes/assign', [AdminController::class, 'assignTeacherForm'])->name('admin.assign-teacher');
     Route::post('/admin/classes/assign', [AdminController::class, 'assignTeacher'])->name('admin.assign-teacher.submit');
 
     Route::get('/announcements/create', [AnnouncementController::class, 'createAdmin'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'storeAdmin'])->name('announcements.store');
+    Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'editAdmin'])->name('announcements.editAdmin');
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
     Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [UserManagementController::class, 'show'])->name('admin.users.show');

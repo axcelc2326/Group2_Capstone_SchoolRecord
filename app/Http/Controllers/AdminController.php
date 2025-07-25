@@ -10,14 +10,21 @@ use Inertia\Inertia;
 class AdminController extends Controller
 {
     // Show the assign teacher form
-    public function assignTeacherForm()
+    public function assignTeacherForm(Request $request)
     {
         $teachers = User::role('teacher')->get(['id', 'name']);
-        $classes = ClassModel::with('teacher')->get();
+        $classes = ClassModel::with('teacher')->get(); // for the dropdown
+
+        // ✅ Paginate the class-teacher assignments (10 per page)
+        $assignments = ClassModel::with('teacher')
+            ->orderBy('grade_level')
+            ->paginate(10)
+            ->withQueryString(); // keeps query params like page on pagination links
 
         return Inertia::render('Admin/AssignTeacher', [
             'teachers' => $teachers,
             'classes' => $classes,
+            'assignments' => $assignments, // pass to Vue
         ]);
     }
 

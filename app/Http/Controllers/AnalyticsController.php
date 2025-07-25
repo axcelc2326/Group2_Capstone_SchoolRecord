@@ -58,6 +58,7 @@ class AnalyticsController extends Controller
                 'last_page' => $classes->lastPage(),
                 'next_page_url' => $classes->nextPageUrl(),
                 'prev_page_url' => $classes->previousPageUrl(),
+                'path' => $classes->path(),
             ],
         ]);
     }

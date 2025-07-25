@@ -11,7 +11,13 @@ class AnnouncementController extends Controller
 {
     public function createAdmin()
     {
-        return Inertia::render('Announcement/AdminCreate');
+        $announcements = Announcement::where('created_by', auth()->id())
+            ->latest()
+            ->paginate(5);
+
+        return Inertia::render('Announcement/AdminCreate', [
+            'announcements' => $announcements,
+        ]);
     }
 
     public function storeAdmin(Request $request)
@@ -28,14 +34,20 @@ class AnnouncementController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Global announcement posted.');
+        return redirect()->route('announcements.create')->with('success', 'Global announcement posted.');
     }
 
     public function createTeacher()
     {
         $classes = auth()->user()->classes;
+
+        $announcements = Announcement::where('created_by', auth()->id())
+            ->latest()
+            ->paginate(5);
+
         return Inertia::render('Announcement/TeacherCreate', [
             'classes' => $classes,
+            'announcements' => $announcements,
         ]);
     }
 
@@ -47,7 +59,6 @@ class AnnouncementController extends Controller
         ]);
 
         $teacher = auth()->user();
-
         $class = $teacher->class;
 
         if (!$class) {
@@ -69,17 +80,16 @@ class AnnouncementController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('parent')) {
-            // ✅ Get class_ids of all the parent's children
+            // ✅ Parents see global and class announcements
             $classIds = $user->students->pluck('class_id')->toArray();
 
-            // ✅ Paginate global and class-specific announcements
             $announcements = Announcement::with('creator')
                 ->where(function ($query) use ($classIds) {
                     $query->whereNull('class_id')
                         ->orWhereIn('class_id', $classIds);
                 })
                 ->latest()
-                ->paginate(5) // ✅ Pagination (5 per page)
+                ->paginate(5)
                 ->withQueryString();
 
             return Inertia::render('Announcement/Index', [
@@ -88,8 +98,9 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        // ✅ Admin and teachers see all announcements with pagination
+        // ✅ Admins and teachers only see their own announcements
         $announcements = Announcement::with('creator')
+            ->where('created_by', $user->id)
             ->latest()
             ->paginate(5)
             ->withQueryString();
@@ -98,4 +109,57 @@ class AnnouncementController extends Controller
             'announcements' => $announcements,
         ]);
     }
+
+    public function editAdmin($id)
+    {
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id()) // Ensure only the owner can edit
+            ->firstOrFail();
+
+        return Inertia::render('Announcement/EditAdmin', [
+            'announcement' => $announcement,
+        ]);
+    }
+
+     public function editTeacher($id)
+    {
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id()) // Ensure only the owner can edit
+            ->firstOrFail();
+
+        return Inertia::render('Announcement/EditTeacher', [
+            'announcement' => $announcement,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id())
+            ->firstOrFail();
+
+        $announcement->update([
+            'title' => $request->title,
+            'body' => $request->body,
+        ]);
+
+        return redirect()->route('announcements.create')->with('success', 'Announcement updated.');
+    }
+
+    public function destroy($id)
+    {
+        $announcement = Announcement::where('id', $id)
+            ->where('created_by', auth()->id())
+            ->firstOrFail();
+
+        $announcement->delete();
+
+        return back()->with('success', 'Announcement deleted.');
+    }
+
 }
