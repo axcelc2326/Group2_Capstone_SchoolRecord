@@ -58,7 +58,7 @@ class GradeController extends Controller
             );
         }
 
-        return redirect()->route('dashboard')->with('success', "Grades saved for {$quarter} quarter.");
+        return redirect()->route('teacher.students')->with('success', "Grades saved for {$quarter} quarter.");
     }
 
     public function viewGrades()

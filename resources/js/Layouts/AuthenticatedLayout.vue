@@ -9,7 +9,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
 const sidebarCollapsed = ref(false);
-const { props } = usePage();
+const { props, url } = usePage();
 const user = props.auth.user;
 const roles = user.roles?.map(role => role.name) || [];
 
@@ -23,11 +23,24 @@ const toggleSidebar = () => {
   sidebarCollapsed.value = !sidebarCollapsed.value;
 };
 
+const toggleMobileNavigation = () => {
+  showingNavigationDropdown.value = !showingNavigationDropdown.value;
+};
+
+// Check if current route is active
+const isActiveRoute = (href) => {
+  return url === href || url.startsWith(href + '/');
+};
+
 // Auto-collapse sidebar on mobile
 onMounted(() => {
   const handleResize = () => {
     if (window.innerWidth < 1024) {
       sidebarCollapsed.value = true;
+    }
+    // Close mobile menu on resize
+    if (window.innerWidth >= 1024) {
+      showingNavigationDropdown.value = false;
     }
   };
   
@@ -165,38 +178,39 @@ const groupedNavigation = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
+  <div class="min-h-screen flex flex-col bg-gradient-to-br from-white via-blue-50/30 to-blue-100/50">
     <!-- Modern Top Navigation -->
-    <nav class="bg-white/80 backdrop-blur-lg border-b border-gray-200/60 shadow-sm sticky top-0 z-50">
+    <nav class="bg-white/95 backdrop-blur-xl border-b border-blue-100/50 shadow-lg shadow-blue-100/20 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <!-- Left: Logo + School Name + User -->
           <div class="flex items-center space-x-4">
             <button
-              @click="toggleSidebar"
-              class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              @click="toggleMobileNavigation"
+              class="lg:hidden p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path v-if="!showingNavigationDropdown" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             
             <Link :href="route('dashboard')" class="flex items-center space-x-3 group">
-              <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-xl flex items-center justify-center text-lg font-bold shadow-lg group-hover:shadow-xl transition-shadow">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105">
                 E
               </div>
               <div class="hidden sm:block">
-                <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                   EduPortal
                 </div>
-                <div class="text-xs text-gray-500 font-medium">Learning Management System</div>
+                <div class="text-xs text-gray-900 font-medium">Learning Management System</div>
               </div>
             </Link>
             
-            <div class="hidden xl:block pl-4 border-l border-gray-200">
+            <div class="hidden xl:block pl-4 border-l border-blue-200">
               <div class="text-sm font-semibold text-gray-900">Welcome back, {{ user.name }}</div>
-              <div class="text-xs text-gray-500 flex items-center space-x-2">
-                <div class="w-2 h-2 rounded-full"
+              <div class="text-xs text-blue-600/70 flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full animate-pulse"
                      :class="{
                        'bg-red-500': isAdmin,
                        'bg-green-500': isTeacher,
@@ -214,15 +228,15 @@ const groupedNavigation = computed(() => {
           <div class="flex items-center space-x-4">
             <Dropdown align="right" width="full">
               <template #trigger>
-                <button class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-lg flex items-center justify-center text-sm font-medium mr-3 shadow">
+                <button class="flex items-center px-4 py-2 bg-white/80 border border-blue-200 rounded-2xl text-sm text-gray-700 hover:text-blue-700 hover:bg-blue-50/80 shadow-lg shadow-blue-100/20 hover:shadow-xl hover:shadow-blue-200/30 transition-all duration-300 hover:scale-105">
+                  <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-center text-sm font-bold mr-3 shadow-lg">
                     {{ user.name.charAt(0).toUpperCase() }}
                   </div>
                   <div class="text-left hidden sm:block">
                     <div class="text-sm font-semibold">{{ user.name }}</div>
-                    <div class="text-xs text-gray-500">{{ user.email }}</div>
+                    <div class="text-xs text-gray-900">{{ user.email }}</div>
                   </div>
-                  <svg class="ml-3 h-4 w-4 transition-transform" 
+                  <svg class="ml-3 h-4 w-4 transition-transform text-blue-500" 
                        :class="{ 'rotate-180': showingNavigationDropdown }"
                        viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -230,22 +244,20 @@ const groupedNavigation = computed(() => {
                 </button>
               </template>
               <template #content>
-                <div class="p-2">
-                  <DropdownLink :href="route('profile.edit')" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    Profile
-                  </DropdownLink>
-                  <hr class="my-2">
-                  <DropdownLink :href="route('logout')" method="post" as="button" 
-                               class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                    Log Out
-                  </DropdownLink>
-                </div>
+                <DropdownLink :href="route('profile.edit')" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-all duration-200">
+                  <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                  Profile
+                </DropdownLink>
+                <hr class="my-2 border-blue-100">
+                <DropdownLink :href="route('logout')" method="post" as="button" 
+                              class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200">
+                  <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                  </svg>
+                  Log Out
+                </DropdownLink>
               </template>
             </Dropdown>
           </div>
@@ -253,29 +265,56 @@ const groupedNavigation = computed(() => {
       </div>
 
       <!-- Mobile Navigation Menu -->
-      <div v-if="showingNavigationDropdown" class="sm:hidden border-t bg-white/95 backdrop-blur-lg">
-        <div class="px-4 py-4 space-y-3">
-          <div class="flex items-center space-x-3 pb-4 border-b border-gray-200">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-lg flex items-center justify-center text-sm font-medium shadow">
+      <div v-show="showingNavigationDropdown" class="lg:hidden border-t bg-white/95 backdrop-blur-xl shadow-xl">
+        <div class="px-4 py-6 space-y-4">
+          <div class="flex items-center space-x-3 pb-4 border-b border-blue-100">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg">
               {{ user.name.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <div class="text-base font-semibold">{{ user.name }}</div>
-              <div class="text-sm text-gray-500">{{ user.email }}</div>
+              <div class="text-base font-semibold text-gray-900">{{ user.name }}</div>
+              <div class="text-sm text-blue-600/70">{{ user.email }}</div>
             </div>
           </div>
-          <ResponsiveNavLink :href="route('profile.edit')" class="flex items-center space-x-3 py-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
-            <span>Profile</span>
-          </ResponsiveNavLink>
-          <ResponsiveNavLink :href="route('logout')" method="post" as="button" class="flex items-center space-x-3 py-2 text-red-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-            </svg>
-            <span>Log Out</span>
-          </ResponsiveNavLink>
+          
+          <!-- Mobile Dashboard Link -->
+          <Link 
+            :href="route('dashboard')" 
+            :class="[
+              'flex items-center space-x-3 py-3 px-4 rounded-xl transition-all duration-200',
+              isActiveRoute(route('dashboard')) 
+                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' 
+                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+            ]"
+            @click="showingNavigationDropdown = false"
+          >
+            <div v-html="navigationItems[0].icon"></div>
+            <span class="font-medium">Dashboard</span>
+          </Link>
+          
+          <!-- Mobile Navigation Sections -->
+          <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-2">
+            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3 px-2">
+              {{ category }}
+            </h3>
+            <div class="space-y-1">
+              <Link 
+                v-for="item in items" 
+                :key="item.name"
+                :href="item.href" 
+                :class="[
+                  'flex items-center space-x-3 py-3 px-4 rounded-xl transition-all duration-200',
+                  isActiveRoute(item.href) 
+                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30' 
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                ]"
+                @click="showingNavigationDropdown = false"
+              >
+                <div v-html="item.icon"></div>
+                <span class="font-medium">{{ item.name }}</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
@@ -284,65 +323,83 @@ const groupedNavigation = computed(() => {
     <div class="flex flex-1">
       <!-- Modern Sidebar -->
       <aside :class="[
-        'bg-white/60 backdrop-blur-lg border-r border-gray-200/60 transition-all duration-300 ease-in-out',
-        sidebarCollapsed ? 'w-0 lg:w-16' : 'w-72',
-        'hidden lg:block shadow-lg'
+        'bg-white/95 backdrop-blur-xl border-r border-blue-100/50 transition-all duration-300 ease-in-out shadow-2xl shadow-blue-100/20',
+        sidebarCollapsed ? 'w-0 lg:w-20' : 'w-70',
+        'hidden lg:block'
       ]">
-        <div class="p-4 h-full overflow-hidden">
+        <div class="p-6 h-full overflow-hidden">
           <!-- Sidebar Toggle -->
-          <div class="flex justify-end mb-4" v-if="!sidebarCollapsed">
+          <div class="flex justify-end mb-6" v-if="!sidebarCollapsed">
             <button 
               @click="toggleSidebar"
-              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              class="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
           </div>
           
-          <div v-if="sidebarCollapsed" class="flex justify-center mb-6">
+          <div v-if="sidebarCollapsed" class="flex justify-center mb-8">
             <button 
               @click="toggleSidebar"
-              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              class="p-3 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
               </svg>
             </button>
           </div>
           
           <!-- Navigation -->
-          <nav class="space-y-6" v-if="!sidebarCollapsed">
+          <nav class="space-y-8" v-if="!sidebarCollapsed">
             <div>
-              <h2 class="text-lg font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent mb-4">
+              <h2 class="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-6">
                 Quick Actions
               </h2>
               
               <!-- Dashboard Link -->
               <Link 
                 :href="route('dashboard')" 
-                class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
+                :class="[
+                  'group flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-300 border-l-4',
+                  isActiveRoute(route('dashboard'))
+                    ? 'bg-blue-500 text-white border-blue-600 shadow-xl shadow-blue-500/30 scale-105'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-transparent hover:border-blue-500 hover:scale-105'
+                ]"
               >
-                <div v-html="navigationItems[0].icon" class="text-gray-500 group-hover:text-blue-600 transition-colors"></div>
-                <span class="font-medium">Dashboard</span>
+                <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-blue-500 group-hover:text-blue-600'"></div>
+                <span class="font-semibold">Dashboard</span>
+                <div v-if="isActiveRoute(route('dashboard'))" class="ml-auto">
+                  <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </div>
               </Link>
             </div>
 
             <!-- Role-based Navigation Sections -->
-            <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-2">
-              <h3 class="text-sm font-bold text-gray-600 uppercase tracking-wider mb-3">
+            <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-3">
+              <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-4 px-2">
                 {{ category }}
               </h3>
-              <div class="space-y-1">
+              <div class="space-y-2">
                 <Link 
                   v-for="item in items" 
                   :key="item.name"
                   :href="item.href" 
-                  class="group flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-4 border-transparent hover:border-blue-500"
+                  :class="[
+                    'group flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-300 border-l-4 relative overflow-hidden',
+                    isActiveRoute(item.href)
+                      ? 'bg-blue-500 text-white border-blue-600 shadow-xl shadow-blue-500/30 scale-105'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50 border-transparent hover:border-blue-500 hover:scale-105'
+                  ]"
                 >
-                  <div v-html="item.icon" class="text-gray-500 group-hover:text-blue-600 transition-colors"></div>
-                  <span class="font-medium">{{ item.name }}</span>
+                  <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-blue-500 group-hover:text-blue-600'"></div>
+                  <span class="font-semibold">{{ item.name }}</span>
+                  <div v-if="isActiveRoute(item.href)" class="ml-auto">
+                    <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                  <!-- Hover effect background -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-blue-400/10 to-blue-400/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                 </Link>
               </div>
             </div>
@@ -352,21 +409,32 @@ const groupedNavigation = computed(() => {
           <nav v-else class="space-y-4">
             <Link 
               :href="route('dashboard')" 
-              class="group flex items-center justify-center p-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
-              title="Dashboard"
+              :class="[
+                'group flex items-center justify-center p-4 rounded-2xl transition-all duration-300',
+                isActiveRoute(route('dashboard'))
+                  ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/30 scale-110'
+                  : 'text-blue-500 hover:text-blue-600 hover:bg-blue-50 hover:scale-110'
+              ]"
+              :title="'Dashboard'"
             >
-              <div v-html="navigationItems[0].icon" class="text-gray-500 group-hover:text-blue-600 transition-colors"></div>
+              <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-blue-500 group-hover:text-blue-600'"></div>
             </Link>
             
-            <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-2">
+            <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-3">
+              <div class="w-full h-px bg-blue-200 my-4"></div>
               <Link 
                 v-for="item in items" 
                 :key="item.name"
                 :href="item.href" 
-                class="group flex items-center justify-center p-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                :class="[
+                  'group flex items-center justify-center p-4 rounded-2xl transition-all duration-300',
+                  isActiveRoute(item.href)
+                    ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/30 scale-110'
+                    : 'text-blue-500 hover:text-blue-600 hover:bg-blue-50 hover:scale-110'
+                ]"
                 :title="item.name"
               >
-                <div v-html="item.icon" class="text-gray-500 group-hover:text-blue-600 transition-colors"></div>
+                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-blue-500 group-hover:text-blue-600'"></div>
               </Link>
             </div>
           </nav>
@@ -378,51 +446,57 @@ const groupedNavigation = computed(() => {
         <!-- Main Content -->
         <main class="flex-1 p-6">
           <header v-if="$slots.header" class="mb-8">
-            <div class="bg-white/60 backdrop-blur-lg rounded-2xl border border-gray-200/60 p-6 shadow-lg">
+            <div class="bg-white/95 backdrop-blur-xl rounded-3xl border border-blue-100/50 p-8 shadow-2xl shadow-blue-100/20">
               <slot name="header" />
             </div>
           </header>
           
-          <div class="bg-white/60 backdrop-blur-lg rounded-2xl border border-gray-200/60 p-8 shadow-lg min-h-96">
-            <slot />
+          <div class="bg-white/95 backdrop-blur-xl rounded-3xl border border-blue-100/50 p-8 shadow-2xl shadow-blue-100/20 min-h-96 relative overflow-hidden">
+            <!-- Background decoration -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100/30 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-50/50 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+            
+            <div class="relative z-10">
+              <slot />
+            </div>
           </div>
         </main>
 
         <!-- Modern Footer -->
-        <footer class="bg-white/80 backdrop-blur-lg border-t border-gray-200/60 shadow-sm mt-8">
+        <footer class="bg-white/95 backdrop-blur-xl border-t border-blue-100/50 shadow-2xl shadow-blue-100/20 mt-8">
           <div class="max-w-7xl mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left space-y-6 md:space-y-0 md:space-x-8">
               <!-- Company Info -->
-              <div class="flex items-center justify-center space-x-3 md:justify-start">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow">
+              <div class="flex items-center justify-center space-x-4 md:justify-start">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-xl shadow-blue-500/25">
                   E
                 </div>
                 <div>
-                  <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  <div class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
                     EduPortal
                   </div>
-                  <div class="text-xs text-gray-500">Learning Management System</div>
+                  <div class="text-sm text-blue-600/70 font-medium">Learning Management System</div>
                 </div>
               </div>
 
               <!-- Paragraph -->
-              <p class="text-gray-600 text-sm max-w-xl mx-auto md:mx-0">
+              <p class="text-gray-600 text-sm max-w-xl mx-auto md:mx-0 leading-relaxed">
                 Empowering education through innovative technology solutions.
                 Connecting students, teachers, and parents in a seamless learning experience.
               </p>
             </div>
             <!-- Bottom Footer -->
-            <div class="border-t border-gray-200 pt-6 mt-8">
+            <div class="border-t border-blue-100 pt-6 mt-8">
               <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div class="text-sm text-gray-500">
                   © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
                 </div>
                 <div class="flex items-center space-x-6">
                   <div class="flex items-center space-x-2 text-sm text-gray-500">
-                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
                     <span>All systems operational</span>
                   </div>
-                  <div class="text-xs text-gray-400">
+                  <div class="text-xs text-blue-400 font-medium bg-blue-50 px-3 py-1 rounded-full">
                     v2.1.0
                   </div>
                 </div>
@@ -442,9 +516,9 @@ const groupedNavigation = computed(() => {
 }
 
 /* Smooth backdrop blur effect */
-@supports (backdrop-filter: blur(16px)) {
-  .backdrop-blur-lg {
-    backdrop-filter: blur(16px);
+@supports (backdrop-filter: blur(20px)) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(20px);
   }
 }
 
@@ -458,16 +532,16 @@ aside::-webkit-scrollbar-track {
 }
 
 aside::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #dbeafe;
   border-radius: 2px;
 }
 
 aside::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #bfdbfe;
 }
 
-/* Gradient text animation */
-@keyframes gradient {
+/* Enhanced gradient text animation */
+@keyframes gradient-shift {
   0%, 100% {
     background-size: 200% 200%;
     background-position: left center;
@@ -478,18 +552,39 @@ aside::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* Pulse animation for status indicator */
-@keyframes pulse {
+/* Enhanced pulse animation for status indicator */
+@keyframes pulse-glow {
   0%, 100% {
     opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 5px currentColor;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.7;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px currentColor;
   }
 }
 
 .animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Floating animation for decorative elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 /* Hover effects for navigation items */
@@ -506,10 +601,62 @@ aside::-webkit-scrollbar-thumb:hover {
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
-  transition: left 0.5s;
+  transition: left 0.6s ease-in-out;
 }
 
 .nav-item:hover::before {
   left: 100%;
+}
+
+/* Active state glow effect */
+.active-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Mobile menu slide animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-enter {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(16px);
+  }
+}
+
+/* Custom focus states for accessibility */
+button:focus,
+a:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 0.75rem;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Enhanced shadow effects */
+.shadow-glow {
+  box-shadow: 0 10px 25px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05);
+}
+
+.shadow-glow:hover {
+  box-shadow: 0 20px 40px -3px rgba(59, 130, 246, 0.15), 0 8px 12px -2px rgba(59, 130, 246, 0.1);
 }
 </style>

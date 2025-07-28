@@ -26,11 +26,11 @@ class TeacherController extends Controller
         ]);
     }
 
-    public function myStudents()
+    public function myStudents(Request $request)
     {
         $user = Auth::user();
+        $search = $request->input('search');
 
-        // Get the class where this teacher is assigned
         $class = $user->classTeaching;
 
         if (!$class) {
@@ -40,14 +40,23 @@ class TeacherController extends Controller
             ]);
         }
 
-        // Only fetch approved students
-        $students = $class->students()
-            ->where('approved_by_teacher', true) // ✅ only approved
+        $query = $class->students()->where('approved_by_teacher', true);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%$search%")
+                ->orWhere('last_name', 'like', "%$search%");
+            });
+        }
+
+        $students = $query->orderBy('last_name')
             ->with('grades')
-            ->get();
+            ->paginate(40)
+            ->withQueryString();
 
         return Inertia::render('Teacher/MyStudents', [
             'students' => $students,
+            'filters' => ['search' => $search],
         ]);
     }
 

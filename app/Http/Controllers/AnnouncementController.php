@@ -151,7 +151,7 @@ class AnnouncementController extends Controller
         return redirect()->route('announcements.create')->with('success', 'Announcement updated.');
     }
 
-        public function updateTeacher(Request $request, $id)
+    public function updateTeacher(Request $request, $id)
     {
         $request->validate([
             'title' => 'required|string|max:255',

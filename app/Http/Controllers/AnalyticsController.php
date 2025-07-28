@@ -10,7 +10,7 @@ class AnalyticsController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = 2;
+        $perPage = 1;
 
         // ✅ Paginate classes with students and grades
         $classes = ClassModel::with('students.grades')->paginate($perPage);

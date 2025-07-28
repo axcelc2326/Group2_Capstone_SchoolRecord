@@ -12,7 +12,8 @@ use App\Http\Controllers\{
     TeacherController,
     AdminController,
     DashboardController,
-    UserManagementController
+    UserManagementController,
+    TeacherStudentController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 
     Route::get('/students/register', [StudentController::class, 'create'])->name('students.create');
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+    Route::get('/students/{id}/edit', [StudentController::class, 'edit'])->name('students.edit');
+    Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
+    Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('students.destroy');
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 });
@@ -74,6 +78,11 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
     Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
+
+    Route::put('/students/{student}/unapprove', [TeacherStudentController::class, 'unapproveStudent'])->name('teacher.students.unapprove');
+    Route::put('/teacher/students/unapprove-all', [TeacherStudentController::class, 'unapproveAll'])->name('teacher.students.unapproveAll');
+    Route::delete('/teacher/students/{student}/clear-grades', [TeacherStudentController::class, 'clearGrades'])->name('teacher.students.clearGrades');
+    Route::delete('/teacher/students/clear-all-grades', [TeacherStudentController::class, 'clearAllGrades'])->name('teacher.students.clearAllGrades');
 
     Route::get('/teacher/students', [TeacherController::class, 'myStudents'])->name('teacher.students');
 
