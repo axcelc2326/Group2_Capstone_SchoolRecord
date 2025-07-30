@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Student;
+use App\Models\Grade;
 use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -47,6 +49,8 @@ class AnalyticsController extends Controller
                 'subject_averages' => $subjectAverages,
                 'top_subject' => $topSubject,
                 'low_subject' => $lowSubject,
+                'total_students' => $class->students->count(),
+                'id' => $class->id, // ✅ Add this line
             ];
         });
 
@@ -60,6 +64,31 @@ class AnalyticsController extends Controller
                 'prev_page_url' => $classes->previousPageUrl(),
                 'path' => $classes->path(),
             ],
+        ]);
+    }
+
+    public function showClassStudents($id)
+    {
+        $class = ClassModel::with('students.user', 'students.grades')->findOrFail($id);
+
+        $students = $class->students->map(function ($student) {
+            $average = round($student->grades->avg('grade') ?? 0, 2);
+
+            $name = optional($student->parent)->fname
+                ? trim($student->parent->fname . ' ' . $student->parent->lname)
+                : trim($student->first_name . ' ' . $student->last_name);
+
+            return [
+                'id' => $student->id,
+                'name' => $name,
+                'average' => $average,
+            ];
+        })->sortByDesc('average')->values()->all(); // Rank by average
+
+        return Inertia::render('Analytics/ClassStudents', [
+            'class_name' => $class->name,
+            'grade_level' => $class->grade_level,
+            'students' => $students,
         ]);
     }
 }

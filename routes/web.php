@@ -116,6 +116,7 @@ Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
     Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics/class/{id}/students', [AnalyticsController::class, 'showClassStudents'])->name('analytics.class.students');
 });
 
 // ✅ Breeze Auth Routes

@@ -15,7 +15,11 @@ const goToPage = (url) => {
     if (url) router.visit(url);
 };
 
-// Modern chart configurations with enhanced colors
+const viewClassStudents = (classId) => {
+    router.visit(route('analytics.class.students', { id: classId }))
+}
+
+// Modern chart configurations with gray colors
 const getDonutChartOptions = (classData, idx) => ({
   chart: {
     id: 'subject-donut-' + idx,
@@ -27,7 +31,7 @@ const getDonutChartOptions = (classData, idx) => ({
       speed: 800
     }
   },
-  colors: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'],
+  colors: ['#6b7280', '#9ca3af', '#4b5563', '#d1d5db', '#374151', '#e5e7eb', '#1f2937', '#f3f4f6'],
   labels: Object.keys(classData.subject_averages),
   dataLabels: {
     enabled: true,
@@ -54,7 +58,7 @@ const getDonutChartOptions = (classData, idx) => ({
             label: 'Average',
             fontSize: '18px',
             fontWeight: 700,
-            color: '#2d3748',
+            color: '#374151',
             formatter: () => {
               const values = Object.values(classData.subject_averages);
               const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
@@ -70,7 +74,7 @@ const getDonutChartOptions = (classData, idx) => ({
     fontSize: '13px',
     fontWeight: 600,
     labels: {
-      colors: '#2d3748'
+      colors: '#374151'
     }
   },
   tooltip: {
@@ -101,18 +105,18 @@ const getAreaChartOptions = (classData, idx) => ({
     categories: Object.keys(classData.subject_averages),
     labels: {
       style: {
-        colors: '#2d3748',
+        colors: '#374151',
         fontSize: '13px',
         fontWeight: 600
       }
     },
     axisBorder: { 
       show: true,
-      color: '#cbd5e0'
+      color: '#d1d5db'
     },
     axisTicks: { 
       show: true,
-      color: '#cbd5e0'
+      color: '#d1d5db'
     }
   },
   yaxis: {
@@ -120,18 +124,18 @@ const getAreaChartOptions = (classData, idx) => ({
     max: 100,
     labels: {
       style: {
-        colors: '#2d3748',
+        colors: '#374151',
         fontSize: '13px',
         fontWeight: 500
       }
     }
   },
-  colors: ['#667eea'],
+  colors: ['#6b7280'],
   fill: {
     type: 'gradient',
     gradient: {
       shade: 'light',
-      gradientToColors: ['#764ba2'],
+      gradientToColors: ['#4b5563'],
       shadeIntensity: 1,
       type: 'vertical',
       opacityFrom: 0.8,
@@ -143,7 +147,7 @@ const getAreaChartOptions = (classData, idx) => ({
     curve: 'smooth'
   },
   grid: {
-    borderColor: '#e2e8f0',
+    borderColor: '#e5e7eb',
     strokeDashArray: 3
   },
   tooltip: {
@@ -174,18 +178,18 @@ const getBarChartOptions = (classData, idx) => ({
     categories: Object.keys(classData.subject_averages),
     labels: {
       style: {
-        colors: '#2d3748',
+        colors: '#374151',
         fontSize: '13px',
         fontWeight: 600
       }
     },
     axisBorder: { 
       show: true,
-      color: '#cbd5e0'
+      color: '#d1d5db'
     },
     axisTicks: { 
       show: true,
-      color: '#cbd5e0'
+      color: '#d1d5db'
     }
   },
   yaxis: {
@@ -193,13 +197,13 @@ const getBarChartOptions = (classData, idx) => ({
     max: 100,
     labels: {
       style: {
-        colors: '#2d3748',
+        colors: '#374151',
         fontSize: '13px',
         fontWeight: 500
       }
     }
   },
-  colors: ['#ff6b6b'],
+  colors: ['#6b7280'],
   plotOptions: {
     bar: {
       borderRadius: 10,
@@ -211,7 +215,7 @@ const getBarChartOptions = (classData, idx) => ({
     type: 'gradient',
     gradient: {
       shade: 'light',
-      gradientToColors: ['#ee5a6f'],
+      gradientToColors: ['#4b5563'],
       shadeIntensity: 1,
       type: 'vertical',
       opacityFrom: 1,
@@ -219,7 +223,7 @@ const getBarChartOptions = (classData, idx) => ({
     }
   },
   grid: {
-    borderColor: '#e2e8f0',
+    borderColor: '#e5e7eb',
     strokeDashArray: 3
   },
   tooltip: {
@@ -273,12 +277,12 @@ const getChartOptions = (classData, idx) => {
   }
 };
 
-// Performance calculations with enhanced colors
+// Performance calculations with gray colors
 const getPerformanceLevel = (average) => {
-  if (average >= 90) return { label: 'Excellent', color: 'from-green-500 to-green-600', textColor: 'text-white', bgColor: 'bg-green-50', borderColor: 'border-green-200', icon: '🏆' };
-  if (average >= 80) return { label: 'Good', color: 'from-blue-500 to-blue-600', textColor: 'text-white', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', icon: '👍' };
-  if (average >= 70) return { label: 'Fair', color: 'from-yellow-500 to-yellow-600', textColor: 'text-white', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-200', icon: '⚡' };
-  return { label: 'Needs Improvement', color: 'from-red-500 to-red-600', textColor: 'text-white', bgColor: 'bg-red-50', borderColor: 'border-red-200', icon: '⚠️' };
+  if (average >= 90) return { label: 'Excellent', color: 'from-gray-700 to-gray-800', textColor: 'text-white', bgColor: 'bg-gray-50', borderColor: 'border-gray-200', icon: '🏆' };
+  if (average >= 80) return { label: 'Good', color: 'from-gray-600 to-gray-700', textColor: 'text-white', bgColor: 'bg-gray-50', borderColor: 'border-gray-200', icon: '👍' };
+  if (average >= 70) return { label: 'Fair', color: 'from-gray-500 to-gray-600', textColor: 'text-white', bgColor: 'bg-gray-50', borderColor: 'border-gray-200', icon: '⚡' };
+  return { label: 'Needs Improvement', color: 'from-gray-400 to-gray-500', textColor: 'text-white', bgColor: 'bg-gray-50', borderColor: 'border-gray-200', icon: '⚠️' };
 };
 
 const getOverallAverage = (classData) => {
@@ -315,12 +319,11 @@ const pageUrl = (page) => {
 
 <template>
   <AuthenticatedLayout>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
       <!-- Animated Background Elements -->
       <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-400/8 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gray-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gray-600/8 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       <div class="relative z-10">
@@ -328,19 +331,19 @@ const pageUrl = (page) => {
         <div class="mb-8">
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+              <div class="w-12 h-12 bg-gradient-to-r from-gray-700 to-gray-800 rounded-2xl flex items-center justify-center shadow-lg shadow-gray-500/25">
                 <span class="text-white text-2xl">📊</span>
               </div>
               <div>
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                   Performance Analytics
                 </h1>
-                <p class="text-slate-700 text-lg font-medium">Advanced insights with interactive visualizations</p>
+                <p class="text-gray-700 text-lg font-medium">Advanced insights with interactive visualizations</p>
               </div>
             </div>
 
             <!-- Chart Type Selector -->
-            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-2xl p-2 border border-slate-200 shadow-lg">
+            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-2xl p-2 border border-gray-200 shadow-lg">
               <button
                 v-for="type in ['bar', 'area', 'donut']"
                 :key="type"
@@ -348,8 +351,8 @@ const pageUrl = (page) => {
                 :class="[
                   'px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 capitalize',
                   selectedChart === type
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white shadow-lg shadow-purple-500/25'
-                    : 'text-slate-700 hover:text-purple-600 hover:bg-purple-50'
+                    ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-lg shadow-gray-500/25'
+                    : 'text-gray-700 hover:text-gray-800 hover:bg-gray-50'
                 ]"
               >
                 {{ type }}
@@ -361,10 +364,10 @@ const pageUrl = (page) => {
         <!-- Analytics Cards Grid -->
         <div class="space-y-8">
           <div v-for="(classData, idx) in analytics" :key="idx" 
-               class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl shadow-xl hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 overflow-hidden group">
+               class="bg-white/80 backdrop-blur-xl border border-gray-200 rounded-3xl shadow-xl hover:shadow-2xl hover:shadow-gray-500/10 transition-all duration-500 overflow-hidden group">
             
             <!-- Class Header -->
-            <div class="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 p-8 text-white">
+            <div class="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 p-8 text-white">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-6">
                   <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-lg border border-white/30">
@@ -372,23 +375,40 @@ const pageUrl = (page) => {
                   </div>
                   <div>
                     <h2 class="text-3xl font-bold text-white mb-2">{{ classData.class }}</h2>
-                    <div class="flex items-center gap-4 text-blue-100">
+                    <div class="flex items-center gap-4 text-gray-200">
                       <span class="flex items-center gap-2">
-                        <div class="w-2 h-2 bg-blue-200 rounded-full animate-pulse"></div>
+                        <div class="w-2 h-2 bg-gray-300 rounded-full animate-pulse"></div>
                         Grade {{ classData.grade_level }}
                       </span>
                       <span class="flex items-center gap-2">
-                        <div class="w-2 h-2 bg-indigo-200 rounded-full animate-pulse delay-150"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
                         {{ Object.keys(classData.subject_averages).length }} Subjects
+                      </span>
+                      <span class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
+                        {{ classData.total_students }} Students
                       </span>
                     </div>
                   </div>
                 </div>
-                <div class="text-right">
-                  <div class="text-5xl font-bold text-white mb-1">
-                    {{ getOverallAverage(classData).toFixed(1) }}%
+                <div class="flex items-center gap-6">
+                  <!-- View Students Button -->
+                  <button
+                    @click="viewClassStudents(classData.id)"
+                    class="group bg-white text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:text-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl border border-gray-100 hover:border-gray-200 flex items-center gap-3"
+                  >
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                    </svg>
+                    View Students
+                  </button>
+
+                  <div class="text-right">
+                    <div class="text-5xl font-bold text-white mb-1">
+                      {{ getOverallAverage(classData).toFixed(1) }}%
+                    </div>
+                    <div class="text-gray-200 text-lg">Overall Average</div>
                   </div>
-                  <div class="text-blue-100 text-lg">Overall Average</div>
                 </div>
               </div>
             </div>
@@ -397,13 +417,13 @@ const pageUrl = (page) => {
               <!-- Performance Overview Cards -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <!-- Overall Performance -->
-                <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300">
+                <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                    <div class="w-14 h-14 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl flex items-center justify-center shadow-lg shadow-gray-500/25">
                       <span class="text-white text-xl">📈</span>
                     </div>
                     <div>
-                      <div class="text-slate-600 text-sm mb-1 font-medium">Performance Level</div>
+                      <div class="text-gray-600 text-sm mb-1 font-medium">Performance Level</div>
                       <div class="flex items-center gap-3">
                         <span class="text-2xl">{{ getPerformanceLevel(getOverallAverage(classData)).icon }}</span>
                         <span class="px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r shadow-lg" 
@@ -416,15 +436,15 @@ const pageUrl = (page) => {
                 </div>
 
                 <!-- Top Subject -->
-                <div class="bg-emerald-50/95 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300">
+                <div class="bg-gray-50/95 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                    <div class="w-14 h-14 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl flex items-center justify-center shadow-lg shadow-gray-500/25">
                       <span class="text-white text-xl">🏆</span>
                     </div>
                     <div>
-                      <div class="text-emerald-700 text-sm mb-1 font-medium">Top Performing</div>
-                      <div class="font-bold text-emerald-800 text-lg">{{ classData.top_subject }}</div>
-                      <div class="text-emerald-600 text-sm font-medium">
+                      <div class="text-gray-700 text-sm mb-1 font-medium">Top Performing</div>
+                      <div class="font-bold text-gray-800 text-lg">{{ classData.top_subject }}</div>
+                      <div class="text-gray-600 text-sm font-medium">
                         {{ classData.subject_averages[classData.top_subject]?.toFixed(1) }}% Average
                       </div>
                     </div>
@@ -432,15 +452,15 @@ const pageUrl = (page) => {
                 </div>
 
                 <!-- Lowest Subject -->
-                <div class="bg-amber-50/95 backdrop-blur-sm rounded-2xl p-6 border border-amber-200 hover:border-amber-300 hover:shadow-lg transition-all duration-300">
+                <div class="bg-gray-100/95 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+                    <div class="w-14 h-14 bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl flex items-center justify-center shadow-lg shadow-gray-500/25">
                       <span class="text-white text-xl">📚</span>
                     </div>
                     <div>
-                      <div class="text-amber-700 text-sm mb-1 font-medium">Needs Focus</div>
-                      <div class="font-bold text-amber-800 text-lg">{{ classData.low_subject }}</div>
-                      <div class="text-amber-600 text-sm font-medium">
+                      <div class="text-gray-700 text-sm mb-1 font-medium">Needs Focus</div>
+                      <div class="font-bold text-gray-800 text-lg">{{ classData.low_subject }}</div>
+                      <div class="text-gray-600 text-sm font-medium">
                         {{ classData.subject_averages[classData.low_subject]?.toFixed(1) }}% Average
                       </div>
                     </div>
@@ -449,16 +469,16 @@ const pageUrl = (page) => {
               </div>
 
               <!-- Chart Section -->
-              <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 mb-8 shadow-sm">
-                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                  <div class="w-3 h-3 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full animate-pulse"></div>
+              <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 mb-8 shadow-sm">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                  <div class="w-3 h-3 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full animate-pulse"></div>
                   Interactive Performance Visualization
-                  <span class="text-sm font-semibold text-purple-600 ml-2 px-3 py-1 bg-purple-50 rounded-full border border-purple-200">
+                  <span class="text-sm font-semibold text-gray-700 ml-2 px-3 py-1 bg-gray-50 rounded-full border border-gray-200">
                     {{ selectedChart.toUpperCase() }}
                   </span>
                 </h3>
                 
-                <div class="chart-container bg-gradient-to-br from-slate-50 to-blue-50/50 rounded-xl p-6 border border-slate-100">
+                <div class="chart-container bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-6 border border-gray-100">
                   <ApexCharts
                     :type="selectedChart"
                     height="400"
@@ -470,21 +490,21 @@ const pageUrl = (page) => {
 
               <!-- Subject Details Grid -->
               <div>
-                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                  <div class="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse"></div>
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                  <div class="w-3 h-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-full animate-pulse"></div>
                   Subject Performance Details
                 </h3>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div v-for="(average, subject) in classData.subject_averages" :key="subject"
-                       class="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-slate-200 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 group">
+                       class="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-gray-200 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-500/10 transition-all duration-300 group">
                     <div class="flex items-center justify-between">
                       <div>
-                        <div class="font-semibold text-slate-800 text-lg group-hover:text-purple-600 transition-colors">{{ subject }}</div>
-                        <div class="text-slate-600 text-sm font-medium">Class Average</div>
+                        <div class="font-semibold text-gray-800 text-lg group-hover:text-gray-700 transition-colors">{{ subject }}</div>
+                        <div class="text-gray-600 text-sm font-medium">Class Average</div>
                       </div>
                       <div class="text-right">
-                        <div class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+                        <div class="text-2xl font-bold bg-gradient-to-r from-gray-700 to-gray-800 bg-clip-text text-transparent">
                           {{ average.toFixed(1) }}%
                         </div>
                         <div class="text-xs px-2 py-1 rounded-full bg-gradient-to-r shadow-sm mt-1 font-semibold" 
@@ -502,14 +522,14 @@ const pageUrl = (page) => {
 
         <!-- Modern Pagination -->
         <div v-if="pagination" class="mt-12">
-          <div class="bg-white/90 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl p-6">
+          <div class="bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-xl p-6">
             <div class="flex flex-wrap justify-center items-center space-x-2 gap-y-3">
 
               <!-- Previous Button -->
               <button
                 @click="goToPage(pagination.prev_page_url)"
                 :disabled="!pagination.prev_page_url"
-                class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:from-purple-600 hover:to-blue-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-800 hover:to-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-gray-500/25"
               >
                 ← Previous
               </button>
@@ -518,7 +538,7 @@ const pageUrl = (page) => {
               <template v-for="page in pages" :key="page">
                 <span
                   v-if="page === '...'"
-                  class="px-4 py-3 text-slate-500 text-lg"
+                  class="px-4 py-3 text-gray-500 text-lg"
                 >...</span>
                 <button
                   v-else
@@ -526,8 +546,8 @@ const pageUrl = (page) => {
                   :class="[
                     'px-4 py-3 rounded-xl font-semibold transition-all duration-300',
                     page === pagination.current_page
-                      ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-slate-100 text-slate-700 hover:bg-purple-50 hover:text-purple-600 border border-slate-200'
+                      ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-white shadow-lg shadow-gray-500/25'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-50 hover:text-gray-800 border border-gray-200'
                   ]"
                 >
                   {{ page }}
@@ -538,7 +558,7 @@ const pageUrl = (page) => {
               <button
                 @click="goToPage(pagination.next_page_url)"
                 :disabled="!pagination.next_page_url"
-                class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:from-purple-600 hover:to-blue-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-800 hover:to-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-gray-500/25"
               >
                 Next →
               </button>
@@ -546,13 +566,12 @@ const pageUrl = (page) => {
           </div>
         </div>
       </div>
-    </div>
   </AuthenticatedLayout>
 </template>
 
 <style scoped>
 .chart-container {
-  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(239, 246, 255, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(249, 250, 251, 0.95) 0%, rgba(243, 244, 246, 0.7) 100%);
   border-radius: 12px;
   backdrop-filter: blur(10px);
 }
@@ -563,17 +582,17 @@ const pageUrl = (page) => {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(241, 245, 249, 0.5);
+  background: rgba(243, 244, 246, 0.5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  background: linear-gradient(135deg, #6b7280, #4b5563);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  background: linear-gradient(135deg, #4b5563, #374151);
 }
 
 /* Smooth animations */
