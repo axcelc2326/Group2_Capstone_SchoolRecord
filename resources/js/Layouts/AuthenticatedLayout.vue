@@ -178,16 +178,16 @@ const groupedNavigation = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-gray-100/30 to-gray-200/50 transition-all duration-700">
+  <div class="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white transition-all duration-700">
     <!-- Modern Top Navigation -->
-    <nav class="bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-xl shadow-gray-900/10 sticky top-0 z-50 transition-all duration-500">
+    <nav class="bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-2xl shadow-black/30 sticky top-0 z-50 transition-all duration-500">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <!-- Left: Logo + School Name + User -->
           <div class="flex items-center space-x-4">
             <button
               @click="toggleMobileNavigation"
-              class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-300 hover:scale-105 hover:text-gray-900"
+              class="lg:hidden p-2 text-white/80 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105 hover:text-white"
             >
               <svg class="w-6 h-6 transition-transform duration-300" :class="{ 'rotate-90': showingNavigationDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path v-if="!showingNavigationDropdown" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -196,30 +196,30 @@ const groupedNavigation = computed(() => {
             </button>
             
             <Link :href="route('dashboard')" class="flex items-center space-x-3 group transition-all duration-300">
-              <div class="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-gray-900/25 group-hover:shadow-xl group-hover:shadow-gray-900/30 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
                 E
               </div>
               <div class="hidden sm:block">
-                <div class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent transition-all duration-300">
+                <div class="text-xl font-bold bg-gradient-to-r from-blue-100 to-indigo-100 bg-clip-text text-transparent transition-all duration-300">
                   EduPortal
                 </div>
-                <div class="text-xs text-gray-600 font-medium transition-colors duration-300 group-hover:text-gray-700">Learning Management System</div>
+                <div class="text-xs text-white/70 font-medium transition-colors duration-300 group-hover:text-white/90">Learning Management System</div>
               </div>
             </Link>
             
-            <div class="hidden xl:block pl-4 border-l border-gray-300 transition-all duration-300">
-              <div class="text-sm font-semibold text-gray-900 transition-colors duration-300">Welcome back, {{ user.name }}</div>
-              <div class="text-xs text-gray-600/70 flex items-center space-x-2 transition-all duration-300">
+            <div class="hidden xl:block pl-4 border-l border-white/20 transition-all duration-300">
+              <div class="text-sm font-semibold text-white transition-colors duration-300">Welcome back, {{ user.name }}</div>
+              <div class="text-xs text-white/60 flex items-center space-x-2 transition-all duration-300">
                 <div class="w-2 h-2 rounded-full animate-pulse transition-all duration-500"
                      :class="{
-                       'bg-purple-600 shadow-purple-600/50': isAdmin,
-                       'bg-emerald-600 shadow-emerald-600/50': isTeacher,
-                       'bg-blue-600 shadow-blue-600/50': isParent
+                       'bg-purple-400 shadow-purple-400/50': isAdmin,
+                       'bg-emerald-400 shadow-emerald-400/50': isTeacher,
+                       'bg-blue-400 shadow-blue-400/50': isParent
                      }">
                 </div>
-                <span v-if="isAdmin" class="text-purple-600 font-medium transition-colors duration-300">Administrator</span>
-                <span v-else-if="isTeacher" class="text-emerald-600 font-medium transition-colors duration-300">Teacher</span>
-                <span v-else-if="isParent" class="text-blue-600 font-medium transition-colors duration-300">Parent</span>
+                <span v-if="isAdmin" class="text-purple-300 font-medium transition-colors duration-300">Administrator</span>
+                <span v-else-if="isTeacher" class="text-emerald-300 font-medium transition-colors duration-300">Teacher</span>
+                <span v-else-if="isParent" class="text-blue-300 font-medium transition-colors duration-300">Parent</span>
               </div>
             </div>
           </div>
@@ -228,15 +228,15 @@ const groupedNavigation = computed(() => {
           <div class="flex items-center space-x-4">
             <Dropdown align="right" width="full">
               <template #trigger>
-                <button class="flex items-center px-4 py-2 bg-gray-100/80 border border-gray-300 rounded-2xl text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 shadow-lg shadow-gray-200/20 hover:shadow-xl hover:shadow-gray-300/30 transition-all duration-300 hover:scale-105 group">
-                  <div class="w-10 h-10 bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-xl flex items-center justify-center text-sm font-bold mr-3 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <button class="flex items-center px-4 py-2 bg-white/10 border border-white/20 rounded-2xl text-sm text-white hover:bg-white/20 shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 hover:scale-105 group">
+                  <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-xl flex items-center justify-center text-sm font-bold mr-3 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
                     {{ user.name.charAt(0).toUpperCase() }}
                   </div>
                   <div class="text-left hidden sm:block">
-                    <div class="text-sm text-gray-900 font-semibold transition-colors duration-300">{{ user.name }}</div>
-                    <div class="text-xs text-gray-600 transition-colors duration-300">{{ user.email }}</div>
+                    <div class="text-sm text-white font-semibold transition-colors duration-300">{{ user.name }}</div>
+                    <div class="text-xs text-white/70 transition-colors duration-300">{{ user.email }}</div>
                   </div>
-                  <svg class="ml-3 h-4 w-4 transition-all duration-300 text-gray-500 group-hover:text-gray-700" 
+                  <svg class="ml-3 h-4 w-4 transition-all duration-300 text-white/70 group-hover:text-white" 
                        :class="{ 'rotate-180': showingNavigationDropdown }"
                        viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -265,15 +265,15 @@ const groupedNavigation = computed(() => {
       </div>
 
       <!-- Mobile Navigation Menu -->
-      <div v-show="showingNavigationDropdown" class="lg:hidden border-t bg-white/95 backdrop-blur-xl shadow-xl transition-all duration-500 mobile-menu-enter">
+      <div v-show="showingNavigationDropdown" class="lg:hidden border-t border-white/20 bg-white/10 backdrop-blur-xl shadow-xl transition-all duration-500 mobile-menu-enter">
         <div class="px-4 py-6 space-y-4">
-          <div class="flex items-center space-x-3 pb-4 border-b border-gray-200 transition-all duration-300">
-            <div class="w-12 h-12 bg-gradient-to-br from-gray-900 to-gray-700 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-300">
+          <div class="flex items-center space-x-3 pb-4 border-b border-white/20 transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-300">
               {{ user.name.charAt(0).toUpperCase() }}
             </div>
             <div>
-              <div class="text-base font-semibold text-gray-900 transition-colors duration-300">{{ user.name }}</div>
-              <div class="text-sm text-gray-600/70 transition-colors duration-300">{{ user.email }}</div>
+              <div class="text-base font-semibold text-white transition-colors duration-300">{{ user.name }}</div>
+              <div class="text-sm text-white/70 transition-colors duration-300">{{ user.email }}</div>
             </div>
           </div>
           
@@ -283,18 +283,18 @@ const groupedNavigation = computed(() => {
             :class="[
               'flex items-center space-x-3 py-3 px-4 rounded-xl transition-all duration-300 group',
               isActiveRoute(route('dashboard')) 
-                ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/30 scale-[1.02]' 
-                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:scale-[1.02]'
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]' 
+                : 'text-white/80 hover:bg-white/10 hover:text-white hover:scale-[1.02]'
             ]"
             @click="showingNavigationDropdown = false"
           >
-            <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+            <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
             <span class="font-medium transition-all duration-300">Dashboard</span>
           </Link>
           
           <!-- Mobile Navigation Sections -->
           <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-2">
-            <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 px-2 transition-colors duration-300">
+            <h3 class="text-xs font-bold text-white/60 uppercase tracking-wider mb-3 px-2 transition-colors duration-300">
               {{ category }}
             </h3>
             <div class="space-y-1">
@@ -305,12 +305,12 @@ const groupedNavigation = computed(() => {
                 :class="[
                   'flex items-center space-x-3 py-3 px-4 rounded-xl transition-all duration-300 group',
                   isActiveRoute(item.href) 
-                    ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/30 scale-[1.02]' 
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:scale-[1.02]'
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]' 
+                    : 'text-white/80 hover:bg-white/10 hover:text-white hover:scale-[1.02]'
                 ]"
                 @click="showingNavigationDropdown = false"
               >
-                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
                 <span class="font-medium transition-all duration-300">{{ item.name }}</span>
               </Link>
             </div>
@@ -323,7 +323,7 @@ const groupedNavigation = computed(() => {
     <div class="flex flex-1">
       <!-- Modern Sidebar -->
       <aside :class="[
-        'bg-white/95 backdrop-blur-xl border-r border-gray-200/50 transition-all duration-500 ease-in-out shadow-2xl shadow-gray-200/20',
+        'bg-white/10 backdrop-blur-xl border-r border-white/20 transition-all duration-500 ease-in-out shadow-2xl shadow-black/20',
         sidebarCollapsed ? 'w-0 lg:w-20' : 'w-72',
         'hidden lg:block'
       ]">
@@ -332,7 +332,7 @@ const groupedNavigation = computed(() => {
           <div class="flex justify-end mb-6" v-if="!sidebarCollapsed">
             <button 
               @click="toggleSidebar"
-              class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-300 hover:scale-105"
+              class="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105"
             >
               <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -343,7 +343,7 @@ const groupedNavigation = computed(() => {
           <div v-if="sidebarCollapsed" class="flex justify-center mb-8">
             <button 
               @click="toggleSidebar"
-              class="p-3 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-300 hover:scale-105"
+              class="p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105"
             >
               <svg class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -354,7 +354,7 @@ const groupedNavigation = computed(() => {
           <!-- Navigation -->
           <nav class="space-y-8" v-if="!sidebarCollapsed">
             <div>
-              <h2 class="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6 transition-all duration-300">
+              <h2 class="text-lg font-bold bg-gradient-to-r from-blue-100 to-indigo-100 bg-clip-text text-transparent mb-6 transition-all duration-300">
                 Quick Actions
               </h2>
               
@@ -364,11 +364,11 @@ const groupedNavigation = computed(() => {
                 :class="[
                   'group flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-500 border-l-4 relative overflow-hidden',
                   isActiveRoute(route('dashboard'))
-                    ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white border-gray-900 shadow-xl shadow-gray-900/30 scale-[1.02]'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 border-transparent hover:border-gray-600 hover:scale-[1.02]'
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-xl shadow-blue-500/30 scale-[1.02]'
+                    : 'text-white/80 hover:text-white hover:bg-white/10 border-transparent hover:border-blue-400 hover:scale-[1.02]'
                 ]"
               >
-                <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+                <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
                 <span class="font-semibold transition-all duration-300">Dashboard</span>
                 <div v-if="isActiveRoute(route('dashboard'))" class="ml-auto">
                   <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
@@ -376,13 +376,13 @@ const groupedNavigation = computed(() => {
                 <!-- Active state indicator -->
                 <div v-if="isActiveRoute(route('dashboard'))" class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full transition-all duration-300"></div>
                 <!-- Hover effect background -->
-                <div v-if="!isActiveRoute(route('dashboard'))" class="absolute inset-0 bg-gradient-to-r from-gray-500/0 via-gray-500/10 to-gray-500/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                <div v-if="!isActiveRoute(route('dashboard'))" class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
               </Link>
             </div>
 
             <!-- Role-based Navigation Sections -->
             <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-3">
-              <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 px-2 transition-colors duration-300">
+              <h3 class="text-sm font-bold text-white/80 uppercase tracking-wider mb-4 px-2 transition-colors duration-300">
                 {{ category }}
               </h3>
               <div class="space-y-2">
@@ -393,11 +393,11 @@ const groupedNavigation = computed(() => {
                   :class="[
                     'group flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-500 border-l-4 relative overflow-hidden',
                     isActiveRoute(item.href)
-                      ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white border-gray-900 shadow-xl shadow-gray-900/30 scale-[1.02]'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 border-transparent hover:border-gray-600 hover:scale-[1.02]'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-xl shadow-blue-500/30 scale-[1.02]'
+                      : 'text-white/80 hover:text-white hover:bg-white/10 border-transparent hover:border-blue-400 hover:scale-[1.02]'
                   ]"
                 >
-                  <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+                  <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
                   <span class="font-semibold transition-all duration-300">{{ item.name }}</span>
                   <div v-if="isActiveRoute(item.href)" class="ml-auto">
                     <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
@@ -405,7 +405,7 @@ const groupedNavigation = computed(() => {
                   <!-- Active state indicator -->
                   <div v-if="isActiveRoute(item.href)" class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full transition-all duration-300"></div>
                   <!-- Hover effect background -->
-                  <div v-if="!isActiveRoute(item.href)" class="absolute inset-0 bg-gradient-to-r from-gray-500/0 via-gray-500/10 to-gray-500/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                  <div v-if="!isActiveRoute(item.href)" class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                 </Link>
               </div>
             </div>
@@ -418,18 +418,18 @@ const groupedNavigation = computed(() => {
               :class="[
                 'group flex items-center justify-center p-4 rounded-2xl transition-all duration-500 relative',
                 isActiveRoute(route('dashboard'))
-                  ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl shadow-gray-900/30 scale-110'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:scale-110'
+                  ? 'bg-gradient-to-b from-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-500/30 scale-110'
+                  : 'text-white/70 hover:text-white hover:bg-white/10 hover:scale-110'
               ]"
               :title="'Dashboard'"
             >
-              <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+              <div v-html="navigationItems[0].icon" :class="isActiveRoute(route('dashboard')) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
               <!-- Active state indicator -->
               <div v-if="isActiveRoute(route('dashboard'))" class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full transition-all duration-300"></div>
             </Link>
             
             <div v-for="(items, category) in groupedNavigation" :key="category" class="space-y-3">
-              <div class="w-full h-px bg-gray-300 my-4 transition-colors duration-300"></div>
+              <div class="w-full h-px bg-white/20 my-4 transition-colors duration-300"></div>
               <Link 
                 v-for="item in items" 
                 :key="item.name"
@@ -437,12 +437,12 @@ const groupedNavigation = computed(() => {
                 :class="[
                   'group flex items-center justify-center p-4 rounded-2xl transition-all duration-500 relative',
                   isActiveRoute(item.href)
-                    ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl shadow-gray-900/30 scale-110'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:scale-110'
+                    ? 'bg-gradient-to-b from-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-500/30 scale-110'
+                    : 'text-white/70 hover:text-white hover:bg-white/10 hover:scale-110'
                 ]"
                 :title="item.name"
               >
-                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-gray-600 group-hover:text-gray-900 transition-colors duration-300'"></div>
+                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
                 <!-- Active state indicator -->
                 <div v-if="isActiveRoute(item.href)" class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full transition-all duration-300"></div>
               </Link>
@@ -456,15 +456,15 @@ const groupedNavigation = computed(() => {
         <!-- Main Content -->
         <main class="flex-1 p-6">
           <header v-if="$slots.header" class="mb-8">
-            <div class="bg-white/95 backdrop-blur-xl rounded-3xl border border-gray-200/50 p-8 shadow-2xl shadow-gray-200/20 transition-all duration-500 hover:shadow-3xl hover:shadow-gray-300/25">
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl shadow-black/20 transition-all duration-500 hover:shadow-3xl hover:shadow-black/25">
               <slot name="header" />
             </div>
           </header>
           
-          <div class="bg-white/95 backdrop-blur-xl rounded-3xl border border-gray-200/50 p-8 shadow-2xl shadow-gray-200/20 min-h-96 relative overflow-hidden transition-all duration-500 hover:shadow-3xl hover:shadow-gray-300/25">
+          <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl shadow-black/20 min-h-96 relative overflow-hidden transition-all duration-500 hover:shadow-3xl hover:shadow-black/25">
             <!-- Background decoration -->
-            <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-200/30 to-transparent rounded-full -translate-y-32 translate-x-32 transition-all duration-700"></div>
-            <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-gray-100/50 to-transparent rounded-full translate-y-24 -translate-x-24 transition-all duration-700"></div>
+            <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full -translate-y-32 translate-x-32 transition-all duration-700"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-400/30 to-transparent rounded-full translate-y-24 -translate-x-24 transition-all duration-700"></div>
             
             <div class="relative z-10">
               <slot />
@@ -473,40 +473,40 @@ const groupedNavigation = computed(() => {
         </main>
 
         <!-- Modern Footer -->
-        <footer class="bg-white/95 backdrop-blur-xl border-t border-gray-200/50 shadow-2xl shadow-gray-200/20 mt-8 transition-all duration-500">
+        <footer class="bg-white/10 backdrop-blur-xl border-t border-white/20 shadow-2xl shadow-black/20 mt-8 transition-all duration-500">
           <div class="max-w-7xl mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left space-y-6 md:space-y-0 md:space-x-8">
               <!-- Company Info -->
               <div class="flex items-center justify-center space-x-4 md:justify-start group">
-                <div class="w-14 h-14 bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-xl shadow-gray-900/25 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-xl shadow-blue-500/25 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
                   E
                 </div>
                 <div>
-                  <div class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent transition-all duration-300">
+                  <div class="text-2xl font-bold bg-gradient-to-r from-blue-100 to-indigo-100 bg-clip-text text-transparent transition-all duration-300">
                     EduPortal
                   </div>
-                  <div class="text-sm text-gray-600 font-medium transition-colors duration-300 group-hover:text-gray-700">Learning Management System</div>
+                  <div class="text-sm text-white/70 font-medium transition-colors duration-300 group-hover:text-white/90">Learning Management System</div>
                 </div>
               </div>
 
               <!-- Paragraph -->
-              <p class="text-gray-600 text-sm max-w-xl mx-auto md:mx-0 leading-relaxed transition-colors duration-300 hover:text-gray-700">
+              <p class="text-white/70 text-sm max-w-xl mx-auto md:mx-0 leading-relaxed transition-colors duration-300 hover:text-white/90">
                 Empowering education through innovative technology solutions.
                 Connecting students, teachers, and parents in a seamless learning experience.
               </p>
             </div>
             <!-- Bottom Footer -->
-            <div class="border-t border-gray-200 pt-6 mt-8 transition-colors duration-300">
+            <div class="border-t border-white/20 pt-6 mt-8 transition-colors duration-300">
               <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-sm text-gray-600 transition-colors duration-300 hover:text-gray-700">
+                <div class="text-sm text-white/70 transition-colors duration-300 hover:text-white/90">
                   © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
                 </div>
                 <div class="flex items-center space-x-6">
-                  <div class="flex items-center space-x-2 text-sm text-gray-500 transition-colors duration-300">
+                  <div class="flex items-center space-x-2 text-sm text-white/60 transition-colors duration-300">
                     <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-                    <span class="hover:text-gray-600 transition-colors duration-300">All systems operational</span>
+                    <span class="hover:text-white/80 transition-colors duration-300">All systems operational</span>
                   </div>
-                  <div class="text-xs text-gray-400 font-medium bg-gray-100 px-3 py-1 rounded-full transition-all duration-300 hover:bg-gray-200 hover:text-gray-500">
+                  <div class="text-xs text-white/50 font-medium bg-white/10 px-3 py-1 rounded-full transition-all duration-300 hover:bg-white/20 hover:text-white/70">
                     v2.1.0
                   </div>
                 </div>
@@ -542,13 +542,13 @@ aside::-webkit-scrollbar-track {
 }
 
 aside::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
   transition: background 0.3s ease;
 }
 
 aside::-webkit-scrollbar-thumb:hover {
-  background: #d1d5db;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Enhanced gradient text animation */
@@ -611,7 +611,7 @@ aside::-webkit-scrollbar-thumb:hover {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transition: left 0.6s ease-in-out;
 }
 
@@ -621,7 +621,7 @@ aside::-webkit-scrollbar-thumb:hover {
 
 /* Active state glow effect */
 .active-glow {
-  box-shadow: 0 0 20px rgba(75, 85, 99, 0.3);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
 /* Mobile menu slide animation */
@@ -650,7 +650,7 @@ aside::-webkit-scrollbar-thumb:hover {
 /* Custom focus states for accessibility */
 button:focus,
 a:focus {
-  outline: 2px solid #374151;
+  outline: 2px solid rgba(59, 130, 246, 0.5);
   outline-offset: 2px;
   border-radius: 0.75rem;
 }
@@ -664,12 +664,12 @@ a:focus {
 
 /* Enhanced shadow effects */
 .shadow-glow {
-  box-shadow: 0 10px 25px -3px rgba(75, 85, 99, 0.1), 0 4px 6px -2px rgba(75, 85, 99, 0.05);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
   transition: box-shadow 0.3s ease;
 }
 
 .shadow-glow:hover {
-  box-shadow: 0 20px 40px -3px rgba(75, 85, 99, 0.15), 0 8px 12px -2px rgba(75, 85, 99, 0.1);
+  box-shadow: 0 20px 40px -3px rgba(0, 0, 0, 0.4), 0 8px 12px -2px rgba(0, 0, 0, 0.3);
 }
 
 /* Active state indicators */
@@ -680,7 +680,7 @@ a:focus {
   transform: translateY(-50%);
   width: 2px;
   height: 24px;
-  background: #374151;
+  background: white;
   border-radius: 1px;
   transition: all 0.3s ease;
 }
@@ -705,7 +705,7 @@ a:focus {
 
 /* Enhanced shadow for elevated elements */
 .shadow-3xl {
-  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.5);
 }
 
 /* Smooth scaling animations */
@@ -726,10 +726,10 @@ a:focus {
 
 /* Modern glass morphism effect */
 .glass-effect {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Subtle animations for hover states */
@@ -783,25 +783,25 @@ a:focus {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
   transition: background 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* Improved focus ring */
 .focus-ring:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.1);
-  border-color: #6b7280;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
 /* Micro-interactions */
