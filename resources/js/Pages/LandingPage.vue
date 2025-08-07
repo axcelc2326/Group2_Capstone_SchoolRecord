@@ -1,5 +1,20 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import LoginModal from '@/Components/LoginModal.vue'
+import RegisterModal from '@/Components/RegisterModal.vue'
+import { ref } from 'vue'
+
+const showLogin = ref(false)
+const showRegister = ref(false)
+
+function openLogin() {
+  showLogin.value = true
+  showRegister.value = false
+}
+function openRegister() {
+  showRegister.value = true
+  showLogin.value = false
+}
 
 const props = defineProps({
   canLogin: Boolean,
@@ -53,27 +68,29 @@ const currentYear = new Date().getFullYear();
             </Link>
 
             <template v-else>
-              <Link
-                v-if="canLogin"
-                :href="route('login')"
-                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-medium backdrop-blur-sm hover:scale-105"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-                Login
-              </Link>
-
-              <Link
-                v-if="canRegister"
-                :href="route('register')"
-                class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-xl text-white rounded-xl hover:bg-white/20 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 font-medium hover:scale-105"
-              >
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-                Register
-              </Link>
+              <div class="flex items-center space-x-3">
+                <button 
+                  v-if="canLogin"
+                  @click="openLogin"
+                  class="inline-flex items-center px-5 py-2.5 bg-white/10 backdrop-blur-xl text-white rounded-lg hover:bg-white/20 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 font-medium hover:scale-105"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Login
+                </button>
+                
+                <button 
+                  v-if="canRegister"
+                  @click="openRegister"
+                  class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-medium backdrop-blur-sm hover:scale-105"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                  Register
+                </button>
+              </div>
             </template>
           </div>
         </div>
@@ -121,9 +138,9 @@ const currentYear = new Date().getFullYear();
             </Link>
 
             <template v-else>
-              <Link
+              <button
                 v-if="canLogin"
-                :href="route('login')"
+                @click="openLogin"
                 class="group inline-flex items-center px-10 py-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl hover:from-blue-600 hover:to-indigo-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 font-semibold text-lg backdrop-blur-sm hover:scale-105"
               >
                 <svg class="w-6 h-6 mr-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,11 +148,11 @@ const currentYear = new Date().getFullYear();
                 </svg>
                 Get Started
                 <div class="ml-2 w-2 h-2 bg-white/50 rounded-full animate-pulse"></div>
-              </Link>
+              </button>
 
-              <Link
+              <button
                 v-if="canRegister"
-                :href="route('register')"
+                @click="openRegister"
                 class="group inline-flex items-center px-10 py-5 bg-white/10 backdrop-blur-xl text-white rounded-2xl hover:bg-white/20 border border-white/30 shadow-2xl hover:shadow-xl transition-all duration-300 font-semibold text-lg hover:scale-105"
               >
                 <svg class="w-6 h-6 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +160,7 @@ const currentYear = new Date().getFullYear();
                 </svg>
                 Join Now
                 <div class="ml-2 w-2 h-2 bg-white/50 rounded-full animate-pulse"></div>
-              </Link>
+              </button>
             </template>
           </div>
         </div>
@@ -277,27 +294,27 @@ const currentYear = new Date().getFullYear();
             </Link>
 
             <template v-else>
-              <Link
+              <button
                 v-if="canRegister"
-                :href="route('register')"
+                @click="openRegister"
                 class="group inline-flex items-center px-10 py-5 bg-gradient-to-r from-white to-blue-50 text-blue-600 rounded-2xl hover:from-blue-50 hover:to-white shadow-2xl hover:shadow-white/10 transition-all duration-300 font-semibold text-lg backdrop-blur-sm hover:scale-105"
               >
                 <svg class="w-6 h-6 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
                 Get Started Today
-              </Link>
+              </button>
 
-              <Link
+              <button
                 v-if="canLogin"
-                :href="route('login')"
+                @click="openLogin"
                 class="group inline-flex items-center px-10 py-5 bg-white/10 backdrop-blur-xl text-white rounded-2xl hover:bg-white/20 border border-white/30 shadow-2xl hover:shadow-xl transition-all duration-300 font-semibold text-lg hover:scale-105"
               >
                 <svg class="w-6 h-6 mr-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
                 Sign In
-              </Link>
+              </button>
             </template>
           </div>
         </div>
@@ -305,35 +322,37 @@ const currentYear = new Date().getFullYear();
     </section>
 
     <!-- Footer -->
-    <div class="text-center space-y-6 pt-6 pb-4">
-      <div class="flex flex-wrap items-center justify-center gap-4 lg:gap-6 text-sm text-white/60">
-          <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
-              Privacy Policy
-          </a>
-          <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
-          <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
-              Terms of Service
-          </a>
-          <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
-          <a href="mailto:support@eduportal.edu" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10">
-              Support
-          </a>
+    <footer class="relative">
+      <div class="text-center space-y-6 pt-6 pb-4">
+        <div class="flex flex-wrap items-center justify-center gap-4 lg:gap-6 text-sm text-white/60">
+            <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
+                Privacy Policy
+            </a>
+            <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
+            <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
+                Terms of Service
+            </a>
+            <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
+            <a href="mailto:support@eduportal.edu" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10">
+                Support
+            </a>
+        </div>
+        
+        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/50">
+            <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+                <span class="hover:text-white/70 transition-colors duration-300">All systems operational</span>
+            </div>
+            <div class="text-xs bg-white/10 px-3 py-1 rounded-full transition-all duration-300 hover:bg-white/20">
+                v2.1.0
+            </div>
+        </div>
+        
+        <p class="text-sm text-white/40 pt-2 transition-colors duration-300 hover:text-white/60">
+            © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
+        </p>
       </div>
-      
-      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/50">
-          <div class="flex items-center space-x-2">
-              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-              <span class="hover:text-white/70 transition-colors duration-300">All systems operational</span>
-          </div>
-          <div class="text-xs bg-white/10 px-3 py-1 rounded-full transition-all duration-300 hover:bg-white/20">
-              v2.1.0
-          </div>
-      </div>
-      
-      <p class="text-sm text-white/40 pt-2 transition-colors duration-300 hover:text-white/60">
-          © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
-      </p>
-    </div>
+    </footer>
 
     <!-- Floating Elements for Visual Interest -->
     <div class="absolute top-20 left-10 w-3 h-3 bg-blue-400/30 rounded-full animate-pulse animate-float hidden lg:block shadow-lg shadow-blue-400/20"></div>
@@ -344,6 +363,18 @@ const currentYear = new Date().getFullYear();
     <!-- Additional decorative elements -->
     <div class="absolute top-1/4 left-4 w-1 h-8 bg-gradient-to-b from-blue-400/40 to-transparent rounded-full hidden xl:block animate-pulse" style="animation-delay: 1.5s;"></div>
     <div class="absolute bottom-1/4 right-4 w-1 h-6 bg-gradient-to-t from-indigo-400/40 to-transparent rounded-full hidden xl:block animate-pulse" style="animation-delay: 2.5s;"></div>
+
+    <!-- Login Modal -->
+    <LoginModal 
+      :show="showLogin" 
+      @close="showLogin = false"
+    />
+
+    <!-- Register Modal -->
+    <RegisterModal 
+      :show="showRegister" 
+      @close="showRegister = false"
+    />
   </div>
 </template>
 

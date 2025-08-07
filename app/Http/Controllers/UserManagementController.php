@@ -79,4 +79,12 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'User updated.');
     }
+
+    public function destroy(User $user)
+    {
+        // You can use soft delete if User model has `use SoftDeletes`
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('success', 'User deleted.');
+    }
 }

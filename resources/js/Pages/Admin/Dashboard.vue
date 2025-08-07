@@ -13,6 +13,7 @@ const props = defineProps({
       total_classes: 0,
       total_students: 0,
       total_teachers: 0,
+      total_parents: 0, // 👈 Ensure this is passed from controller
       overall_average: 0,
     }),
   },
@@ -33,11 +34,15 @@ const props = defineProps({
 
     <div class="py-12 max-w-6xl mx-auto space-y-6">
 
-      <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <!-- ✅ Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
         <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
           <h4 class="text-sm text-gray-600">Total Students</h4>
           <p class="text-xl font-bold text-gray-800">{{ summary.total_students }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow border-l-4 border-pink-500">
+          <h4 class="text-sm text-gray-600">Total Parents</h4>
+          <p class="text-xl font-bold text-gray-800">{{ summary.total_parents }}</p>
         </div>
         <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
           <h4 class="text-sm text-gray-600">Total Teachers</h4>
@@ -53,7 +58,7 @@ const props = defineProps({
         </div>
       </div>
 
-      <!-- Top 3 Performing Classes -->
+      <!-- 🏆 Top 3 Performing Classes -->
       <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
         <h3 class="text-lg font-semibold text-gray-700 mb-4">🏆 Top 3 Performing Classes</h3>
         <ul class="space-y-2">
@@ -66,7 +71,7 @@ const props = defineProps({
         <p v-if="topClasses.length === 0" class="text-gray-500">No class data available.</p>
       </div>
 
-      <!-- Latest Announcements -->
+      <!-- 📢 Latest Announcements -->
       <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
         <h3 class="text-lg font-semibold text-gray-700 mb-4">📢 Latest Announcements</h3>
         <ul class="space-y-4">

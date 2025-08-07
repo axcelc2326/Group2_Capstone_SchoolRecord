@@ -6,6 +6,7 @@ use App\Models\ClassModel;
 use App\Models\User;
 use App\Models\Grade;
 use App\Models\Announcement;
+use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -38,8 +39,9 @@ class DashboardController extends Controller
                 // 📊 Summary info
                 $summary = [
                     'total_classes' => ClassModel::count(),
-                    'total_students' => User::role('parent')->count(),
+                    'total_students' => Student::count(),
                     'total_teachers' => User::role('teacher')->count(),
+                    'total_parents' => User::role('parent')->count(),
                     'overall_average' => round(Grade::avg('grade') ?? 0, 2),
                 ];
 
