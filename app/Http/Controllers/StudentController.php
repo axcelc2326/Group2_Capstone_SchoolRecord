@@ -20,7 +20,7 @@ class StudentController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('Students/Create', [
+        return Inertia::render('Parent/Create', [
             'classes' => $classes,
             'students' => $students,
         ]);
@@ -43,17 +43,6 @@ class StudentController extends Controller
         ]);
 
         return redirect()->route('students.create')->with('success', 'Student registered!');
-    }
-
-    public function edit($id)
-    {
-        $student = Student::where('id', $id)->where('parent_id', auth()->id())->firstOrFail();
-        $classes = ClassModel::all();
-
-        return Inertia::render('Students/Edit', [
-            'student' => $student,
-            'classes' => $classes,
-        ]);
     }
 
     public function update(Request $request, $id)

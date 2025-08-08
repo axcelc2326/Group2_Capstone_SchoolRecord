@@ -77,7 +77,6 @@ const getPerformanceStatus = (gpa) => {
       </div>
     </template>
 
-    <div class="py-8 px-6 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
       <div class="max-w-7xl mx-auto space-y-8">
         <div
           v-for="student in students"
@@ -290,6 +289,5 @@ const getPerformanceStatus = (gpa) => {
           </div>
         </div>
       </div>
-    </div>
   </AuthenticatedLayout>
 </template>
