@@ -20,7 +20,7 @@ class StudentController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('Parent/Create', [
+        return Inertia::render('Parent/RegisterStudent', [
             'classes' => $classes,
             'students' => $students,
         ]);

@@ -9,6 +9,65 @@ use Inertia\Inertia;
 
 class AnnouncementController extends Controller
 {
+    public function index()
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('parent')) {
+            $classIds = $user->students->pluck('class_id')->toArray();
+
+            $filter = request()->query('filter', 'all'); // default: all
+
+            // 🔍 Counts
+            $totalGlobal = Announcement::whereNull('class_id')->count();
+            $totalClass = Announcement::whereIn('class_id', $classIds)->count();
+            $totalAll = $totalGlobal + $totalClass;
+
+            // 🔍 Announcements query
+            $announcementsQuery = Announcement::with('creator')
+                ->where(function ($query) use ($classIds, $filter) {
+                    if ($filter === 'global') {
+                        $query->whereNull('class_id');
+                    } elseif ($filter === 'class') {
+                        $query->whereIn('class_id', $classIds);
+                    } else { // all
+                        $query->whereNull('class_id')
+                            ->orWhereIn('class_id', $classIds);
+                    }
+                });
+
+            $announcements = $announcementsQuery
+                ->latest()
+                ->paginate(5)
+                ->withQueryString();
+
+            return Inertia::render('Announcement/Index', [
+                'announcements' => $announcements,
+                'classIds' => $classIds,
+                'filter' => $filter,
+                'counts' => [
+                    'total_announcements' => $totalAll,
+                    'total_global' => $totalGlobal,
+                    'total_class' => $totalClass
+                ],
+                'auth' => [
+                    'user' => $user
+                ]
+            ]);
+        }
+
+        // ✅ Admins and teachers only see their own announcements
+        $announcements = Announcement::with('creator')
+            ->where('created_by', $user->id)
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
+
+        return Inertia::render('Announcement/Index', [
+            'announcements' => $announcements,
+        ]);
+    }
+
     public function createAdmin()
     {
         $announcements = Announcement::where('created_by', auth()->id())
@@ -73,41 +132,6 @@ class AnnouncementController extends Controller
         ]);
 
         return redirect()->route('teacher.announcements.create')->with('success', 'Class announcement posted.');
-    }
-
-    public function index()
-    {
-        $user = auth()->user();
-
-        if ($user->hasRole('parent')) {
-            // ✅ Parents see global and class announcements
-            $classIds = $user->students->pluck('class_id')->toArray();
-
-            $announcements = Announcement::with('creator')
-                ->where(function ($query) use ($classIds) {
-                    $query->whereNull('class_id')
-                        ->orWhereIn('class_id', $classIds);
-                })
-                ->latest()
-                ->paginate(5)
-                ->withQueryString();
-
-            return Inertia::render('Announcement/Index', [
-                'announcements' => $announcements,
-                'classIds' => $classIds,
-            ]);
-        }
-
-        // ✅ Admins and teachers only see their own announcements
-        $announcements = Announcement::with('creator')
-            ->where('created_by', $user->id)
-            ->latest()
-            ->paginate(5)
-            ->withQueryString();
-
-        return Inertia::render('Announcement/Index', [
-            'announcements' => $announcements,
-        ]);
     }
 
     public function editAdmin($id)

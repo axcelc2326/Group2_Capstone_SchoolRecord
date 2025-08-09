@@ -69,9 +69,82 @@ class DashboardController extends Controller
 
             case 'teacher':
                 return Inertia::render('Teacher/Dashboard', ['user' => $user]);
+                
+case 'parent':
+    $parentId = $user->id;
 
-            case 'parent':
-                return Inertia::render('Parent/Dashboard', ['user' => $user]);
+    // 📚 Get all students linked to this parent (with grades & class info)
+    $students = Student::with('grades', 'class')
+        ->where('parent_id', $parentId)
+        ->get();
+
+    // 🧮 Student stats
+    $totalRegistered = $students->count();
+    $totalEnrolled = $students->where('approved_by_teacher', 1)->count();
+    $totalPending = $students->where('approved_by_teacher', 0)->count();
+
+    // 📊 Average grade (overall) - exclude pending students
+    $enrolledGrades = $students
+        ->where('approved_by_teacher', 1)
+        ->flatMap->grades;
+    $averageGrade = round($enrolledGrades->avg('grade') ?? 0, 2);
+
+    // 👦 Individual child performance with class name & grade level
+    $childrenPerformance = $students->map(function ($student) {
+        $className = $student->class->name ?? null;
+        $gradeLevel = $student->class->grade_level ?? null;
+
+        if ($student->approved_by_teacher != 1) {
+            return [
+                'name' => "{$student->first_name} {$student->last_name}",
+                'class_name' => $className ?? 'No Class Assigned',
+                'grade_level' => $gradeLevel ?? 'No Grade Level',
+                'average' => null,
+                'status' => 'Pending Approval',
+            ];
+        }
+
+        $avg = round($student->grades->avg('grade') ?? 0, 2);
+        return [
+            'name' => "{$student->first_name} {$student->last_name}",
+            'class_name' => $className ?? 'No Class Assigned',
+            'grade_level' => $gradeLevel ?? 'No Grade Level',
+            'average' => $avg,
+            'status' => $avg >= 75 ? 'Doing Good' : 'Terrible',
+        ];
+    });
+
+    // 📢 Latest announcements (class-specific + global)
+    $classIds = $students->pluck('class_id')->unique();
+    $announcements = Announcement::with('creator:id,name')
+        ->where(function ($query) use ($classIds) {
+            $query->whereIn('class_id', $classIds)
+                ->orWhereNull('class_id'); // Include global announcements
+        })
+        ->latest()
+        ->take(3)
+        ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+        ->map(function ($announcement) {
+            return [
+                'id' => $announcement->id,
+                'title' => $announcement->title,
+                'body' => $announcement->body,
+                'created_at' => $announcement->created_at,
+                'created_by' => $announcement->creator->name ?? 'Unknown',
+            ];
+        });
+
+    return Inertia::render('Parent/Dashboard', [
+        'user' => $user,
+        'summary' => [
+            'total_registered' => $totalRegistered,
+            'total_enrolled' => $totalEnrolled,
+            'total_pending' => $totalPending,
+            'average_grade' => $averageGrade,
+        ],
+        'childrenPerformance' => $childrenPerformance,
+        'announcements' => $announcements,
+    ]);
 
             default:
                 abort(403, 'Unauthorized');
