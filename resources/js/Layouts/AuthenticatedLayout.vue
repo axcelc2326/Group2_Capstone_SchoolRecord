@@ -1,10 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import Footer from '@/Components/Footer.vue'
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
@@ -127,35 +125,35 @@ const navigationItems = computed(() => {
         href: route('classes.create'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>`,
         show: isAdmin.value,
-        category: 'Administration'
+        category: 'Admin Portal'
       },
       {
         name: 'Assign Teacher',
         href: route('admin.assign-teacher'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`,
         show: isAdmin.value,
-        category: 'Administration'
+        category: 'Admin Portal'
       },
       {
         name: 'Create Announcement',
         href: route('announcements.create'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>`,
         show: isAdmin.value,
-        category: 'Administration'
+        category: 'Admin Portal'
       },
       {
         name: 'View Analytics',
         href: route('analytics.index'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>`,
         show: isAdmin.value,
-        category: 'Administration'
+        category: 'Admin Portal'
       },
       {
         name: 'Manage Users',
         href: route('admin.users.index'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path></svg>`,
         show: isAdmin.value,
-        category: 'Administration'
+        category: 'Admin Portal'
       }
     );
   }
@@ -461,7 +459,7 @@ const groupedNavigation = computed(() => {
             </div>
           </header>
           
-          <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl shadow-black/20 min-h-96 relative overflow-hidden transition-all duration-500 hover:shadow-3xl hover:shadow-black/25">
+          <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-4 shadow-2xl shadow-black/20 min-h-96 relative overflow-hidden transition-all duration-500 hover:shadow-3xl hover:shadow-black/25">
             <!-- Background decoration -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-400/20 to-transparent rounded-full -translate-y-32 translate-x-32 transition-all duration-700"></div>
             <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-400/30 to-transparent rounded-full translate-y-24 -translate-x-24 transition-all duration-700"></div>
@@ -473,47 +471,7 @@ const groupedNavigation = computed(() => {
         </main>
 
         <!-- Modern Footer -->
-        <footer class="bg-white/10 backdrop-blur-xl border-t border-white/20 shadow-2xl shadow-black/20 mt-8 transition-all duration-500">
-          <div class="max-w-7xl mx-auto px-6 py-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left space-y-6 md:space-y-0 md:space-x-8">
-              <!-- Company Info -->
-              <div class="flex items-center justify-center space-x-4 md:justify-start group">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-lg font-bold shadow-xl shadow-blue-500/25 transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
-                  E
-                </div>
-                <div>
-                  <div class="text-2xl font-bold bg-gradient-to-r from-blue-100 to-indigo-100 bg-clip-text text-transparent transition-all duration-300">
-                    EduPortal
-                  </div>
-                  <div class="text-sm text-white/70 font-medium transition-colors duration-300 group-hover:text-white/90">Learning Management System</div>
-                </div>
-              </div>
-
-              <!-- Paragraph -->
-              <p class="text-white/70 text-sm max-w-xl mx-auto md:mx-0 leading-relaxed transition-colors duration-300 hover:text-white/90">
-                Empowering education through innovative technology solutions.
-                Connecting students, teachers, and parents in a seamless learning experience.
-              </p>
-            </div>
-            <!-- Bottom Footer -->
-            <div class="border-t border-white/20 pt-6 mt-8 transition-colors duration-300">
-              <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-sm text-white/70 transition-colors duration-300 hover:text-white/90">
-                  © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
-                </div>
-                <div class="flex items-center space-x-6">
-                  <div class="flex items-center space-x-2 text-sm text-white/60 transition-colors duration-300">
-                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-                    <span class="hover:text-white/80 transition-colors duration-300">All systems operational</span>
-                  </div>
-                  <div class="text-xs text-white/50 font-medium bg-white/10 px-3 py-1 rounded-full transition-all duration-300 hover:bg-white/20 hover:text-white/70">
-                    v2.1.0
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   </div>

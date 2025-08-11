@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import LoginModal from '@/Components/LoginModal.vue'
 import RegisterModal from '@/Components/RegisterModal.vue'
+import Footer from '@/Components/Footer.vue'
 import { ref } from 'vue'
 
 const showLogin = ref(false)
@@ -322,37 +323,7 @@ const currentYear = new Date().getFullYear();
     </section>
 
     <!-- Footer -->
-    <footer class="relative">
-      <div class="text-center space-y-6 pt-6 pb-4">
-        <div class="flex flex-wrap items-center justify-center gap-4 lg:gap-6 text-sm text-white/60">
-            <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
-                Privacy Policy
-            </a>
-            <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
-            <a href="#" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10" role="button" tabindex="0">
-                Terms of Service
-            </a>
-            <div class="w-1 h-1 bg-white/30 rounded-full animate-pulse hidden sm:block"></div>
-            <a href="mailto:support@eduportal.edu" class="hover:text-white/90 transition-all duration-300 hover:scale-105 px-3 py-1 rounded-lg hover:bg-white/10">
-                Support
-            </a>
-        </div>
-        
-        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/50">
-            <div class="flex items-center space-x-2">
-                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-                <span class="hover:text-white/70 transition-colors duration-300">All systems operational</span>
-            </div>
-            <div class="text-xs bg-white/10 px-3 py-1 rounded-full transition-all duration-300 hover:bg-white/20">
-                v2.1.0
-            </div>
-        </div>
-        
-        <p class="text-sm text-white/40 pt-2 transition-colors duration-300 hover:text-white/60">
-            © {{ currentYear }} EduPortal. All rights reserved. Built with ❤️ for education.
-        </p>
-      </div>
-    </footer>
+    <Footer />
 
     <!-- Floating Elements for Visual Interest -->
     <div class="absolute top-20 left-10 w-3 h-3 bg-blue-400/30 rounded-full animate-pulse animate-float hidden lg:block shadow-lg shadow-blue-400/20"></div>

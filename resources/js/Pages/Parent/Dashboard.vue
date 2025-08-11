@@ -129,7 +129,7 @@ const formatDateTime = (dateString) => {
                           <!-- Mobile-first child card layout -->
                           <div class="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                               <div class="flex items-center space-x-3">
-                                  <div class="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
+                                  <div class="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 flex items-center justify-center text-white font-medium text-xs sm:text-sm">
                                       {{ child.name.split(' ').map(n => n.charAt(0)).join('') }}
                                   </div>
                                   <div class="flex-1 min-w-0">

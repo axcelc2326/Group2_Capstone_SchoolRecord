@@ -183,7 +183,7 @@ const getCreatorInitials = (name) => {
 
                 <!-- Author Info -->
                 <div class="flex items-center mt-4 pt-4 border-t border-white/10">
-                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
+                  <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 flex items-center justify-center text-white text-xs font-medium">
                     {{ getCreatorInitials(announcement.creator.name) }}
                   </div>
                   <div class="ml-3 flex items-center">

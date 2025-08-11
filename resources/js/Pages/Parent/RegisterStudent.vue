@@ -189,7 +189,7 @@ const deleteStudent = (id) => {
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
-                      <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
+                      <div class="h-10 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm">
                         {{ student.first_name.charAt(0) }}{{ student.last_name.charAt(0) }}
                       </div>
                     </div>
