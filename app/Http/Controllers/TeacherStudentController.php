@@ -9,16 +9,27 @@ use App\Models\ClassModel; // Ensure this model exists for your classes
 
 class TeacherStudentController extends Controller
 {
-    // ✅ Unapprove all students in a class
+    // ✅ Unapprove all students in a class and remove their class assignment
     public function unapproveAll(Request $request)
     {
         $teacherId = auth()->id();
 
-        Student::whereHas('class', function ($query) use ($teacherId) {
+        $students = Student::whereHas('class', function ($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
-        })->update(['approved_by_teacher' => false]);
+        })->get();
 
-        return back()->with('message', 'All students unapproved.');
+        foreach ($students as $student) {
+            // Unapprove
+            $student->approved_by_teacher = false;
+            // Remove from class
+            $student->class_id = null;
+            $student->save();
+
+            // Delete all grades
+            $student->grades()->delete();
+        }
+
+        return back()->with('message', 'All students unapproved, grades cleared, and class assignments removed.');
     }
 
     // ✅ Clear all grades for all students in a class
@@ -35,11 +46,15 @@ class TeacherStudentController extends Controller
         return back()->with('message', 'All grades cleared.');
     }
 
-    // ✅ Unapprove single student
+    // ✅ Unapprove a single student, clear their grades, and remove class assignment
     public function unapproveStudent(Student $student)
     {
-        $student->update(['approved_by_teacher' => false]);
-        return back()->with('success', 'Student unapproved.');
+        $student->approved_by_teacher = false;
+        $student->class_id = null;
+        $student->grades()->delete();
+        $student->save();
+
+        return back()->with('success', 'Student unapproved, grades cleared, and removed from class.');
     }
 
     // ✅ Clear grades for a single student

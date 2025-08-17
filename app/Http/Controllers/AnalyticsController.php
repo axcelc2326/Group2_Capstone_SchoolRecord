@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Grade;
 use App\Models\ClassModel;
+use App\Models\Subject; // ✅ Import Subject
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,27 +18,19 @@ class AnalyticsController extends Controller
         // ✅ Paginate classes with students and grades
         $classes = ClassModel::with('students.grades')->paginate($perPage);
 
-        $subjectNames = [
-            1 => 'English',
-            2 => 'Filipino',
-            3 => 'Mathematics',
-            4 => 'Science',
-            5 => 'Araling Panlipunan',
-            6 => 'ESP',
-            7 => 'MAPEH',
-            8 => 'EPP/TLE'
-        ];
-
         // ✅ Map class data
-        $analytics = collect($classes->items())->map(function ($class) use ($subjectNames) {
+        $analytics = collect($classes->items())->map(function ($class) {
             $subjectAverages = [];
 
-            foreach ($subjectNames as $subjectId => $subjectName) {
-                $grades = $class->students->flatMap(function ($student) use ($subjectId) {
-                    return $student->grades->where('subject_id', $subjectId)->pluck('grade');
+            // ✅ Only fetch subjects for this class's grade level
+            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+
+            foreach ($subjects as $subject) {
+                $grades = $class->students->flatMap(function ($student) use ($subject) {
+                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
                 });
 
-                $subjectAverages[$subjectName] = round($grades->avg() ?? 0, 2);
+                $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
             }
 
             $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
@@ -50,7 +43,8 @@ class AnalyticsController extends Controller
                 'top_subject' => $topSubject,
                 'low_subject' => $lowSubject,
                 'total_students' => $class->students->count(),
-                'id' => $class->id, // ✅ Add this line
+                'id' => $class->id,
+                'subjects' => $subjects, // ✅ include subjects list
             ];
         });
 
@@ -83,7 +77,7 @@ class AnalyticsController extends Controller
                 'name' => $name,
                 'average' => $average,
             ];
-        })->sortByDesc('average')->values()->all(); // Rank by average
+        })->sortByDesc('average')->values()->all();
 
         return Inertia::render('Analytics/ClassStudents', [
             'class_name' => $class->name,

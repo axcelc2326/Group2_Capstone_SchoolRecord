@@ -115,9 +115,9 @@ function clearAllGrades() {
       </div>
 
       <div v-if="students.data.length">
-        <table class="min-w-full bg-white rounded shadow text-sm">
+        <table class="min-w-full bg-transparent rounded shadow text-sm">
           <thead>
-            <tr class="bg-gray-200 text-left text-gray-700">
+            <tr class="bg-transparent text-left text-white">
               <th class="px-4 py-2">#</th>
               <th class="px-4 py-2">Name</th>
               <th class="px-4 py-2">Actions</th>
@@ -130,7 +130,11 @@ function clearAllGrades() {
               class="border-t"
             >
               <td class="px-4 py-2">{{ index + 1 + (students.current_page - 1) * students.per_page }}</td>
-              <td class="px-4 py-2">{{ student.first_name }} {{ student.last_name }}</td>
+              <td class="px-4 py-2">{{ student.first_name }} {{ student.last_name }}
+                <span class="text-gray-500 text-sm">
+                  (Parent: {{ student.parent_name }})
+                </span>
+              </td>
               <td class="px-4 py-2 space-x-4">
                 <Link
                   :href="route('teacher.student.grades', { student: student.id })"

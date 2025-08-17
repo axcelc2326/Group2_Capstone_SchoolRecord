@@ -3,7 +3,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 
 const props = defineProps({
-  student: Object
+  student: Object,
+  subjects: Array,
+  grades: Object,   // ✅ add this
 });
 
 const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -21,20 +23,18 @@ const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
     </template>
 
     <div class="py-8 px-8">
-      <table class="min-w-full bg-white rounded shadow text-sm">
+      <table class="min-w-full bg-transparent rounded shadow text-sm">
         <thead>
-          <tr class="bg-gray-200">
+          <tr class="bg-transparent">
             <th class="p-2 border">Subject</th>
-            <th v-for="q in quarters" :key="q" class="p-2 border">{{ q }}</th>
+            <th v-for="q in quarters" :key="q" class="p-2 border text-center">{{ q }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="subject in [...new Set(student.grades.map(g => g.subject.name))]" :key="subject">
-            <td class="p-2 border font-medium">{{ subject }}</td>
+          <tr v-for="subject in subjects" :key="subject.id">
+            <td class="p-2 border font-medium">{{ subject.name }}</td>
             <td v-for="q in quarters" :key="q" class="p-2 border text-center">
-              {{
-                student.grades.find(g => g.subject.name === subject && g.quarter === q)?.grade ?? '—'
-              }}
+              {{ grades[q]?.[subject.id] ?? '—' }}
             </td>
           </tr>
         </tbody>

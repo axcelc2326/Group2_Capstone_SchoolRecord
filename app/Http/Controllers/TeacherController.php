@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -22,7 +23,7 @@ class TeacherController extends Controller
             ->get();
 
         return Inertia::render('Teacher/ApproveStudents', [
-            'students' => $students
+            'students' => $students,
         ]);
     }
 
@@ -50,9 +51,16 @@ class TeacherController extends Controller
         }
 
         $students = $query->orderBy('last_name')
-            ->with('grades')
+            ->with('grades', 'parent') // load parent relationship
             ->paginate(40)
             ->withQueryString();
+
+        $students->getCollection()->transform(function ($student) {
+            $student->parent_name = $student->parent
+                ? $student->parent->name // use 'name' instead of first_name + last_name
+                : 'N/A';
+            return $student;
+        });
 
         return Inertia::render('Teacher/MyStudents', [
             'students' => $students,
@@ -62,13 +70,26 @@ class TeacherController extends Controller
 
     public function viewStudentGrades($studentId)
     {
-        $student = \App\Models\Student::with([
+        $student = Student::with([
             'grades.subject',
             'class',
         ])->findOrFail($studentId);
 
+        // ✅ Only fetch subjects for the student's grade level
+        $subjects = Subject::where('grade_level', $student->class->grade_level)->get();
+
+        // ✅ Group grades by quarter → subject_id → grade
+        $grades = $student->grades
+            ->groupBy('quarter')
+            ->map(function ($quarterGrades) {
+                return $quarterGrades->keyBy('subject_id')->map->grade;
+            })
+            ->toArray(); // ✅ convert to plain array for Inertia
+
         return Inertia::render('Teacher/ViewStudentGrades', [
             'student' => $student,
+            'subjects' => $subjects,
+            'grades'   => $grades, // ✅ added grouped grades
         ]);
     }
 }

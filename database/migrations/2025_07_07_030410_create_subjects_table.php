@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name'); // Subject name
+            $table->unsignedTinyInteger('grade_level'); // e.g. 1 = Grade 1, 6 = Grade 6
             $table->timestamps();
+
+            $table->unique(['name', 'grade_level']); // Prevent duplicate subject per grade
         });
     }
 

@@ -63,11 +63,14 @@ const submit = () => {
     </template>
 
     <div class="py-8">
-      <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow space-y-6">
+      <div class="max-w-4xl mx-auto bg-transparent p-6 rounded shadow space-y-6">
         <!-- 🔻 Quarter Dropdown -->
         <div>
-          <label class="block text-sm font-medium text-gray-700">Select Quarter</label>
-          <select v-model="quarter" class="mt-1 block w-full rounded border-gray-300 shadow-sm">
+          <label class="block text-sm font-medium text-white">Select Quarter</label>
+          <select
+            v-model="quarter"
+            class="mt-1 block w-full rounded border border-gray-400 bg-transparent text-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option v-for="q in quarters" :key="q" :value="q">
               {{ q }} Quarter
             </option>
@@ -79,7 +82,7 @@ const submit = () => {
           <h3 class="text-lg font-bold mb-2">{{ quarter }} Grades</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="subject in subjects" :key="subject.id">
-              <label class="block text-sm font-medium text-gray-700">
+              <label class="block text-sm font-medium text-white">
                 {{ subject.name }}
               </label>
               <input
@@ -87,7 +90,7 @@ const submit = () => {
                 min="60"
                 max="100"
                 v-model="form.grades[subject.id]"
-                class="mt-1 block w-full rounded border-gray-300 shadow-sm"
+                class="mt-1 block w-full rounded border border-gray-400 bg-transparent text-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -106,3 +109,4 @@ const submit = () => {
     </div>
   </AuthenticatedLayout>
 </template>
+

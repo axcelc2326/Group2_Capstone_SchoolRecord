@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     AdminController,
     DashboardController,
     UserManagementController,
-    TeacherStudentController
+    TeacherStudentController,
+    SubjectController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
     Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
+    Route::get('/students/{student}/grades', [GradeController::class, 'getModalData']);
     Route::get('/teacher/student/{student}/grades', [TeacherController::class, 'viewStudentGrades'])->name('teacher.student.grades');
 
     Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
@@ -99,6 +101,11 @@ Route::middleware(['auth', 'role:admin',  'verified'])->group(function () {
     Route::get('/classes/{class}/edit', [ClassController::class, 'edit'])->name('classes.edit');
     Route::put('/classes/{class}', [ClassController::class, 'update'])->name('classes.update');
     Route::delete('/classes/{class}', [ClassController::class, 'destroy'])->name('classes.destroy');
+
+    Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+    Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+    Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
     Route::get('/admin/classes/assign', [AdminController::class, 'assignTeacherForm'])->name('admin.assign-teacher');
     Route::post('/admin/classes/assign', [AdminController::class, 'assignTeacher'])->name('admin.assign-teacher.submit');

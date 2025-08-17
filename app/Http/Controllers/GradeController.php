@@ -14,7 +14,9 @@ class GradeController extends Controller
     public function create($studentId)
     {
         $student = Student::with('class')->findOrFail($studentId);
-        $subjects = Subject::all();
+
+        // ✅ Only fetch subjects for the student's grade level
+        $subjects = Subject::where('grade_level', $student->class->grade_level)->get();
 
         // Load existing grades grouped by quarter and subject
         $grades = Grade::where('student_id', $studentId)
@@ -61,21 +63,22 @@ class GradeController extends Controller
         return redirect()->route('teacher.students')->with('success', "Grades saved for {$quarter} quarter.");
     }
 
+    /**
+     * View grades (for parents)
+     */
     public function viewGrades()
     {
-        // Get the authenticated parent
         $parent = Auth::user();
 
-        // Get the parent's students with grades and subjects
+        // Load parent’s students with their classes, subjects, and grades
         $students = Student::with([
             'class',
-            'grades.subject',
             'grades' => fn ($q) => $q->orderBy('quarter'),
+            'grades.subject',
         ])->where('parent_id', $parent->id)->get();
 
         return Inertia::render('Parent/ViewGrades', [
             'students' => $students,
         ]);
     }
-
 }

@@ -18,6 +18,7 @@ class DashboardController extends Controller
         $role = $user->getRoleNames()->first();
 
         switch ($role) {
+            //Admin Dashboard
             case 'admin':
                 // 🏆 Get top 3 performing classes
                 $topClasses = ClassModel::with('students.grades')
@@ -67,84 +68,172 @@ class DashboardController extends Controller
                     'announcements' => $announcements,
                 ]);
 
+
+            //Teacher Dashboard
             case 'teacher':
-                return Inertia::render('Teacher/Dashboard', ['user' => $user]);
-                
-case 'parent':
-    $parentId = $user->id;
+                // ✅ Get teacher's assigned class (assuming 1 class per teacher)
+                $class = ClassModel::with('students.grades')
+                    ->where('teacher_id', $user->id)
+                    ->first();
 
-    // 📚 Get all students linked to this parent (with grades & class info)
-    $students = Student::with('grades', 'class')
-        ->where('parent_id', $parentId)
-        ->get();
+                if (!$class) {
+                    return Inertia::render('Teacher/Dashboard', [
+                        'user' => $user,
+                        'summary' => [
+                            'total_students' => 0,
+                            'total_subjects' => 0,
+                            'class_average' => 0,
+                            'top_subject' => null,
+                            'worst_subject' => null,
+                        ],
+                        'topStudents' => [],
+                        'announcements' => [],
+                    ]);
+                }
 
-    // 🧮 Student stats
-    $totalRegistered = $students->count();
-    $totalEnrolled = $students->where('approved_by_teacher', 1)->count();
-    $totalPending = $students->where('approved_by_teacher', 0)->count();
+                // ✅ Total students
+                $totalStudents = $class->students->count();
 
-    // 📊 Average grade (overall) - exclude pending students
-    $enrolledGrades = $students
-        ->where('approved_by_teacher', 1)
-        ->flatMap->grades;
-    $averageGrade = round($enrolledGrades->avg('grade') ?? 0, 2);
+                // ✅ Subjects for this grade level
+                $subjects = \App\Models\Subject::where('grade_level', $class->grade_level)->get();
+                $totalSubjects = $subjects->count();
 
-    // 👦 Individual child performance with class name & grade level
-    $childrenPerformance = $students->map(function ($student) {
-        $className = $student->class->name ?? null;
-        $gradeLevel = $student->class->grade_level ?? null;
+                // ✅ Class average
+                $classAverage = round($class->students->flatMap->grades->avg('grade') ?? 0, 2);
 
-        if ($student->approved_by_teacher != 1) {
-            return [
-                'name' => "{$student->first_name} {$student->last_name}",
-                'class_name' => $className ?? 'No Class Assigned',
-                'grade_level' => $gradeLevel ?? 'No Grade Level',
-                'average' => null,
-                'status' => 'Pending Approval',
-            ];
-        }
+                // ✅ Subject performance (avg per subject)
+                $subjectAverages = [];
+                foreach ($subjects as $subject) {
+                    $grades = $class->students->flatMap(function ($student) use ($subject) {
+                        return $student->grades->where('subject_id', $subject->id)->pluck('grade');
+                    });
+                    $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
+                }
 
-        $avg = round($student->grades->avg('grade') ?? 0, 2);
-        return [
-            'name' => "{$student->first_name} {$student->last_name}",
-            'class_name' => $className ?? 'No Class Assigned',
-            'grade_level' => $gradeLevel ?? 'No Grade Level',
-            'average' => $avg,
-            'status' => $avg >= 75 ? 'Doing Good' : 'Terrible',
-        ];
-    });
+                $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
+                $worstSubject = collect($subjectAverages)->sort()->keys()->first();
 
-    // 📢 Latest announcements (class-specific + global)
-    $classIds = $students->pluck('class_id')->unique();
-    $announcements = Announcement::with('creator:id,name')
-        ->where(function ($query) use ($classIds) {
-            $query->whereIn('class_id', $classIds)
-                ->orWhereNull('class_id'); // Include global announcements
-        })
-        ->latest()
-        ->take(3)
-        ->get(['id', 'title', 'body', 'created_at', 'created_by'])
-        ->map(function ($announcement) {
-            return [
-                'id' => $announcement->id,
-                'title' => $announcement->title,
-                'body' => $announcement->body,
-                'created_at' => $announcement->created_at,
-                'created_by' => $announcement->creator->name ?? 'Unknown',
-            ];
-        });
+                // ✅ Top 3 students (by average)
+                $topStudents = $class->students->map(function ($student) {
+                    $average = round($student->grades->avg('grade') ?? 0, 2);
+                    return [
+                        'id' => $student->id,
+                        'name' => "{$student->first_name} {$student->last_name}",
+                        'average' => $average,
+                    ];
+                })->sortByDesc('average')->take(3)->values();
 
-    return Inertia::render('Parent/Dashboard', [
-        'user' => $user,
-        'summary' => [
-            'total_registered' => $totalRegistered,
-            'total_enrolled' => $totalEnrolled,
-            'total_pending' => $totalPending,
-            'average_grade' => $averageGrade,
-        ],
-        'childrenPerformance' => $childrenPerformance,
-        'announcements' => $announcements,
-    ]);
+                // ✅ Latest 3 announcements (specific class + global)
+                $announcements = \App\Models\Announcement::with('creator:id,name')
+                    ->where(function ($query) use ($class) {
+                        $query->where('class_id', $class->id)
+                            ->orWhereNull('class_id');
+                    })
+                    ->latest()
+                    ->take(3)
+                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                    ->map(function ($announcement) {
+                        return [
+                            'id' => $announcement->id,
+                            'title' => $announcement->title,
+                            'body' => $announcement->body,
+                            'created_at' => $announcement->created_at,
+                            'created_by' => $announcement->creator->name ?? 'Unknown',
+                        ];
+                    });
+
+                return Inertia::render('Teacher/Dashboard', [
+                    'user' => $user,
+                    'summary' => [
+                        'total_students' => $totalStudents,
+                        'total_subjects' => $totalSubjects,
+                        'class_average' => $classAverage,
+                        'top_subject' => $topSubject,
+                        'worst_subject' => $worstSubject,
+                    ],
+                    'topStudents' => $topStudents,
+                    'announcements' => $announcements,
+                ]);
+
+
+            //Parent Dashboard
+            case 'parent':
+                $parentId = $user->id;
+
+                // 📚 Get all students linked to this parent (with grades & class info)
+                $students = Student::with('grades', 'class')
+                    ->where('parent_id', $parentId)
+                    ->get();
+
+                // 🧮 Student stats
+                $totalRegistered = $students->count();
+                $totalEnrolled = $students->where('approved_by_teacher', 1)->count();
+                $totalPending = $students->where('approved_by_teacher', 0)->count();
+
+                // 📊 Average grade (overall) - exclude pending students
+                $enrolledGrades = $students
+                    ->where('approved_by_teacher', 1)
+                    ->flatMap->grades;
+                $averageGrade = round($enrolledGrades->avg('grade') ?? 0, 2);
+
+                // 👦 Individual child performance with class name & grade level
+                $childrenPerformance = $students->map(function ($student) {
+                    $className = $student->class->name ?? null;
+                    $gradeLevel = $student->class->grade_level ?? null;
+
+                    if ($student->approved_by_teacher != 1) {
+                        return [
+                            'name' => "{$student->first_name} {$student->last_name}",
+                            'class_name' => $className ?? 'No Class Assigned',
+                            'grade_level' => $gradeLevel ?? 'No Grade Level',
+                            'average' => null,
+                            'status' => 'Pending Approval',
+                        ];
+                    }
+
+                    $avg = round($student->grades->avg('grade') ?? 0, 2);
+                    return [
+                        'name' => "{$student->first_name} {$student->last_name}",
+                        'class_name' => $className ?? 'No Class Assigned',
+                        'grade_level' => $gradeLevel ?? 'No Grade Level',
+                        'average' => $avg,
+                        'status' => $avg >= 75 ? 'Doing Good' : 'Terrible',
+                    ];
+                });
+
+                // 📢 Latest announcements (class-specific + global)
+                $classIds = $students->pluck('class_id')->unique();
+                $announcements = Announcement::with('creator:id,name')
+                    ->where(function ($query) use ($classIds) {
+                        $query->whereIn('class_id', $classIds)
+                            ->orWhereNull('class_id'); // Include global announcements
+                    })
+                    ->latest()
+                    ->take(3)
+                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                    ->map(function ($announcement) {
+                        return [
+                            'id' => $announcement->id,
+                            'title' => $announcement->title,
+                            'body' => $announcement->body,
+                            'created_at' => $announcement->created_at,
+                            'created_by' => $announcement->creator->name ?? 'Unknown',
+                        ];
+                    });
+
+                return Inertia::render('Parent/Dashboard', [
+                    'user' => $user,
+                    'summary' => [
+                        'total_registered' => $totalRegistered,
+                        'total_enrolled' => $totalEnrolled,
+                        'total_pending' => $totalPending,
+                        'average_grade' => $averageGrade,
+                    ],
+                    'childrenPerformance' => $childrenPerformance,
+                    'announcements' => $announcements,
+                ]);
+
+
 
             default:
                 abort(403, 'Unauthorized');

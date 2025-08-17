@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\ClassModel;
 use App\Models\Grade;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -45,15 +46,17 @@ class ParentsWithChildrenSeeder extends Seeder
                 'approved_by_teacher' => true
             ]);
 
-            // Create random grades for 8 subjects (subject_id 1-8) across 4 quarters
-            for ($subjectId = 1; $subjectId <= 8; $subjectId++) {
+            // ✅ Fetch subjects for this student's grade level
+            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+
+            foreach ($subjects as $subject) {
                 for ($quarter = 1; $quarter <= 4; $quarter++) {
                     Grade::create([
                         'student_id' => $student->id,
-                        'class_id' => $class->id,
-                        'subject_id' => $subjectId,
-                        'quarter' => $quarter,
-                        'grade' => rand(75, 99),
+                        'class_id'   => $class->id,
+                        'subject_id' => $subject->id,
+                        'quarter'    => $quarter,
+                        'grade'      => rand(75, 99),
                     ]);
                 }
             }
