@@ -17,11 +17,11 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->boolean('approved_by_teacher')->default(false);
-            $table->unsignedBigInteger('class_id');
+            $table->unsignedBigInteger('class_id')->nullable();
             $table->timestamps();
 
             $table->foreign('parent_id')->references('id')->on('users');
-            $table->foreign('class_id')->references('id')->on('classes');
+            $table->foreign('class_id')->references('id')->on('classes')->onDelete('set null');
         });
     }
 
