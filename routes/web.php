@@ -66,10 +66,10 @@ Route::middleware(['auth', 'role:parent',  'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
-    Route::get('/grades/enter/{student}', [GradeController::class, 'create'])->name('grades.create');
-    Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
-    Route::get('/students/{student}/grades', [GradeController::class, 'getModalData']);
+    Route::get('/teacher/students', [TeacherController::class, 'myStudents'])->name('teacher.students');
     Route::get('/teacher/student/{student}/grades', [TeacherController::class, 'viewStudentGrades'])->name('teacher.student.grades');
+    Route::get('/grades/modal/{studentId}', [GradeController::class, 'InputGrade'])->name('grades.InputGrade');
+    Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
 
     Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
     Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
@@ -84,8 +84,6 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
     Route::put('/teacher/students/unapprove-all', [TeacherStudentController::class, 'unapproveAll'])->name('teacher.students.unapproveAll');
     Route::delete('/teacher/students/{student}/clear-grades', [TeacherStudentController::class, 'clearGrades'])->name('teacher.students.clearGrades');
     Route::delete('/teacher/students/clear-all-grades', [TeacherStudentController::class, 'clearAllGrades'])->name('teacher.students.clearAllGrades');
-
-    Route::get('/teacher/students', [TeacherController::class, 'myStudents'])->name('teacher.students');
 
     Route::get('/sf5/{class}', [GradeRemarkController::class, 'download'])->name('sf5.download');
 });

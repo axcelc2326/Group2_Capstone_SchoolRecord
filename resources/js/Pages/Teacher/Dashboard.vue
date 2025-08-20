@@ -15,10 +15,12 @@ import {
   BarChart3,
   GraduationCap,
   Target,
-  Zap,
   Award,
   Medal,
-  Star
+  Star,
+  Sparkles,
+  Activity,
+  Flame
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -42,38 +44,38 @@ const props = defineProps({
   },
 });
 
-// Simple icon mapping
+// Enhanced icon mapping with modern alternatives
 const getSummaryIcon = (key) => {
   const icons = {
     total_students: Users,
     total_subjects: BookOpen,
     class_average: Target,
-    top_subject: Zap,
+    top_subject: Flame,
     worst_subject: AlertCircle
   };
   return icons[key] || BarChart3;
 };
 
-// Simple background colors for each card
-const getCardColor = (key) => {
-  const colors = {
-    total_students: 'bg-blue-500',
-    total_subjects: 'bg-green-500',
-    class_average: 'bg-purple-500',
-    top_subject: 'bg-orange-500',
-    worst_subject: 'bg-red-500'
+// Modern gradient backgrounds
+const getCardGradient = (key) => {
+  const gradients = {
+    total_students: 'from-violet-500 to-purple-600',
+    total_subjects: 'from-emerald-500 to-teal-600',
+    class_average: 'from-rose-500 to-pink-600',
+    top_subject: 'from-amber-500 to-orange-600',
+    worst_subject: 'from-red-500 to-rose-600'
   };
-  return colors[key] || 'bg-gray-500';
+  return gradients[key] || 'from-gray-500 to-slate-600';
 };
 
 // Helper function to format card titles
 const formatCardTitle = (key) => {
   const titles = {
-    total_students: 'Students',
-    total_subjects: 'Subjects',
+    total_students: 'Total Students',
+    total_subjects: 'Active Subjects',
     class_average: 'Class Average',
-    top_subject: 'Best Subject',
-    worst_subject: 'Needs Help'
+    top_subject: 'Top Performing',
+    worst_subject: 'Needs Attention'
   };
   return titles[key] || key.replace('_', ' ');
 };
@@ -81,36 +83,69 @@ const formatCardTitle = (key) => {
 // Helper function to format date and time
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
-  const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-  const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const now = new Date();
+  const diffInHours = Math.abs(now - date) / (1000 * 60 * 60);
   
-  const formattedDate = date.toLocaleDateString('en-US', dateOptions);
-  const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
-  
-  return { date: formattedDate, time: formattedTime };
+  if (diffInHours < 24) {
+    return { 
+      date: 'Today', 
+      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+    };
+  } else if (diffInHours < 48) {
+    return { 
+      date: 'Yesterday', 
+      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+    };
+  } else {
+    const dateOptions = { month: 'short', day: 'numeric' };
+    const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+    
+    return {
+      date: date.toLocaleDateString('en-US', dateOptions),
+      time: date.toLocaleTimeString('en-US', timeOptions)
+    };
+  }
 };
 
-// Get rank icon based on position
-const getRankIcon = (index) => {
-  const icons = [Crown, Medal, Award];
-  return icons[index] || Star;
-};
-
-// Get rank colors
-const getRankColors = (index) => {
-  const colors = [
-    'bg-yellow-500', // Gold
-    'bg-gray-400',   // Silver  
-    'bg-orange-500'  // Bronze
+// Enhanced rank styling
+const getRankStyling = (index) => {
+  const styles = [
+    { 
+      icon: Crown, 
+      gradient: 'from-yellow-400 to-yellow-600', 
+      ring: 'ring-yellow-400/30',
+      badge: '1st',
+      glow: 'shadow-yellow-500/25'
+    },
+    { 
+      icon: Medal, 
+      gradient: 'from-slate-300 to-slate-500', 
+      ring: 'ring-slate-400/30',
+      badge: '2nd',
+      glow: 'shadow-slate-500/25'
+    },
+    { 
+      icon: Award, 
+      gradient: 'from-orange-400 to-orange-600', 
+      ring: 'ring-orange-400/30',
+      badge: '3rd',
+      glow: 'shadow-orange-500/25'
+    }
   ];
-  return colors[index] || 'bg-blue-500';
+  return styles[index] || { 
+    icon: Star, 
+    gradient: 'from-blue-400 to-blue-600', 
+    ring: 'ring-blue-400/30',
+    badge: `${index + 1}th`,
+    glow: 'shadow-blue-500/25'
+  };
 };
 
 // Convert summary object to array for easier iteration
 const summaryItems = [
   { key: 'total_students', value: props.summary.total_students },
   { key: 'total_subjects', value: props.summary.total_subjects },
-  { key: 'class_average', value: props.summary.class_average },
+  { key: 'class_average', value: `${props.summary.class_average}%` },
   { key: 'top_subject', value: props.summary.top_subject || 'N/A' },
   { key: 'worst_subject', value: props.summary.worst_subject || 'N/A' }
 ];
@@ -121,18 +156,23 @@ const summaryItems = [
 
   <AuthenticatedLayout>
     <template #header>
-      <div class="space-y-3">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2 sm:space-x-3">
-            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-500 flex items-center justify-center">
-              <GraduationCap class="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/25 ring-4 ring-white/10">
+                <GraduationCap class="w-7 h-7 text-white" />
+              </div>
             </div>
             <div>
-              <h2 class="text-lg sm:text-xl font-bold text-white bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                Teaching Hub
-              </h2>
-              <p class="text-white/70 text-xs sm:text-sm">
-                Track your teaching progress
+              <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                <span class="bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
+                  Teaching Hub
+                </span>
+              </h1>
+              <p class="text-white/70 text-sm sm:text-base flex items-center space-x-2">
+                <Activity class="w-4 h-4" />
+                <span>Real-time insights & analytics</span>
               </p>
             </div>
           </div>
@@ -140,174 +180,255 @@ const summaryItems = [
       </div>
     </template>
 
-    <div class="py-4 px-4 sm:py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-      <!-- Summary Cards - Mobile First -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+    <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      <!-- Enhanced Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         <div
-          v-for="item in summaryItems"
+          v-for="(item, index) in summaryItems"
           :key="item.key"
-          class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-3 sm:p-4 shadow-xl hover:shadow-2xl hover:bg-white/15 transition-all duration-300 transform active:scale-95 sm:hover:scale-105"
+          class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+          :style="{ 'animation-delay': `${index * 100}ms` }"
         >
-          <!-- Mobile optimized layout -->
-          <div class="text-center space-y-2">
-            <div :class="['w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-lg flex items-center justify-center', getCardColor(item.key)]">
-              <component :is="getSummaryIcon(item.key)" class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <!-- Gradient overlay -->
+          <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
+          
+          <!-- Content with side-by-side layout -->
+          <div class="relative p-6">
+            <div class="flex items-center justify-between">
+              <!-- Icon and content side by side -->
+              <div class="flex items-center space-x-4">
+                <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
+                  <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+                </div>
+                
+                <!-- Text content beside icon -->
+                <div class="space-y-1">
+                  <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
+                    {{ item.value }}
+                  </div>
+                  <div class="text-sm text-white/70 font-medium">
+                    {{ formatCardTitle(item.key) }}
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div>
-              <p class="text-lg sm:text-xl font-bold text-white">
-                {{ item.value }}
-              </p>
-              <h3 class="text-xs sm:text-sm font-medium text-white/70 leading-tight">
-                {{ formatCardTitle(item.key) }}
-              </h3>
-            </div>
+            <!-- Hover effect -->
+            <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>
         </div>
       </div>
 
-      <!-- Top Students Section -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
-        <!-- Mobile-optimized header -->
-        <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-white/10">
-          <div class="flex items-center space-x-2 sm:space-x-3">
-            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-yellow-500 flex items-center justify-center">
-              <Trophy class="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-            </div>
-            <div>
-              <h2 class="text-base sm:text-lg font-semibold text-white">Top Students</h2>
-              <p class="text-xs sm:text-sm text-white/70 hidden sm:block">Best performers</p>
+      <!-- Modern Top Students Section -->
+      <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+        <!-- Header with enhanced styling -->
+        <div class="px-6 py-5 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-yellow-500/25">
+                <Trophy class="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                  <span>Top Students</span>
+                  <Sparkles class="w-5 h-5 text-yellow-400" />
+                </h2>
+                <p class="text-white/70 text-sm">Leading performers this month</p>
+              </div>
             </div>
           </div>
         </div>
         
-        <!-- Student List -->
-        <div class="p-4 sm:p-6">
-          <div v-if="topStudents.length" class="space-y-3 sm:space-y-4">
+        <!-- Enhanced Student List -->
+        <div class="p-6">
+          <div v-if="topStudents.length" class="space-y-4">
             <div
               v-for="(student, index) in topStudents.slice(0, 3)"
               :key="student.id"
-              class="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5 hover:bg-white/10 transition-all duration-200 active:bg-white/15"
+              class="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div class="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-                <div class="flex items-center space-x-3">
-                  <!-- Rank Badge -->
-                  <div :class="['flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center', getRankColors(index)]">
-                    <component :is="getRankIcon(index)" class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              <!-- Rank glow effect -->
+              <div :class="['absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300', getRankStyling(index).glow]"></div>
+              
+              <div class="relative flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <!-- Enhanced rank badge -->
+                  <div class="relative">
+                    <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg ring-2 transition-transform duration-300 group-hover:scale-110', getRankStyling(index).gradient, getRankStyling(index).ring]">
+                      <component :is="getRankStyling(index).icon" class="w-6 h-6 text-white" />
+                    </div>
+                    <div class="absolute -top-2 -right-2 bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-bold text-white border border-white/30">
+                      {{ getRankStyling(index).badge }}
+                    </div>
                   </div>
                   
-                  <!-- Student Avatar -->
-                  <div class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                    {{ student.name.split(' ').map(n => n.charAt(0)).join('') }}
+                  <!-- Enhanced student avatar -->
+                  <div class="relative">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white/20">
+                      {{ student.name.split(' ').map(n => n.charAt(0)).join('') }}
+                    </div>
                   </div>
                   
-                  <!-- Student Info -->
-                  <div class="flex-1 min-w-0">
-                    <h3 class="font-medium text-white text-sm sm:text-base truncate">
+                  <!-- Enhanced student info -->
+                  <div>
+                    <h3 class="font-semibold text-white text-lg group-hover:text-white/90 transition-colors">
                       {{ student.name }}
                     </h3>
-                    <p class="text-white/70 text-xs sm:text-sm">
-                      {{ student.average }}% Average
-                    </p>
+                    <div class="flex items-center space-x-3 text-sm text-white/70">
+                      <span class="flex items-center space-x-1">
+                        <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                        <span>{{ student.average }}% Average</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Position -->
-                <div class="flex items-center justify-between sm:justify-end">
-                  <div class="text-white/50 text-sm sm:text-base font-bold">
+                <!-- Performance indicator -->
+                <div class="text-right">
+                  <div class="text-2xl font-bold text-white/90">
                     #{{ index + 1 }}
+                  </div>
+                  <div class="text-xs text-white/50">
+                    Rank
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Empty State -->
-          <div v-else class="text-center py-8 sm:py-12">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-lg bg-yellow-500/20 flex items-center justify-center mb-3">
-              <Trophy class="w-5 h-5 sm:w-6 sm:h-6 text-white/40" />
+          <!-- Enhanced Empty State -->
+          <div v-else class="text-center py-16">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center mb-4 backdrop-blur-sm border border-white/10">
+              <Trophy class="w-8 h-8 text-white/40" />
             </div>
-            <h3 class="text-sm font-medium text-white/80 mb-1">No Students Yet</h3>
-            <p class="text-white/60 text-xs sm:text-sm">
-              Top performers will appear here
+            <h3 class="text-lg font-semibold text-white/80 mb-2">No Students Yet</h3>
+            <p class="text-white/60 text-sm max-w-sm mx-auto">
+              Top performing students will appear here once you have data to analyze
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Announcements -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden">
-        <!-- Mobile-optimized header -->
-        <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-white/10">
-          <div class="flex items-center space-x-2 sm:space-x-3">
-            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-green-500 flex items-center justify-center">
-              <Megaphone class="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+      <!-- Modern Announcements -->
+      <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+        <!-- Enhanced header -->
+        <div class="px-6 py-5 border-b border-white/10 bg-gradient-to-r from-white/5 to-transparent">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                <Megaphone class="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Recent Announcements</h2>
+                <p class="text-white/70 text-sm">Stay updated with the latest news</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-base sm:text-lg font-semibold text-white">Announcements</h2>
-              <p class="text-xs sm:text-sm text-white/70 hidden sm:block">Latest updates</p>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+              <span class="text-xs text-white/70">Live</span>
             </div>
           </div>
         </div>
 
-        <!-- Announcements List -->
-        <div class="p-4 sm:p-6">
-          <div v-if="announcements.length" class="space-y-3 sm:space-y-4">
+        <!-- Enhanced Announcements List -->
+        <div class="p-6">
+          <div v-if="announcements.length" class="space-y-4">
             <div
-              v-for="announcement in announcements"
+              v-for="(announcement, index) in announcements"
               :key="announcement.id"
-              class="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5 hover:bg-white/10 transition-all duration-200 active:bg-white/15 group"
+              class="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-              <div class="space-y-3 sm:space-y-0 sm:flex sm:items-start sm:space-x-4">
-                <!-- Icon -->
-                <div class="flex items-start space-x-3 sm:space-x-0">
-                  <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-500 flex items-center justify-center">
-                    <User class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  </div>
-                  <div class="flex-1 min-w-0 sm:hidden">
-                    <h3 class="font-medium text-white text-sm group-hover:text-white/90 transition-colors duration-200">
-                      {{ announcement.title }}
-                    </h3>
+              <div class="flex items-start space-x-4">
+                <!-- Enhanced creator avatar -->
+                <div class="relative flex-shrink-0">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <User class="w-6 h-6 text-white" />
                   </div>
                 </div>
                 
-                <!-- Content -->
-                <div class="flex-1 min-w-0 sm:ml-0">
-                  <h3 class="hidden sm:block font-medium text-white text-base group-hover:text-white/90 transition-colors duration-200 mb-2">
-                    {{ announcement.title }}
-                  </h3>
-                  <p class="text-white/80 text-sm sm:text-base leading-relaxed mb-3">
+                <!-- Enhanced content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold text-white text-lg group-hover:text-white/90 transition-colors leading-tight">
+                      {{ announcement.title }}
+                    </h3>
+                  </div>
+                  
+                  <p class="text-white/80 text-base leading-relaxed mb-4">
                     {{ announcement.body }}
                   </p>
                   
-                  <!-- Mobile-optimized metadata -->
-                  <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs">
-                    <span class="flex items-center space-x-1 text-white/60">
-                      <User class="w-3 h-3" />
-                      <span class="truncate">{{ announcement.created_by }}</span>
-                    </span>
-                    <span class="flex items-center space-x-1 text-white/60">
-                      <Calendar class="w-3 h-3" />
-                      <span>{{ formatDateTime(announcement.created_at).date }}</span>
-                    </span>
-                    <span class="flex items-center space-x-1 text-white/60">
-                      <Clock class="w-3 h-3" />
-                      <span>{{ formatDateTime(announcement.created_at).time }}</span>
-                    </span>
+                  <!-- Enhanced metadata with modern styling -->
+                  <div class="flex flex-wrap gap-4 text-sm">
+                    <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
+                      <User class="w-4 h-4 text-white/60" />
+                      <span class="text-white/80 font-medium">{{ announcement.created_by }}</span>
+                    </div>
+                    <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
+                      <Calendar class="w-4 h-4 text-white/60" />
+                      <span class="text-white/80">{{ formatDateTime(announcement.created_at).date }}</span>
+                    </div>
+                    <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
+                      <Clock class="w-4 h-4 text-white/60" />
+                      <span class="text-white/80">{{ formatDateTime(announcement.created_at).time }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Mobile-optimized Empty State -->
-          <div v-else class="text-center py-8 sm:py-12">
-            <Megaphone class="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-white/40" />
-            <h3 class="mt-2 text-sm font-medium text-white/80">No announcements</h3>
-            <p class="mt-1 text-xs sm:text-sm text-white/60">Check back for updates</p>
+          <!-- Enhanced Empty State -->
+          <div v-else class="text-center py-16">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-4 backdrop-blur-sm border border-white/10">
+              <Megaphone class="w-8 h-8 text-white/40" />
+            </div>
+            <h3 class="text-lg font-semibold text-white/80 mb-2">No Announcements</h3>
+            <p class="text-white/60 text-sm max-w-sm mx-auto">
+              New announcements and updates will appear here when available
+            </p>
           </div>
         </div>
       </div>
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.group:hover .float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Enhanced glassmorphism effects */
+.backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+}
+
+/* Smooth animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid > div {
+  animation: slideInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.grid > div:nth-child(1) { animation-delay: 0.1s; }
+.grid > div:nth-child(2) { animation-delay: 0.2s; }
+.grid > div:nth-child(3) { animation-delay: 0.3s; }
+.grid > div:nth-child(4) { animation-delay: 0.4s; }
+.grid > div:nth-child(5) { animation-delay: 0.5s; }
+</style>

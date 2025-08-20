@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class GradeController extends Controller
 {
-    public function create($studentId)
+    public function InputGrade($studentId)
     {
         $student = Student::with('class')->findOrFail($studentId);
 
@@ -26,7 +26,7 @@ class GradeController extends Controller
                 return $quarterGrades->keyBy('subject_id')->map->grade;
             });
 
-        return Inertia::render('Teacher/GradeEntry', [
+        return response()->json([
             'student' => $student,
             'subjects' => $subjects,
             'grades' => $grades,
