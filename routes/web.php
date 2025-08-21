@@ -78,7 +78,8 @@ Route::middleware(['auth', 'role:teacher',  'verified'])->group(function () {
     Route::delete('/teacherDestroy/{id}', [AnnouncementController::class, 'destroyTeacher'])->name('announcements.destroyTeacher');
     
     Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
-    Route::put('/students/{student}/approve', [StudentController::class, 'approve'])->name('students.approve');
+    Route::put('/students/{student}/approve', [TeacherController::class, 'approveStudent'])->name('students.approve');
+    Route::put('/students/{student}/deny', [TeacherController::class, 'denyStudent'])->name('students.deny');
 
     Route::put('/students/{student}/unapprove', [TeacherStudentController::class, 'unapproveStudent'])->name('teacher.students.unapprove');
     Route::put('/teacher/students/unapprove-all', [TeacherStudentController::class, 'unapproveAll'])->name('teacher.students.unapproveAll');

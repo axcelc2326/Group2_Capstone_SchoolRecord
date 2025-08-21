@@ -71,14 +71,4 @@ class StudentController extends Controller
 
         return back()->with('message', 'Student deleted successfully.');
     }
-
-    // ✅ Teacher approval method
-    public function approve($id)
-    {
-        $student = Student::findOrFail($id);
-        $student->approved_by_teacher = true;
-        $student->save();
-
-        return back()->with('message', 'Student approved.');
-    }
 }

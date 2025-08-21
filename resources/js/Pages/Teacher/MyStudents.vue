@@ -6,6 +6,7 @@ import Swal from 'sweetalert2'
 import axios from 'axios'
 import GradeInputModal from '@/Components/GradeInputModal.vue'
 import SettingsModal from '@/Components/StudentSettingsModal.vue'
+import IndividualStudentModal from '@/Components/StudentSettingsIndividualModal.vue'
 
 const props = defineProps({
   students: Object,
@@ -15,7 +16,8 @@ const props = defineProps({
 
 const search = ref(props.filters?.search || '')
 const showSettingsModal = ref(false)
-const activeStudentDropdown = ref(null)
+const showIndividualModal = ref(false)
+const selectedStudent = ref(null)
 
 // 🔍 Search filter
 watch(search, (value) => {
@@ -40,27 +42,32 @@ const openGradeModal = async (studentId) => {
   }
 }
 
-// Dropdown management
-const toggleStudentDropdown = (studentId) => {
-  if (activeStudentDropdown.value === studentId) {
-    activeStudentDropdown.value = null
-  } else {
-    activeStudentDropdown.value = studentId
-  }
+// Individual student modal functions
+const openIndividualModal = (student) => {
+  selectedStudent.value = student
+  showIndividualModal.value = true
+}
+
+const closeIndividualModal = () => {
+  showIndividualModal.value = false
+  selectedStudent.value = null
 }
 
 const openSettingsModal = () => {
   showSettingsModal.value = true
-  activeStudentDropdown.value = null // Close individual dropdowns when opening modal
 }
 
 const closeSettingsModal = () => {
   showSettingsModal.value = false
 }
 
-// 🔻 Existing student actions
-function removeStudent(studentId) {
-  activeStudentDropdown.value = null
+// 🔻 Individual student actions (called from modal)
+function removeStudent() {
+  if (!selectedStudent.value) return
+  
+  const studentId = selectedStudent.value.id
+  closeIndividualModal()
+  
   Swal.fire({
     title: 'Are you sure?',
     text: 'This will unapprove the student.',
@@ -88,8 +95,12 @@ function removeStudent(studentId) {
   })
 }
 
-function clearGrades(studentId) {
-  activeStudentDropdown.value = null
+function clearGrades() {
+  if (!selectedStudent.value) return
+  
+  const studentId = selectedStudent.value.id
+  closeIndividualModal()
+  
   Swal.fire({
     title: 'Clear student grades?',
     text: 'This will delete all grades for this student.',
@@ -117,6 +128,7 @@ function clearGrades(studentId) {
   })
 }
 
+// Bulk actions
 function unapproveAll() {
   showSettingsModal.value = false
   Swal.fire({
@@ -315,44 +327,17 @@ function clearAllGrades() {
                       Input Grades
                     </button>
                     
-                    <!-- Individual Settings Dropdown -->
-                    <div class="relative inline-block">
-                      <button
-                        @click="toggleStudentDropdown(student.id)"
-                        class="inline-flex items-center px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-100 border border-purple-400/30 hover:border-purple-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                      </button>
-                      
-                      <div 
-                        v-if="activeStudentDropdown === student.id"
-                        class="absolute right-0 mt-1 w-44 bg-slate-800/95 backdrop-blur-lg border border-gray-600 rounded-lg shadow-2xl z-[50]"
-                        @click.away="activeStudentDropdown = null"
-                      >
-                        <div class="p-1">
-                          <button
-                            @click="removeStudent(student.id)"
-                            class="w-full text-left px-3 py-2 text-xs text-red-100 hover:bg-red-500/20 rounded transition-colors duration-150 flex items-center"
-                          >
-                            <svg class="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
-                            </svg>
-                            Unapprove
-                          </button>
-                          <button
-                            @click="clearGrades(student.id)"
-                            class="w-full text-left px-3 py-2 text-xs text-yellow-100 hover:bg-yellow-500/20 rounded transition-colors duration-150 flex items-center"
-                          >
-                            <svg class="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Clear Grades
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <!-- Individual Settings Button (replaces dropdown) -->
+                    <button
+                      @click="openIndividualModal(student)"
+                      class="inline-flex items-center px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-100 border border-purple-400/30 hover:border-purple-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                    >
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Actions
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -397,26 +382,16 @@ function clearAllGrades() {
                   </svg>
                   Input Grades
                 </button>
-                <div class="grid grid-cols-2 gap-2">
-                  <button
-                    @click="removeStudent(student.id)"
-                    class="inline-flex justify-center items-center px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm text-sm"
-                  >
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728" />
-                    </svg>
-                    Unapprove
-                  </button>
-                  <button
-                    @click="clearGrades(student.id)"
-                    class="inline-flex justify-center items-center px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-100 border border-yellow-400/30 hover:border-yellow-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm text-sm"
-                  >
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Clear Grades
-                  </button>
-                </div>
+                <button
+                  @click="openIndividualModal(student)"
+                  class="w-full inline-flex justify-center items-center px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-100 border border-purple-400/30 hover:border-purple-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Student Actions
+                </button>
               </div>
             </div>
           </div>
@@ -464,6 +439,15 @@ function clearAllGrades() {
     @close="closeSettingsModal"
     @unapprove-all="unapproveAll"
     @clear-all-grades="clearAllGrades"
+  />
+
+  <!-- Individual Student Modal Component -->
+  <IndividualStudentModal
+    :show="showIndividualModal"
+    :student="selectedStudent"
+    @close="closeIndividualModal"
+    @unapprove-student="removeStudent"
+    @clear-student-grades="clearGrades"
   />
 
   <!-- 📌 Grade Input Modal -->

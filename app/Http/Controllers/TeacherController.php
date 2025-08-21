@@ -15,16 +15,51 @@ class TeacherController extends Controller
     {
         $teacherId = Auth::id();
 
-        $students = Student::with('class')
+        $students = Student::with(['class', 'parent']) // Load parent and class
             ->whereHas('class', function ($query) use ($teacherId) {
                 $query->where('teacher_id', $teacherId);
             })
             ->where('approved_by_teacher', false)
             ->get();
 
+        // Add parent_name for each student
+        $students->transform(function ($student) {
+            $student->parent_name = $student->parent
+                ? $student->parent->name // parent is a User, use 'name' field
+                : 'N/A';
+            return $student;
+        });
+
+        // Count of pending students
+        $pendingCount = $students->count();
+
         return Inertia::render('Teacher/ApproveStudents', [
             'students' => $students,
+            'pendingCount' => $pendingCount,
         ]);
+    }
+
+    // ✅ Teacher approval method
+    public function approveStudent($id)
+    {
+        $student = Student::findOrFail($id);
+        $student->approved_by_teacher = true;
+        $student->save();
+
+        return back()->with('message', 'Student approved.');
+    }
+
+    public function denyStudent($studentId)
+    {
+        $student = Student::findOrFail($studentId);
+
+        // Remove from class and unapprove
+        $student->update([
+            'class_id' => null,
+            'approved_by_teacher' => false,
+        ]);
+
+        return redirect()->back()->with('success', 'Student has been denied and removed from your class.');
     }
 
     public function myStudents(Request $request)
