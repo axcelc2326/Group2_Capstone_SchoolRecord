@@ -150,10 +150,10 @@ const getRankStyling = (index) => {
 const summaryItems = [
   { key: 'total_students', value: props.summary.total_students },
   { key: 'total_subjects', value: props.summary.total_subjects },
-  { key: 'class_average', value: `${props.summary.class_average}%` },
+  { key: 'pending_students', value: props.summary.pending_students }, // ✅ added here
   { key: 'top_subject', value: props.summary.top_subject || 'N/A' },
   { key: 'worst_subject', value: props.summary.worst_subject || 'N/A' },
-  { key: 'pending_students', value: props.summary.pending_students } // ✅ added here
+  { key: 'class_average', value: `${props.summary.class_average}%` }
 ];
 </script>
 
