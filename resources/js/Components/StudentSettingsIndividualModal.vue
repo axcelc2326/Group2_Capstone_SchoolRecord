@@ -20,7 +20,6 @@
           <div>
             <h3 class="text-xl font-semibold text-white">Student Actions</h3>
             <p class="text-sm text-gray-300" v-if="student">Name: {{ student.first_name }} {{ student.last_name }}</p>
-            <p class="text-sm text-gray-300">Parent: {{ student.parent_name }}</p>
           </div>
         </div>
         <button
@@ -42,7 +41,7 @@
         >
           <div class="flex-shrink-0 p-2 bg-red-500/20 rounded-lg mr-4 group-hover:bg-red-500/30 transition-colors">
             <svg class="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
             </svg>
           </div>
           <div>

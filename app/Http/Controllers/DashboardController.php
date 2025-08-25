@@ -71,89 +71,94 @@ class DashboardController extends Controller
 
             //Teacher Dashboard
             case 'teacher':
-                // ✅ Get teacher's assigned class (assuming 1 class per teacher)
-                $class = ClassModel::with('students.grades')
-                    ->where('teacher_id', $user->id)
-                    ->first();
+            // ✅ Get teacher's assigned class (assuming 1 class per teacher)
+            $class = ClassModel::with('students.grades')
+                ->where('teacher_id', $user->id)
+                ->first();
 
-                if (!$class) {
-                    return Inertia::render('Teacher/Dashboard', [
-                        'user' => $user,
-                        'summary' => [
-                            'total_students' => 0,
-                            'total_subjects' => 0,
-                            'class_average' => 0,
-                            'top_subject' => null,
-                            'worst_subject' => null,
-                        ],
-                        'topStudents' => [],
-                        'announcements' => [],
-                    ]);
-                }
-
-                // ✅ Total students
-                $totalStudents = $class->students->count();
-
-                // ✅ Subjects for this grade level
-                $subjects = \App\Models\Subject::where('grade_level', $class->grade_level)->get();
-                $totalSubjects = $subjects->count();
-
-                // ✅ Class average
-                $classAverage = round($class->students->flatMap->grades->avg('grade') ?? 0, 2);
-
-                // ✅ Subject performance (avg per subject)
-                $subjectAverages = [];
-                foreach ($subjects as $subject) {
-                    $grades = $class->students->flatMap(function ($student) use ($subject) {
-                        return $student->grades->where('subject_id', $subject->id)->pluck('grade');
-                    });
-                    $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
-                }
-
-                $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
-                $worstSubject = collect($subjectAverages)->sort()->keys()->first();
-
-                // ✅ Top 3 students (by average)
-                $topStudents = $class->students->map(function ($student) {
-                    $average = round($student->grades->avg('grade') ?? 0, 2);
-                    return [
-                        'id' => $student->id,
-                        'name' => "{$student->first_name} {$student->last_name}",
-                        'average' => $average,
-                    ];
-                })->sortByDesc('average')->take(3)->values();
-
-                // ✅ Latest 3 announcements (specific class + global)
-                $announcements = \App\Models\Announcement::with('creator:id,name')
-                    ->where(function ($query) use ($class) {
-                        $query->where('class_id', $class->id)
-                            ->orWhereNull('class_id');
-                    })
-                    ->latest()
-                    ->take(3)
-                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
-                    ->map(function ($announcement) {
-                        return [
-                            'id' => $announcement->id,
-                            'title' => $announcement->title,
-                            'body' => $announcement->body,
-                            'created_at' => $announcement->created_at,
-                            'created_by' => $announcement->creator->name ?? 'Unknown',
-                        ];
-                    });
-
+            if (!$class) {
                 return Inertia::render('Teacher/Dashboard', [
                     'user' => $user,
                     'summary' => [
-                        'total_students' => $totalStudents,
-                        'total_subjects' => $totalSubjects,
-                        'class_average' => $classAverage,
-                        'top_subject' => $topSubject,
-                        'worst_subject' => $worstSubject,
+                        'total_students' => 0,
+                        'pending_students' => 0, // added
+                        'total_subjects' => 0,
+                        'class_average' => 0,
+                        'top_subject' => null,
+                        'worst_subject' => null,
                     ],
-                    'topStudents' => $topStudents,
-                    'announcements' => $announcements,
+                    'topStudents' => [],
+                    'announcements' => [],
                 ]);
+            }
+
+            // ✅ Total students
+            $totalStudents = $class->students->count();
+
+            // ✅ Pending students (not approved yet)
+            $pendingStudents = $class->students->where('approved_by_teacher', false)->count();
+
+            // ✅ Subjects for this grade level
+            $subjects = \App\Models\Subject::where('grade_level', $class->grade_level)->get();
+            $totalSubjects = $subjects->count();
+
+            // ✅ Class average
+            $classAverage = round($class->students->flatMap->grades->avg('grade') ?? 0, 2);
+
+            // ✅ Subject performance (avg per subject)
+            $subjectAverages = [];
+            foreach ($subjects as $subject) {
+                $grades = $class->students->flatMap(function ($student) use ($subject) {
+                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
+                });
+                $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
+            }
+
+            $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
+            $worstSubject = collect($subjectAverages)->sort()->keys()->first();
+
+            // ✅ Top 3 students (by average)
+            $topStudents = $class->students->map(function ($student) {
+                $average = round($student->grades->avg('grade') ?? 0, 2);
+                return [
+                    'id' => $student->id,
+                    'name' => "{$student->first_name} {$student->last_name}",
+                    'average' => $average,
+                ];
+            })->sortByDesc('average')->take(3)->values();
+
+            // ✅ Latest 3 announcements (specific class + global)
+            $announcements = \App\Models\Announcement::with('creator:id,name')
+                ->where(function ($query) use ($class) {
+                    $query->where('class_id', $class->id)
+                        ->orWhereNull('class_id');
+                })
+                ->latest()
+                ->take(3)
+                ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                ->map(function ($announcement) {
+                    return [
+                        'id' => $announcement->id,
+                        'title' => $announcement->title,
+                        'body' => $announcement->body,
+                        'created_at' => $announcement->created_at,
+                        'created_by' => $announcement->creator->name ?? 'Unknown',
+                    ];
+                });
+
+            return Inertia::render('Teacher/Dashboard', [
+                'user' => $user,
+                'summary' => [
+                    'total_students' => $totalStudents,
+                    'pending_students' => $pendingStudents, // ✅ added
+                    'total_subjects' => $totalSubjects,
+                    'class_average' => $classAverage,
+                    'top_subject' => $topSubject,
+                    'worst_subject' => $worstSubject,
+                ],
+                'topStudents' => $topStudents,
+                'announcements' => $announcements,
+            ]);
 
 
             //Parent Dashboard
