@@ -82,6 +82,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.students': '/teacher/students',
       'students.approval.list': '/students/approve',
       'teacher.announcements.create': '/teacher/announcements/create',
+      'teacher.analytics': '/teacher/analytics',
       'sf5.download': `/sf5/${params.class || 1}`,
       'classes.create': '/classes',
       'subjects.index': '/subjects',
@@ -154,6 +155,12 @@ const roleBasedNavigation = computed(() => {
         href: routeUrl('teacher.announcements.create'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m3-3h-6"></path></svg>`,
         description: 'Share class updates'
+      },
+      {
+        name: 'My Class Analytics',
+        href: routeUrl('teacher.analytics'),
+        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>`,
+        description: 'View analytics for my classes'
       },
       {
         name: 'Download SF5',

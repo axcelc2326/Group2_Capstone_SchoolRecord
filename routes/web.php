@@ -95,6 +95,9 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     Route::delete('/teacher/students/{student}/clear-grades', [TeacherStudentController::class, 'clearGrades'])->name('teacher.students.clearGrades');
     Route::delete('/teacher/students/clear-all-grades', [TeacherStudentController::class, 'clearAllGrades'])->name('teacher.students.clearAllGrades');
 
+    // Teachers Analytics
+    Route::get('/teacher/analytics', [AnalyticsController::class, 'teacherAnalytics'])->name('teacher.analytics');
+
     // SF5 Download (School Form 5)
     Route::get('/sf5/{class}', [GradeRemarkController::class, 'download'])->name('sf5.download');
 });

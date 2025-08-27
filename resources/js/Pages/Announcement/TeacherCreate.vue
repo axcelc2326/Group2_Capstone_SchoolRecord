@@ -29,10 +29,22 @@ const deleteAnnouncement = (id) => {
     confirmButtonText: 'Yes, delete it!',
   }).then((result) => {
     if (result.isConfirmed) {
-      router.delete(route('announcements.destroyTeacher', id));
+      router.delete(route('teacher.announcements.destroy', id), {
+        preserveScroll: true,
+        onSuccess: () => {
+          Swal.fire('Deleted!', 'The announcement has been deleted.', 'success')
+            .then(() => {
+              location.reload(); // ✅ reload page after success alert
+            });
+        },
+        onError: () => {
+          Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+        },
+      });
     }
   });
 };
+
 
 const openEditModal = (announcement) => {
   selectedAnnouncement.value = announcement;

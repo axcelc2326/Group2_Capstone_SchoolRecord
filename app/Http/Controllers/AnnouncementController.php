@@ -194,7 +194,7 @@ class AnnouncementController extends Controller
         return back()->with('success', 'Announcement deleted.');
     }
 
-        public function destroyTeacher($id)
+    public function destroyTeacher($id)
     {
         $announcement = Announcement::where('id', $id)
             ->where('created_by', auth()->id())
@@ -204,5 +204,4 @@ class AnnouncementController extends Controller
 
         return back()->with('success', 'Announcement deleted.');
     }
-
 }

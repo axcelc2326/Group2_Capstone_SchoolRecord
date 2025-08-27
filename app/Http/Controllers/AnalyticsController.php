@@ -61,6 +61,49 @@ class AnalyticsController extends Controller
         ]);
     }
 
+    public function teacherAnalytics(Request $request)
+    {
+        $user = auth()->user();
+
+        // ✅ Assuming your `ClassModel` has a `teacher_id` column
+        $classes = ClassModel::with('students.grades')
+            ->where('teacher_id', $user->id)
+            ->get();
+
+        $analytics = $classes->map(function ($class) {
+            $subjectAverages = [];
+
+            // ✅ Only fetch subjects for this class's grade level
+            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+
+            foreach ($subjects as $subject) {
+                $grades = $class->students->flatMap(function ($student) use ($subject) {
+                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
+                });
+
+                $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
+            }
+
+            $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
+            $lowSubject = collect($subjectAverages)->sort()->keys()->first();
+
+            return [
+                'class' => $class->name,
+                'grade_level' => $class->grade_level,
+                'subject_averages' => $subjectAverages,
+                'top_subject' => $topSubject,
+                'low_subject' => $lowSubject,
+                'total_students' => $class->students->count(),
+                'id' => $class->id,
+                'subjects' => $subjects,
+            ];
+        });
+
+        return Inertia::render('Analytics/TeacherIndex', [
+            'analytics' => $analytics,
+        ]);
+    }
+
     public function showClassStudents($id)
     {
         $class = ClassModel::with('students.user', 'students.grades')->findOrFail($id);
