@@ -81,8 +81,7 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     // Teacher-specific announcements
     Route::get('/teacher/announcements/create', [AnnouncementController::class, 'createTeacher'])->name('teacher.announcements.create');
     Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
-    Route::get('/teacher/announcements/{id}/edit', [AnnouncementController::class, 'editTeacher'])->name('teacher.announcements.edit');
-    Route::put('/teacher/announcements/{id}', [AnnouncementController::class, 'updateTeacher'])->name('teacher.announcements.update');
+    Route::put('/teacher/announcements/{id}', [AnnouncementController::class, 'updateTeacher'])->name('announcements.updateTeacher');
     Route::delete('/teacher/announcements/{id}', [AnnouncementController::class, 'destroyTeacher'])->name('teacher.announcements.destroy');
     
     // Student approval system
