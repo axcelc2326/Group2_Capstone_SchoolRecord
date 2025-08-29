@@ -322,7 +322,7 @@ function checkPasswordStrength() {
 }
 
 function register() {
-  form.post(route('register'), {
+  form.post(route('parents.store'), {
     onSuccess: () => {
       closeModal()
       form.reset()

@@ -57,11 +57,8 @@ Route::middleware(['auth', 'role:parent', 'verified'])->group(function () {
     // Parent-specific grade viewing
     Route::get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
     
-    // Student registration and management
-    Route::get('/students/register', [StudentController::class, 'create'])->name('students.create');
-    Route::post('/students', [StudentController::class, 'store'])->name('students.store');
-    Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
-    Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('students.destroy');
+    // Student registration
+    Route::get('/students/index', [StudentController::class, 'index'])->name('students.index');
 });
 
 /*
@@ -141,6 +138,26 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/class/{id}/students', [AnalyticsController::class, 'showClassStudents'])->name('analytics.class.students');
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🧑‍💼 ADMIN AND TEACHER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin|teacher'])->group(function () {
+    Route::get('/parents', [ParentController::class, 'index'])->name('parents.index');
+    Route::get('/parents/{parent}/students', [ParentController::class, 'getStudents'])->name('parents.students.index');
+    Route::post('/parents', [ParentController::class, 'store'])->name('parents.store');
+
+    // Store a new student for a specific parent
+    Route::post('/parents/{parent}/students', [StudentController::class, 'store'])->name('parents.students.store');
+
+    // Update a student (approve_by_teacher always true)
+    Route::put('/parents/{parent}/students/{student}', [StudentController::class, 'update'])->name('parents.students.update');
+
+    // Delete a student
+    Route::delete('/parents/{parent}/students/{student}', [StudentController::class, 'destroy'])->name('parents.students.destroy');
 });
 
 // ✅ Breeze Auth Routes

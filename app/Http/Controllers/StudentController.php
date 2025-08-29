@@ -10,7 +10,7 @@ use App\Models\Student;
 class StudentController extends Controller
 {
     // ✅ Show student registration form (for parents)
-    public function create()
+    public function index()
     {
         $classes = ClassModel::select('id', 'name', 'grade_level')->get();
 
@@ -26,8 +26,7 @@ class StudentController extends Controller
         ]);
     }
 
-    // ✅ Store the student after validation
-    public function store(Request $request)
+    public function store(Request $request, $parent)
     {
         $request->validate([
             'first_name' => 'required|string|max:255',
@@ -39,34 +38,43 @@ class StudentController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'class_id' => $request->class_id,
-            'parent_id' => auth()->id(), // assumes parent is logged in
+            'parent_id' => $parent,  // use the route parameter
+            'approved_by_teacher' => true,
         ]);
 
-        return redirect()->route('students.create')->with('success', 'Student registered!');
+        return redirect()->route('parents.index')->with('success', 'Student registered!');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $parentId, $studentId)
     {
-        $student = Student::where('id', $id)->where('parent_id', auth()->id())->firstOrFail();
+        // Find the student belonging to the given parent
+        $student = Student::where('id', $studentId)
+                        ->where('parent_id', $parentId)
+                        ->firstOrFail();
 
         $request->validate([
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'class_id' => 'required|exists:classes,id',
+            'last_name'  => 'required|string|max:255',
+            'class_id'   => 'required|exists:classes,id',
         ]);
 
         $student->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'class_id' => $request->class_id,
+            'first_name'          => $request->first_name,
+            'last_name'           => $request->last_name,
+            'class_id'            => $request->class_id,
+            'approved_by_teacher' => true, // always true
         ]);
 
-        return redirect()->route('students.create')->with('message', 'Student updated successfully.');
+        return redirect()->route('parents.index')->with('message', 'Student updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy($parentId, $studentId)
     {
-        $student = Student::where('id', $id)->where('parent_id', auth()->id())->firstOrFail();
+        // Find the student belonging to the given parent
+        $student = Student::where('id', $studentId)
+                        ->where('parent_id', $parentId)
+                        ->firstOrFail();
+
         $student->delete();
 
         return back()->with('message', 'Student deleted successfully.');

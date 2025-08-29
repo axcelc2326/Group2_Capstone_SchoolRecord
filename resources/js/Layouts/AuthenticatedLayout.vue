@@ -77,7 +77,8 @@ const routeUrl = (routeName, params = {}) => {
     const routeMap = {
       'dashboard': '/dashboard',
       'announcements.index': '/announcements',
-      'students.create': '/students/register',
+      'parents.index': '/parents',
+      'students.index': '/students/index',
       'parent.grades': '/parent/grades',
       'teacher.students': '/teacher/students',
       'students.approval.list': '/students/approve',
@@ -112,7 +113,17 @@ const quickActions = computed(() => [
     href: routeUrl('announcements.index'),
     icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M6.343 6.343a9 9 0 000 12.728m2.829-9.9a5 5 0 000 7.072M12 12h.01"></path></svg>`,
     description: 'School News & Updates'
-  }
+  },
+  {
+  name: 'Parents Management',
+  href: routeUrl('parents.index'),
+  icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                 d="M17 20h5v-2a4 4 0 00-4-4h-1m-6 6h6m-6 0a6 6 0 01-6-6V7a6 6 0 016-6h0a6 6 0 016 6v7a6 6 0 01-6 6z"/>
+         </svg>`,
+  description: 'Manage Parent Accounts & Assign Students'
+}
+
 ]);
 
 // Role-specific navigation items with proper unique icons (colors removed)
@@ -123,7 +134,7 @@ const roleBasedNavigation = computed(() => {
     sections['Parent Portal'] = [
       {
         name: 'Register Student',
-        href: routeUrl('students.create'),
+        href: routeUrl('students.index'),
         icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v4m0 0V4m0 4h4m-4 0H8"></path></svg>`,
         description: 'Enroll new student'
       },

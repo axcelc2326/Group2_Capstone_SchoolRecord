@@ -217,7 +217,12 @@ watch(() => props.student, (newStudent) => {
 }, { immediate: true })
 
 const submit = () => {
-  form.put(route('students.update', props.student.id), {
+  if (!props.student || !props.student.parent_id) return;
+
+  form.put(route('parents.students.update', { 
+    parent: props.student.parent_id, 
+    student: props.student.id 
+  }), {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
@@ -225,23 +230,16 @@ const submit = () => {
         position: 'top-end',
         icon: 'success',
         title: 'Student updated successfully',
-        background: '#1f2937', // Tailwind slate-900
-        color: '#f9fafb',       // Tailwind gray-50
-        iconColor: '#22c55e',   // Tailwind green-500
+        background: '#1f2937',
+        color: '#f9fafb',
+        iconColor: '#22c55e',
         showConfirmButton: false,
-        timer: 3000,
+        timer: 2000,
         timerProgressBar: true,
-        customClass: {
-          popup: 'rounded-lg border border-gray-700',
-          timerProgressBar: 'bg-green-500' // Tailwind green-500
-        }
-      }).then(() => {
-        location.reload() // Refreshes the page
       });
-      emit('updated')
-      emit('close')
+      emit('close');   // close modal
     }
-  })
+  });
 }
 
 function closeModal() {
