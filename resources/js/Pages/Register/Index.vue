@@ -3,27 +3,70 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import RegisterModal from '@/Components/RegisterModal.vue'
 import ManageParentModal from '@/Components/ManageParentModal.vue'
+import EditParentModal from '@/Components/EditParentModal.vue'
 import { ref } from 'vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   parents: Object,
-  classes: Array, // classes already come from backend
+  classes: Array,
   filters: Object,
 })
 
 const showRegisterModal = ref(false)
 const showManageModal = ref(false)
+const showEditParentModal = ref(false)
 const selectedParent = ref(null)
 
 const search = ref(props.filters.search || '')
+const selectedClass = ref(props.filters.class_id || '')
 
-const performSearch = () => {
-  router.get(route('parents.index'), { search: search.value }, { preserveState: true, replace: true })
+// Filter & search
+const applyFilters = () => {
+  router.get(route('parents.index'), 
+    { search: search.value, class_id: selectedClass.value }, 
+    { preserveState: true, replace: true }
+  )
 }
 
+// Open Manage modal
 const openManageModal = (parent) => {
   selectedParent.value = parent
   showManageModal.value = true
+}
+
+// Open Edit modal
+const openEditParentModal = (parent) => {
+  selectedParent.value = parent
+  showEditParentModal.value = true
+}
+
+// Delete parent
+const confirmDeleteParent = (parentId) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will delete the parent and all their students!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(route('parents.destroy', parentId), {
+        preserveScroll: true,
+        onSuccess: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Parent deleted successfully',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+          })
+        }
+      })
+    }
+  })
 }
 </script>
 
@@ -34,18 +77,36 @@ const openManageModal = (parent) => {
     <div class="max-w-6xl mx-auto py-6">
       <h1 class="text-2xl font-bold mb-6">Parents Management</h1>
 
-      <!-- Search + Register Parent -->
-      <div class="flex justify-between items-center mb-4">
-        <div>
+      <!-- Search + Class Filter + Register Parent -->
+      <div class="flex justify-between items-center mb-4 space-x-4">
+        <div class="flex space-x-2">
           <input
             v-model="search"
-            @keyup.enter="performSearch"
+            @keyup.enter="applyFilters"
             type="text"
             placeholder="Search parents..."
-            class="px-4 py-2 border rounded-lg"
+            class="w-64 px-4 py-2 border-white text-white rounded-lg bg-transparent"
           />
-          <button @click="performSearch" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg">
-            Search
+          <select
+            v-model="selectedClass"
+            @change="applyFilters"
+            class="w-64 px-4 py-2 border border-white text-white rounded-lg bg-transparent appearance-none"
+          >
+            <option value="" class="bg-transparent text-white">All Classes</option>
+            <option 
+              v-for="cls in props.classes" 
+              :key="cls.id" 
+              :value="cls.id"
+              class="bg-transparent text-white"
+            >
+              {{ cls.name }} (Grade {{ cls.grade_level }})
+            </option>
+          </select>
+          <button 
+            @click="applyFilters"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            Filter
           </button>
         </div>
 
@@ -87,12 +148,24 @@ const openManageModal = (parent) => {
                 </span>
                 <span v-else class="text-gray-400 italic">No student assigned</span>
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 flex space-x-2">
                 <button
                   @click="openManageModal(parent)"
                   class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700"
                 >
                   Manage
+                </button>
+                <button
+                  @click="openEditParentModal(parent)"
+                  class="px-3 py-1 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="() => confirmDeleteParent(parent.id)"
+                  class="px-3 py-1 bg-red-600 text-white rounded shadow hover:bg-red-700"
+                >
+                  Delete
                 </button>
               </td>
             </tr>
@@ -117,18 +190,27 @@ const openManageModal = (parent) => {
     </div>
   </AuthenticatedLayout>
 
-  <!-- Register Modal -->
+  <!-- Modals -->
   <RegisterModal 
     :show="showRegisterModal" 
     @close="showRegisterModal = false"
   />
-
-  <!-- Manage Parent Modal -->
   <ManageParentModal
     v-if="selectedParent"
     :show="showManageModal"
     :parent="selectedParent"
     :classes="props.classes"
     @close="showManageModal = false"
+  />
+  <EditParentModal
+    v-if="selectedParent"
+    :show="showEditParentModal"
+    :parent="selectedParent"
+    @close="showEditParentModal = false"
+    @updated="(updatedParent) => {
+        const index = props.parents.data.findIndex(p => p.id === updatedParent.id);
+        if (index !== -1) props.parents.data[index] = { ...updatedParent };
+        showEditParentModal.value = false;
+    }"
   />
 </template>

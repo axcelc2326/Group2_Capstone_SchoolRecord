@@ -3,7 +3,24 @@ import { ref, computed, onMounted } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import Footer from '@/Components/Footer.vue'
-import { ChevronRight } from 'lucide-vue-next'
+import { 
+  ChevronRight, 
+  LayoutDashboard, 
+  Speaker, 
+  Users, 
+  User, 
+  ClipboardList, 
+  UserCheck, 
+  MessageCirclePlus, 
+  BarChart3, 
+  Download, 
+  School, 
+  BookOpen, 
+  UserPlus, 
+  Megaphone, 
+  TrendingUp, 
+  Settings 
+} from 'lucide-vue-next'
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
@@ -100,48 +117,38 @@ const routeUrl = (routeName, params = {}) => {
   }
 };
 
-// Quick Actions - Available to all users with proper icons
+// Quick Actions - Available to all users (Updated to use lucide-vue-next)
 const quickActions = computed(() => [
   {
     name: 'Dashboard',
     href: routeUrl('dashboard'),
-    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 9 5 5V9l5 5"></path></svg>`,
+    icon: LayoutDashboard,
     description: 'Overview & Quick Stats'
   },
   {
     name: 'View Announcements',
     href: routeUrl('announcements.index'),
-    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M6.343 6.343a9 9 0 000 12.728m2.829-9.9a5 5 0 000 7.072M12 12h.01"></path></svg>`,
+    icon: Speaker,
     description: 'School News & Updates'
-  },
-  {
-  name: 'Parents Management',
-  href: routeUrl('parents.index'),
-  icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                 d="M17 20h5v-2a4 4 0 00-4-4h-1m-6 6h6m-6 0a6 6 0 01-6-6V7a6 6 0 016-6h0a6 6 0 016 6v7a6 6 0 01-6 6z"/>
-         </svg>`,
-  description: 'Manage Parent Accounts & Assign Students'
-}
-
+  }
 ]);
 
-// Role-specific navigation items with proper unique icons (colors removed)
+// Role-specific navigation items with proper unique icons (Updated to use lucide-vue-next)
 const roleBasedNavigation = computed(() => {
   const sections = {};
 
   if (isParent.value) {
     sections['Parent Portal'] = [
       {
-        name: 'Register Student',
+        name: 'My Student',
         href: routeUrl('students.index'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v4m0 0V4m0 4h4m-4 0H8"></path></svg>`,
-        description: 'Enroll new student'
+        icon: User,
+        description: 'View My student'
       },
       {
         name: 'View Child\'s Grades',
         href: routeUrl('parent.grades'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>`,
+        icon: ClipboardList,
         description: 'Academic performance'
       }
     ];
@@ -150,33 +157,39 @@ const roleBasedNavigation = computed(() => {
   if (isTeacher.value) {
     sections['Teacher Portal'] = [
       {
+        name: 'Parents Management',
+        href: routeUrl('parents.index'),
+        icon: Users,
+        description: 'Manage Parent Accounts & Assign Students'
+      },
+      {
         name: 'View My Students',
         href: routeUrl('teacher.students'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path></svg>`,
+        icon: Users,
         description: 'Manage class roster'
       },
       {
         name: 'Approve Students',
         href: routeUrl('students.approval.list'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>`,
+        icon: UserCheck,
         description: 'Review enrollments'
       },
       {
         name: 'Create Class Announcement',
         href: routeUrl('teacher.announcements.create'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m3-3h-6"></path></svg>`,
+        icon: MessageCirclePlus,
         description: 'Share class updates'
       },
       {
         name: 'My Class Analytics',
         href: routeUrl('teacher.analytics'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>`,
+        icon: BarChart3,
         description: 'View analytics for my classes'
       },
       {
         name: 'Download SF5',
         href: routeUrl('sf5.download', { class: 1 }),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>`,
+        icon: Download,
         description: 'Export class records'
       }
     ];
@@ -185,39 +198,45 @@ const roleBasedNavigation = computed(() => {
   if (isAdmin.value) {
     sections['Administration'] = [
       {
+        name: 'Parents Management',
+        href: routeUrl('parents.index'),
+        icon: Users,
+        description: 'Manage Parent Accounts & Assign Students'
+      },
+      {
         name: 'Create Class',
         href: routeUrl('classes.create'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>`,
+        icon: School,
         description: 'Setup new classes'
       },
       {
         name: 'Manage Subjects',
         href: routeUrl('subjects.index'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`,
+        icon: BookOpen,
         description: 'Configure curriculum'
       },
       {
         name: 'Assign Teachers',
         href: routeUrl('admin.assign-teacher'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>`,
+        icon: UserPlus,
         description: 'Staff assignments'
       },
       {
         name: 'Create School Announcement',
         href: routeUrl('announcements.create'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path><circle cx="18" cy="8" r="2" fill="currentColor"></circle></svg>`,
+        icon: Megaphone,
         description: 'School-wide updates'
       },
       {
         name: 'View Analytics',
         href: routeUrl('analytics.index'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>`,
+        icon: TrendingUp,
         description: 'Performance insights'
       },
       {
         name: 'Manage Users',
         href: routeUrl('admin.users.index'),
-        icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>`,
+        icon: Settings,
         description: 'User management'
       }
     ];
@@ -312,9 +331,7 @@ const roleBasedNavigation = computed(() => {
               <template #content>
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/20 border border-white/20 overflow-hidden">
                   <DropdownLink :href="route('profile.edit')" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300 group">
-                    <svg class="w-4 h-4 mr-3 transition-all duration-300 group-hover:text-blue-600 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
+                    <User class="w-4 h-4 mr-3 transition-all duration-300 group-hover:text-blue-600 group-hover:scale-110" />
                     Profile Settings
                   </DropdownLink>
                   <hr class="my-2 border-gray-200">
@@ -375,7 +392,7 @@ const roleBasedNavigation = computed(() => {
                         animate-pulse">
                 </div>
                 
-                <div v-html="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300'"></div>
+                <component :is="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300'" class="w-5 h-5" />
                 <div class="flex flex-col flex-1 relative z-10">
                   <span class="font-semibold transition-all duration-300">{{ action.name }}</span>
                   <span class="text-xs opacity-70 transition-all duration-300">{{ action.description }}</span>
@@ -429,13 +446,13 @@ const roleBasedNavigation = computed(() => {
                 </div>
 
                 <!-- Icon -->
-                <div 
-                  v-html="item.icon" 
+                <component 
+                  :is="item.icon" 
                   :class="isActiveRoute(item.href) 
                     ? 'text-white' 
                     : 'text-white/70 group-hover:text-white transition-colors duration-300'"
-                  class="transform group-hover:scale-110 transition-transform duration-300"
-                ></div>
+                  class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300"
+                />
 
                 <!-- Text -->
                 <div class="flex flex-col flex-1 relative z-10">
@@ -520,7 +537,7 @@ const roleBasedNavigation = computed(() => {
                           rounded-full shadow-[0_0_12px_rgba(167,139,250,0.8)]
                           animate-pulse">
                   </div>
-                  <div v-html="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300'"></div>
+                  <component :is="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300'" class="w-5 h-5" />
                   <div class="flex flex-col flex-1 relative z-10">
                     <span class="font-semibold transition-all duration-300">{{ action.name }}</span>
                     <span class="text-xs opacity-70 transition-all duration-300">{{ action.description }}</span>
@@ -580,13 +597,13 @@ const roleBasedNavigation = computed(() => {
                   </div>
 
                   <!-- Icon -->
-                  <div 
-                    v-html="item.icon" 
+                  <component 
+                    :is="item.icon" 
                     :class="isActiveRoute(item.href) 
                       ? 'text-white' 
                       : 'text-white/70 group-hover:text-white transition-colors duration-300'"
-                    class="transform group-hover:scale-110 transition-transform duration-300"
-                  ></div>
+                    class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300"
+                  />
 
                   <!-- Text -->
                   <div class="flex flex-col flex-1 relative z-10">
@@ -625,7 +642,12 @@ const roleBasedNavigation = computed(() => {
                 ]"
                 :title="action.name"
               >
-                <div v-html="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
+                <component 
+                  :is="action.icon" 
+                  :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'" 
+                  class="w-5 h-5"
+                  :key="`collapsed-action-${action.name}`"
+                />
                 
                 <!-- Active underline effect for collapsed -->
                 <div 
@@ -653,7 +675,12 @@ const roleBasedNavigation = computed(() => {
                 ]"
                 :title="item.name"
               >
-                <div v-html="item.icon" :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'"></div>
+                <component 
+                  :is="item.icon" 
+                  :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'" 
+                  class="w-5 h-5"
+                  :key="`collapsed-${category}-${item.name}`"
+                />
                 
                 <!-- Active underline effect for collapsed -->
                 <div 

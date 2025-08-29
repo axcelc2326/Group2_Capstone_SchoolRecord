@@ -20,7 +20,7 @@ class StudentController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('Parent/RegisterStudent', [
+        return Inertia::render('Parent/MyStudent', [
             'classes' => $classes,
             'students' => $students,
         ]);
@@ -42,7 +42,7 @@ class StudentController extends Controller
             'approved_by_teacher' => true,
         ]);
 
-        return redirect()->route('parents.index')->with('success', 'Student registered!');
+        return back()->with('success', 'Student Created successfully!');
     }
 
     public function update(Request $request, $parentId, $studentId)
@@ -65,7 +65,7 @@ class StudentController extends Controller
             'approved_by_teacher' => true, // always true
         ]);
 
-        return redirect()->route('parents.index')->with('message', 'Student updated successfully.');
+        return back()->with('success', 'Student Updated successfully!');
     }
 
     public function destroy($parentId, $studentId)

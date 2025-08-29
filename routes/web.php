@@ -54,11 +54,11 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:parent', 'verified'])->group(function () {
+    // Parents Student
+    Route::get('/students/index', [StudentController::class, 'index'])->name('students.index');
+
     // Parent-specific grade viewing
     Route::get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
-    
-    // Student registration
-    Route::get('/students/index', [StudentController::class, 'index'])->name('students.index');
 });
 
 /*
@@ -146,17 +146,18 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin|teacher'])->group(function () {
+    // Creates an account for Parents
     Route::get('/parents', [ParentController::class, 'index'])->name('parents.index');
-    Route::get('/parents/{parent}/students', [ParentController::class, 'getStudents'])->name('parents.students.index');
     Route::post('/parents', [ParentController::class, 'store'])->name('parents.store');
+    Route::put('/parents/{parent}', [ParentController::class, 'update'])->name('parents.update');
+    Route::delete('/parents/{id}', [ParentController::class, 'destroy'])->name('parents.destroy');
 
-    // Store a new student for a specific parent
+    // Pass the data into the Modal
+    Route::get('/parents/{parent}/students', [ParentController::class, 'getStudents'])->name('parents.students.index');
+
+    // Register Student into the parent with edit and delete
     Route::post('/parents/{parent}/students', [StudentController::class, 'store'])->name('parents.students.store');
-
-    // Update a student (approve_by_teacher always true)
     Route::put('/parents/{parent}/students/{student}', [StudentController::class, 'update'])->name('parents.students.update');
-
-    // Delete a student
     Route::delete('/parents/{parent}/students/{student}', [StudentController::class, 'destroy'])->name('parents.students.destroy');
 });
 

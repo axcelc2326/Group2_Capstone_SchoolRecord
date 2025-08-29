@@ -12,29 +12,33 @@ class ParentController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $classId = $request->input('class_id'); // selected class filter
 
         // Parents with their students
         $parents = User::role('parent')
-            ->with(['students.class']) // include each student's class
+            ->with(['students.class'])
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
+            ->when($classId, function ($query, $classId) {
+                // Only include parents who have at least one student in this class
+                $query->whereHas('students', function ($q) use ($classId) {
+                    $q->where('class_id', $classId);
+                });
+            })
             ->paginate(50)
             ->withQueryString();
 
-        // All classes (for dropdowns, selection, etc.)
+        // All classes for dropdown
         $classes = ClassModel::select('id', 'name', 'grade_level')->get();
-
-        // All students with their class
-        $students = Student::with('class')->get();
 
         return Inertia::render('Register/Index', [
             'parents' => $parents,
             'classes' => $classes,
-            'students' => $students,
             'filters' => [
                 'search' => $search,
+                'class_id' => $classId,
             ],
         ]);
     }
@@ -56,6 +60,39 @@ class ParentController extends Controller
         $user->assignRole('parent'); // 👈 auto parent role
 
         return back()->with('success', 'Parent registered successfully!');
+    }
+
+    public function update(Request $request, User $parent)
+    {
+        // Validate input
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $parent->id,
+            'password' => 'nullable|string|confirmed|min:6',
+        ]);
+
+        // Update parent info
+        $parent->name = $data['name'];
+        $parent->email = $data['email'];
+        if (!empty($data['password'])) {
+            $parent->password = bcrypt($data['password']);
+        }
+        $parent->save();
+
+        return back()->with('success', 'Parent Updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $parent = User::findOrFail($id);
+
+        // Delete all students linked to this parent
+        $parent->students()->delete();
+
+        // Delete the parent user account
+        $parent->delete();
+
+        return back()->with('success', 'Parent and their students deleted successfully.');
     }
 
     public function getStudents(User $parent)
