@@ -14,21 +14,24 @@ class ParentController extends Controller
         $search = $request->input('search');
         $classId = $request->input('class_id'); // selected class filter
 
-        // Parents with their students
-        $parents = User::role('parent')
+        // Filtered parents query
+        $parentQuery = User::role('parent')
             ->with(['students.class'])
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
             ->when($classId, function ($query, $classId) {
-                // Only include parents who have at least one student in this class
                 $query->whereHas('students', function ($q) use ($classId) {
                     $q->where('class_id', $classId);
                 });
-            })
-            ->paginate(50)
-            ->withQueryString();
+            });
+
+        // Paginated parents (with filters)
+        $parents = $parentQuery->paginate(50)->withQueryString();
+
+        // ✅ Total parents ever created (all with parent role, ignoring filters)
+        $totalMadeParents = User::role('parent')->count();
 
         // All classes for dropdown
         $classes = ClassModel::select('id', 'name', 'grade_level')->get();
@@ -36,6 +39,7 @@ class ParentController extends Controller
         return Inertia::render('Register/Index', [
             'parents' => $parents,
             'classes' => $classes,
+            'totalMadeParents' => $totalMadeParents, // 👈 pass to frontend
             'filters' => [
                 'search' => $search,
                 'class_id' => $classId,

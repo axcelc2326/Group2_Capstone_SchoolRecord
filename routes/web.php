@@ -43,10 +43,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ✅ Public Announcements (accessible to all authenticated users)
-Route::middleware('auth')->group(function () {
-    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +55,9 @@ Route::middleware(['auth', 'role:parent', 'verified'])->group(function () {
 
     // Parent-specific grade viewing
     Route::get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
+
+    // Announcements from Admin and Class
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 });
 
 /*

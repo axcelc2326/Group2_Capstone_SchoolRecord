@@ -30,7 +30,7 @@
             <div
               v-if="show"
               ref="modalContent"
-              class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
+              class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
               @click.stop
             >
               <!-- Gradient overlay for visual depth -->
@@ -140,8 +140,6 @@
                     <p v-if="form.password.length > 0">Password should contain:</p>
                     <ul class="list-disc list-inside space-y-1 mt-1">
                       <li :class="{'text-green-500': hasMinLength}">At least 8 characters</li>
-                      <li :class="{'text-green-500': hasUppercase}">One uppercase letter</li>
-                      <li :class="{'text-green-500': hasLowercase}">One lowercase letter</li>
                       <li :class="{'text-green-500': hasNumber}">One number</li>
                       <li :class="{'text-green-500': hasSpecialChar}">One special character</li>
                     </ul>
@@ -182,24 +180,6 @@
                     </button>
                   </div>
                   <InputError class="mt-1" :message="form.errors.password_confirmation" />
-                </div>
-
-                <!-- Terms Checkbox -->
-                <div class="flex items-start">
-                  <div class="flex items-center h-5">
-                    <input
-                      id="terms"
-                      v-model="form.terms"
-                      type="checkbox"
-                      class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 transition-colors"
-                      required
-                    >
-                  </div>
-                  <div class="ml-3 text-sm">
-                    <label for="terms" class="font-medium text-gray-700 dark:text-gray-300">
-                      I agree to the <a href="#" class="text-blue-600 hover:text-blue-500 dark:text-blue-400">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500 dark:text-blue-400">Privacy Policy</a>
-                    </label>
-                  </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -264,14 +244,11 @@ const form = useForm({
   email: '',
   password: '',
   password_confirmation: '',
-  terms: false,
 })
 
 // Password strength indicators
 const passwordStrength = ref(0)
 const hasMinLength = computed(() => form.password.length >= 8)
-const hasUppercase = computed(() => /[A-Z]/.test(form.password))
-const hasLowercase = computed(() => /[a-z]/.test(form.password))
 const hasNumber = computed(() => /[0-9]/.test(form.password))
 const hasSpecialChar = computed(() => /[^A-Za-z0-9]/.test(form.password))
 
@@ -303,19 +280,12 @@ function checkPasswordStrength() {
   let strength = 0
   
   // Length check
-  if (form.password.length >= 8) strength += 20
-  if (form.password.length >= 12) strength += 10
+  if (form.password.length >= 8) strength += 40
+  if (form.password.length >= 12) strength += 20
   
   // Character type checks
-  if (hasUppercase.value) strength += 15
-  if (hasLowercase.value) strength += 15
-  if (hasNumber.value) strength += 15
-  if (hasSpecialChar.value) strength += 25
-  
-  // Bonus for multiple character types
-  const typesCount = [hasUppercase, hasLowercase, hasNumber, hasSpecialChar]
-    .filter(Boolean).length
-  if (typesCount >= 3) strength += 10
+  if (hasNumber.value) strength += 20
+  if (hasSpecialChar.value) strength += 20
   
   // Cap at 100
   passwordStrength.value = Math.min(strength, 100)

@@ -125,12 +125,6 @@ const quickActions = computed(() => [
     icon: LayoutDashboard,
     description: 'Overview & Quick Stats'
   },
-  {
-    name: 'View Announcements',
-    href: routeUrl('announcements.index'),
-    icon: Speaker,
-    description: 'School News & Updates'
-  }
 ]);
 
 // Role-specific navigation items with proper unique icons (Updated to use lucide-vue-next)
@@ -150,6 +144,12 @@ const roleBasedNavigation = computed(() => {
         href: routeUrl('parent.grades'),
         icon: ClipboardList,
         description: 'Academic performance'
+      },
+      {
+        name: 'View Announcements',
+        href: routeUrl('announcements.index'),
+        icon: Speaker,
+        description: 'School News & Updates'
       }
     ];
   }
