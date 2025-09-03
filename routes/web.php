@@ -23,9 +23,8 @@ use Inertia\Inertia;
 
 // ✅ Default landing page
 Route::get('/', function () {
-    return Inertia::render('LandingPage', [
+    return Inertia::render('Auth/Login', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
