@@ -79,11 +79,6 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     Route::post('/teacher/announcements', [AnnouncementController::class, 'storeTeacher'])->name('teacher.announcements.store');
     Route::put('/teacher/announcements/{id}', [AnnouncementController::class, 'updateTeacher'])->name('announcements.updateTeacher');
     Route::delete('/teacher/announcements/{id}', [AnnouncementController::class, 'destroyTeacher'])->name('teacher.announcements.destroy');
-    
-    // Student approval system
-    Route::get('/students/approve', [TeacherController::class, 'approveStudents'])->name('students.approval.list');
-    Route::put('/students/{student}/approve', [TeacherController::class, 'approveStudent'])->name('students.approve');
-    Route::put('/students/{student}/deny', [TeacherController::class, 'denyStudent'])->name('students.deny');
 
     // Advanced student management
     Route::put('/students/{student}/unapprove', [TeacherStudentController::class, 'unapproveStudent'])->name('teacher.students.unapprove');
@@ -128,15 +123,12 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     Route::put('/announcements/{id}', [AnnouncementController::class, 'updateAdmin'])->name('announcements.update');
     Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroyAdmin'])->name('announcements.destroy');
 
-    // User management
-    Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
-    Route::get('/admin/users/{user}', [UserManagementController::class, 'show'])->name('admin.users.show');
-    Route::put('/admin/users/{user}', [UserManagementController::class, 'update'])->name('admin.users.update');
-    Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
-
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/analytics/class/{id}/students', [AnalyticsController::class, 'showClassStudents'])->name('analytics.class.students');
+
+    // Add Teacher User
+    Route::resource('teachers', TeacherController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 /*

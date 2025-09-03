@@ -19,7 +19,8 @@ import {
   UserPlus, 
   Megaphone, 
   TrendingUp, 
-  Settings 
+  Settings,
+  Cog
 } from 'lucide-vue-next'
 import { Link, usePage } from '@inertiajs/vue3';
 
@@ -94,11 +95,9 @@ const routeUrl = (routeName, params = {}) => {
     const routeMap = {
       'dashboard': '/dashboard',
       'announcements.index': '/announcements',
-      'parents.index': '/parents',
       'students.index': '/students/index',
       'parent.grades': '/parent/grades',
       'teacher.students': '/teacher/students',
-      'students.approval.list': '/students/approve',
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
       'sf5.download': `/sf5/${params.class || 1}`,
@@ -106,8 +105,9 @@ const routeUrl = (routeName, params = {}) => {
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
       'announcements.create': '/announcements/create',
+      'teachers.index': '/teachers',
       'analytics.index': '/analytics',
-      'admin.users.index': '/admin/users'
+      'parents.index': '/parents'
     };
     
     return routeMap[routeName] || '#';
@@ -157,22 +157,10 @@ const roleBasedNavigation = computed(() => {
   if (isTeacher.value) {
     sections['Teacher Portal'] = [
       {
-        name: 'Parents Management',
-        href: routeUrl('parents.index'),
-        icon: Users,
-        description: 'Manage Parent Accounts & Assign Students'
-      },
-      {
         name: 'View My Students',
         href: routeUrl('teacher.students'),
         icon: Users,
         description: 'Manage class roster'
-      },
-      {
-        name: 'Approve Students',
-        href: routeUrl('students.approval.list'),
-        icon: UserCheck,
-        description: 'Review enrollments'
       },
       {
         name: 'Create Class Announcement',
@@ -191,18 +179,18 @@ const roleBasedNavigation = computed(() => {
         href: routeUrl('sf5.download', { class: 1 }),
         icon: Download,
         description: 'Export class records'
+      },
+      {
+        name: 'Parent Management',
+        href: routeUrl('parents.index'),
+        icon: Settings,
+        description: 'Manage Parent Accounts & Assign Students'
       }
     ];
   }
 
   if (isAdmin.value) {
     sections['Administration'] = [
-      {
-        name: 'Parents Management',
-        href: routeUrl('parents.index'),
-        icon: Users,
-        description: 'Manage Parent Accounts & Assign Students'
-      },
       {
         name: 'Create Class',
         href: routeUrl('classes.create'),
@@ -234,10 +222,16 @@ const roleBasedNavigation = computed(() => {
         description: 'Performance insights'
       },
       {
-        name: 'Manage Users',
-        href: routeUrl('admin.users.index'),
+        name: 'Teacher Management', // 👈 new section
+        href: routeUrl('teachers.index'),
+        icon: Cog, // you can swap for another icon like UserCog or ChalkboardTeacher
+        description: 'Manage Teacher Accounts'
+      },
+      {
+        name: 'Parent Management',
+        href: routeUrl('parents.index'),
         icon: Settings,
-        description: 'User management'
+        description: 'Manage Parent Accounts & Assign Students'
       }
     ];
   }

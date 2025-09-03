@@ -21,7 +21,6 @@ import {
   Sparkles,
   Activity,
   Flame,
-  Hourglass // ⏳ for pending students
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -33,7 +32,6 @@ const props = defineProps({
       class_average: 0,
       top_subject: null,
       worst_subject: null,
-      pending_students: 0, // ✅ new property
     }),
   },
   topStudents: {
@@ -54,7 +52,6 @@ const getSummaryIcon = (key) => {
     class_average: Target,
     top_subject: Flame,
     worst_subject: AlertCircle,
-    pending_students: Hourglass, // ✅ added icon
   };
   return icons[key] || BarChart3;
 };
@@ -67,7 +64,6 @@ const getCardGradient = (key) => {
     class_average: 'from-rose-500 to-pink-600',
     top_subject: 'from-amber-500 to-orange-600',
     worst_subject: 'from-red-500 to-rose-600',
-    pending_students: 'from-cyan-500 to-blue-600' // ✅ new gradient
   };
   return gradients[key] || 'from-gray-500 to-slate-600';
 };
@@ -80,7 +76,6 @@ const formatCardTitle = (key) => {
     class_average: 'Class Average',
     top_subject: 'Top Performing',
     worst_subject: 'Needs Attention',
-    pending_students: 'Pending Students' // ✅ new title
   };
   return titles[key] || key.replace('_', ' ');
 };
@@ -150,10 +145,9 @@ const getRankStyling = (index) => {
 const summaryItems = [
   { key: 'total_students', value: props.summary.total_students },
   { key: 'total_subjects', value: props.summary.total_subjects },
-  { key: 'pending_students', value: props.summary.pending_students }, // ✅ added here
+  { key: 'class_average', value: `${props.summary.class_average}%` },
   { key: 'top_subject', value: props.summary.top_subject || 'N/A' },
-  { key: 'worst_subject', value: props.summary.worst_subject || 'N/A' },
-  { key: 'class_average', value: `${props.summary.class_average}%` }
+  { key: 'worst_subject', value: props.summary.worst_subject || 'N/A' }
 ];
 </script>
 

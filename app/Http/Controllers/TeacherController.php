@@ -3,63 +3,99 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class TeacherController extends Controller
 {
-    // View all unapproved students under the teacher's class
-    public function approveStudents()
+    public function index(Request $request)
     {
-        $teacherId = Auth::id();
+        $search = $request->input('search');
 
-        $students = Student::with(['class', 'parent']) // Load parent and class
-            ->whereHas('class', function ($query) use ($teacherId) {
-                $query->where('teacher_id', $teacherId);
+        $teachers = User::role('teacher')
+            ->with('class') // 👈 or 'classes'
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
             })
-            ->where('approved_by_teacher', false)
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        // Add parent_name for each student
-        $students->transform(function ($student) {
-            $student->parent_name = $student->parent
-                ? $student->parent->name // parent is a User, use 'name' field
-                : 'N/A';
-            return $student;
-        });
+        $totalTeachers = User::role('teacher')->count();
 
-        // Count of pending students
-        $pendingCount = $students->count();
-
-        return Inertia::render('Teacher/ApproveStudents', [
-            'students' => $students,
-            'pendingCount' => $pendingCount,
+        return Inertia::render('Admin/MyTeacher', [
+            'teachers' => $teachers,
+            'totalTeachers' => $totalTeachers,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 
-    // ✅ Teacher approval method
-    public function approveStudent($id)
+    public function store(Request $request)
     {
-        $student = Student::findOrFail($id);
-        $student->approved_by_teacher = true;
-        $student->save();
-
-        return back()->with('message', 'Student approved.');
-    }
-
-    public function denyStudent($studentId)
-    {
-        $student = Student::findOrFail($studentId);
-
-        // Remove from class and unapprove
-        $student->update([
-            'class_id' => null,
-            'approved_by_teacher' => false,
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
         ]);
 
-        return redirect()->back()->with('success', 'Student has been denied and removed from your class.');
+        $user = User::create([
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+
+        $user->assignRole('teacher');
+
+        return back()->with('success', 'Teacher created successfully!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $teacher = User::role('teacher')->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $teacher->id,
+            'password' => 'nullable|min:6|confirmed',
+        ]);
+
+        $teacher->name = $validated['name'];
+        $teacher->email = $validated['email'];
+
+        if (!empty($validated['password'])) {
+            $teacher->password = bcrypt($validated['password']);
+        }
+
+        $teacher->save();
+
+        return back()->with('success', 'Teacher updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $teacher = User::role('teacher')->findOrFail($id);
+
+        // detach related classes
+        if (method_exists($teacher, 'classes')) {
+            $teacher->classes()->detach();
+        }
+
+        // delete related announcements
+        if (method_exists($teacher, 'announcements')) {
+            $teacher->announcements()->delete();
+        }
+
+        $teacher->delete();
+
+        return back()->with('success', 'Teacher deleted successfully.');
     }
 
     public function myStudents(Request $request)
