@@ -99,11 +99,10 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
 */
 Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     // Class management
-    Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
-    Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
-    Route::get('/classes/{class}/edit', [ClassController::class, 'edit'])->name('classes.edit');
-    Route::put('/classes/{class}', [ClassController::class, 'update'])->name('classes.update');
-    Route::delete('/classes/{class}', [ClassController::class, 'destroy'])->name('classes.destroy');
+    Route::get('/classes', [ClassController::class, 'index'])->name('classes.index');
+    Route::post('/classes', [ClassController::class, 'store'])->name('classes.store'); 
+    Route::put('/classes/{id}', [ClassController::class, 'update'])->name('classes.update');
+    Route::delete('/classes/{class}', [ClassController::class, 'destroy'])->name('classes.destroy'); 
 
     // Subject management
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');

@@ -101,7 +101,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
       'sf5.download': `/sf5/${params.class || 1}`,
-      'classes.create': '/classes',
+      'classes.index': '/classes',
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
       'announcements.create': '/announcements/create',
@@ -193,7 +193,7 @@ const roleBasedNavigation = computed(() => {
     sections['Administration'] = [
       {
         name: 'Create Class',
-        href: routeUrl('classes.create'),
+        href: routeUrl('classes.index'),
         icon: School,
         description: 'Setup new classes'
       },

@@ -1,20 +1,44 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\ClassModel;
 use Inertia\Inertia;
 
 class ClassController extends Controller
 {
-    // ✅ Display all classes with pagination and form
-    public function create(Request $request)
-    {
-        $classes = ClassModel::orderBy('grade_level', 'asc')->paginate(10);
 
-        return Inertia::render('Classes/Create', [
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $gradeLevel = $request->input('grade_level');
+
+        $classes = ClassModel::with('teacher') // eager load teacher
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('grade_level', 'like', "%{$search}%");
+                });
+            })
+            ->when($gradeLevel, function ($query, $gradeLevel) {
+                $query->where('grade_level', $gradeLevel);
+            })
+            ->orderBy('grade_level', 'asc')
+            ->paginate(10)
+            ->withQueryString();
+
+        // get all teachers
+        $teachers = User::role('teacher')->select('id', 'name')->get();
+
+        return Inertia::render('Admin/CreateClass', [
             'classes' => $classes,
+            'filters' => [
+                'search' => $search,
+                'grade_level' => $gradeLevel,
+            ],
+            'totalCount' => ClassModel::count(),
+            'teachers' => $teachers, // ✅ pass teachers to Vue
         ]);
     }
 
@@ -23,7 +47,7 @@ class ClassController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'grade_level' => 'required|integer|min:1|max:12',
+            'grade_level' => 'required|string|in:K1,K2,1,2,3,4,5,6',
         ]);
 
         ClassModel::create([
@@ -31,27 +55,25 @@ class ClassController extends Controller
             'grade_level' => $request->grade_level,
         ]);
 
-        return redirect()->route('classes.create')->with('success', 'Class created successfully!');
+        return redirect()->route('classes.index')->with('success', 'Class created successfully!');
     }
 
-    // ✅ Show edit form
-    public function edit(ClassModel $class)
+    public function update(Request $request, $id)
     {
-        return Inertia::render('Classes/Edit', [
-            'classItem' => $class,
-        ]);
-    }
-
-    public function update(Request $request, ClassModel $class)
-    {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'grade_level' => 'required|integer|min:1|max:12',
+            'grade_level' => 'required|string|max:10', // since we allow K1, K2, and numbers
         ]);
 
-        $class->update($validated);
+        $class = ClassModel::findOrFail($id);
 
-        return redirect()->route('classes.create')->with('success', 'Class updated successfully.');
+        $class->update([
+            'name' => $request->name,
+            'grade_level' => $request->grade_level,
+        ]);
+
+        return redirect()->route('classes.index')
+            ->with('success', 'Class updated successfully!');
     }
 
     // ✅ Delete a class
@@ -60,6 +82,6 @@ class ClassController extends Controller
         $class = ClassModel::findOrFail($id);
         $class->delete();
 
-        return redirect()->route('classes.create')->with('success', 'Class deleted successfully!');
+        return redirect()->route('classes.index')->with('success', 'Class deleted successfully!');
     }
 }
