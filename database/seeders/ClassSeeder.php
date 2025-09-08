@@ -9,7 +9,7 @@ class ClassSeeder extends Seeder
 {
     public function run(): void
     {
-        $gradeLevels = [1, 2, 3, 4, 5, 6];
+        $gradeLevels = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
 
         foreach ($gradeLevels as $level) {
             ClassModel::create([

@@ -20,8 +20,10 @@ class SubjectSeeder extends Seeder
             'EPP/TLE',
         ];
 
-        // Example: For Grade 1 to Grade 6 (elementary)
-        for ($grade = 1; $grade <= 6; $grade++) {
+        // Grade levels as strings (K1, K2, 1-6)
+        $gradeLevels = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
+
+        foreach ($gradeLevels as $grade) {
             foreach ($subjects as $subject) {
                 Subject::firstOrCreate([
                     'name' => $subject,

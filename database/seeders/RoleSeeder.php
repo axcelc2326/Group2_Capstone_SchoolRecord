@@ -65,10 +65,12 @@ class RoleSeeder extends Seeder
         $admin->assignRole($adminRole);
 
         // -------- Teachers --------
-        foreach (range(1, 6) as $i) {
+        $teacherGrades = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
+
+        foreach ($teacherGrades as $index => $grade) {
             $teacher = User::create([
-                'name' => "Teacher_{$i} User",
-                'email' => "teacher{$i}@gmail.com",
+                'name' => "Teacher_{$grade} User",
+                'email' => "teacher{$grade}@gmail.com",
                 'password' => Hash::make('password'),
             ]);
             $teacher->assignRole($teacherRole);

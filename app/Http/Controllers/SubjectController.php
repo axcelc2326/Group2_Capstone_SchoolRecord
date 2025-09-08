@@ -8,43 +8,37 @@ use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
-    /**
-     * Show all subjects
-     */
     public function index(Request $request)
     {
         $query = Subject::query()->orderBy('grade_level');
 
-        if ($request->has('grade_level') && $request->grade_level !== '') {
+        if ($request->filled('grade_level')) {
             $query->where('grade_level', $request->grade_level);
         }
 
-        $subjects = $query->paginate(8)->withQueryString();
+        $subjects = $query->paginate(15)->withQueryString();
 
-        return Inertia::render('Admin/Subjects', [
+        return Inertia::render('Admin/ManageSubjects', [
             'subjects' => $subjects,
             'filters' => $request->only('grade_level'),
         ]);
     }
 
-    /**
-     * Store a new subject
-     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'grade_level' => 'required|integer|min:1|max:12',
+            'grade_level' => 'required|string|in:K1,K2,1,2,3,4,5,6',
         ]);
 
-        Subject::create($request->only('name', 'grade_level'));
+        Subject::create([
+            'name' => $request->name,
+            'grade_level' => $request->grade_level,
+        ]);
 
-        return redirect()->back()->with('success', 'Subject added successfully.');
+        return redirect()->route('subjects.index')->with('success', 'Subject added successfully!');
     }
 
-    /**
-     * Update an existing subject
-     */
     public function update(Request $request, Subject $subject)
     {
         $request->validate([

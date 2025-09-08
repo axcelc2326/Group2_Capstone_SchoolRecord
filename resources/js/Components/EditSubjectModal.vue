@@ -1,6 +1,6 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
-import { watch, ref } from 'vue'
+import { watch } from 'vue'
 
 const props = defineProps({
   show: Boolean,
@@ -42,19 +42,49 @@ function submit() {
       <h2 class="text-white font-semibold mb-4">Edit Subject</h2>
 
       <form @submit.prevent="submit" class="space-y-4">
+        <!-- Subject Name -->
         <div>
           <label class="block text-white font-medium">Name</label>
-          <input v-model="form.name" type="text" class="w-full border rounded px-3 py-2" required />
+          <input 
+            v-model="form.name" 
+            type="text" 
+            class="w-full border rounded px-3 py-2" 
+            required 
+          />
         </div>
 
+        <!-- Grade Level Dropdown -->
         <div>
           <label class="block text-white font-medium">Grade Level</label>
-          <input v-model="form.grade_level" type="number" min="1" max="12" class="w-full border rounded px-3 py-2" required />
+          <select
+            v-model="form.grade_level"
+            class="block w-full pl-3 pr-3 py-2 border rounded mt-1"
+            required
+          >
+            <option disabled value="">-- Select Grade Level --</option>
+            <option value="K1">Kinder 1</option>
+            <option value="K2">Kinder 2</option>
+            <option v-for="n in 6" :key="n" :value="String(n)">
+              Grade {{ n }}
+            </option>
+          </select>
         </div>
 
+        <!-- Actions -->
         <div class="flex justify-end gap-2 mt-4">
-          <button type="button" @click="$emit('close')" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
+          <button 
+            type="button" 
+            @click="$emit('close')" 
+            class="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Update
+          </button>
         </div>
       </form>
     </div>

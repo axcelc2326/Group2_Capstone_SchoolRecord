@@ -18,15 +18,19 @@ class ParentsWithChildrenSeeder extends Seeder
         // Create Parent Role if not exists
         Role::firstOrCreate(['name' => 'parent']);
 
-        // Create Classes (Grade 1-6)
-        for ($grade = 1; $grade <= 6; $grade++) {
+        // Define grade levels as strings (K1, K2, 1-6)
+        $gradeLevels = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
+
+        // Create Classes for each grade level
+        foreach ($gradeLevels as $grade) {
             ClassModel::firstOrCreate([
                 'grade_level' => $grade,
                 'name' => "Section A",
-                'teacher_id' => $grade + 1
+                'teacher_id' => null, // assign as needed
             ]);
         }
 
+        // Create Parents and Students
         for ($i = 1; $i <= 150; $i++) {
             $parent = User::create([
                 'name' => "Parent $i",
@@ -46,7 +50,7 @@ class ParentsWithChildrenSeeder extends Seeder
                 'approved_by_teacher' => true
             ]);
 
-            // ✅ Fetch subjects for this student's grade level
+            // Fetch subjects for this student's grade level
             $subjects = Subject::where('grade_level', $class->grade_level)->get();
 
             foreach ($subjects as $subject) {
