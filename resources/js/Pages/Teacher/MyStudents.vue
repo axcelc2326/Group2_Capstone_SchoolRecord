@@ -4,9 +4,9 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import { ref, watch, computed } from 'vue'
 import Swal from 'sweetalert2'
 import axios from 'axios'
-import GradeInputModal from '@/Components/GradeInputModal.vue'
-import SettingsModal from '@/Components/StudentSettingsModal.vue'
-import IndividualStudentModal from '@/Components/StudentSettingsIndividualModal.vue'
+import GradeInputModal from '@/Components/Teacher/GradeInputModal.vue'
+import SettingsModal from '@/Components/Teacher/StudentSettingsModal.vue'
+import IndividualStudentModal from '@/Components/Teacher/StudentSettingsIndividualModal.vue'
 
 const props = defineProps({
   students: Object,

@@ -1,8 +1,8 @@
 <script setup>
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import CreateClassModal from '@/Components/CreateClassModal.vue'
-import EditClassModal from '@/Components/EditClassModal.vue'
+import CreateClassModal from '@/Components/Admin/CreateClassModal.vue'
+import EditClassModal from '@/Components/Admin/EditClassModal.vue'
 import { ref, watch, computed } from 'vue'
 import Swal from 'sweetalert2'
 import { Search, GraduationCap, Settings, Plus, Edit, Trash2 } from 'lucide-vue-next'

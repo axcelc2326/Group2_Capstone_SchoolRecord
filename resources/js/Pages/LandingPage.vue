@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import LoginModal from '@/Components/LoginModal.vue'
-import RegisterModal from '@/Components/RegisterModal.vue'
+import RegisterModal from '@/Components/AdminAndTeacher/RegisterModal.vue'
 import Footer from '@/Components/Footer.vue'
 import { ref } from 'vue'
 

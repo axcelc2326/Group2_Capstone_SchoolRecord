@@ -1,8 +1,8 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import AnnouncementAdminModal from '@/Components/AnnouncementAdminModal.vue'
-import EditAdminAnnouncementModal from '@/Components/EditAdminAnnouncementModal.vue'
+import AnnouncementAdminModal from '@/Components/Admin/AnnouncementAdminModal.vue'
+import EditAdminAnnouncementModal from '@/Components/Admin/EditAdminAnnouncementModal.vue'
 import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
 import { Plus, Edit, Trash2, FileText } from 'lucide-vue-next'

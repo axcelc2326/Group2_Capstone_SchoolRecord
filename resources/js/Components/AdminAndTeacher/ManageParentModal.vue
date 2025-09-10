@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
-import EditStudentModal from '@/Components/EditStudentModal.vue'
+import EditStudentModal from '@/Components/AdminAndTeacher/EditStudentModal.vue'
 
 const props = defineProps({
   show: Boolean,

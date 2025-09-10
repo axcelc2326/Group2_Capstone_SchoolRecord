@@ -4,8 +4,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Swal from 'sweetalert2';
-import AnnouncementModal from '@/Components/AnnouncementTeacherModal.vue';
-import EditAnnouncementModal from '@/Components/EditTeacherAnnouncementModal.vue';
+import AnnouncementModal from '@/Components/Teacher/AnnouncementTeacherModal.vue';
+import EditAnnouncementModal from '@/Components/Teacher/EditTeacherAnnouncementModal.vue';
 import { Plus, Edit, Trash2, FileText } from 'lucide-vue-next';
 
 const props = defineProps({

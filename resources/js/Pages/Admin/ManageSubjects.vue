@@ -2,8 +2,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, router } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
-import EditSubjectModal from '@/Components/EditSubjectModal.vue'
-import CreateSubjectModal from '@/Components/CreateSubjectModal.vue'
+import EditSubjectModal from '@/Components/Admin/EditSubjectModal.vue'
+import CreateSubjectModal from '@/Components/Admin/CreateSubjectModal.vue'
 import Swal from 'sweetalert2'
 import { BookOpen, Plus, Edit, Trash2 } from 'lucide-vue-next'
 

@@ -1,9 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
-import RegisterModal from '@/Components/RegisterModal.vue'
-import ManageParentModal from '@/Components/ManageParentModal.vue'
-import EditParentModal from '@/Components/EditParentModal.vue'
+import RegisterModal from '@/Components/AdminAndTeacher/RegisterModal.vue'
+import ManageParentModal from '@/Components/AdminAndTeacher/ManageParentModal.vue'
+import EditParentModal from '@/Components/AdminAndTeacher/EditParentModal.vue'
 import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
 

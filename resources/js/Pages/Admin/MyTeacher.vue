@@ -3,8 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, router, Link } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import Swal from 'sweetalert2'
-import AddTeacherModal from '@/Components/AddTeacherModal.vue'
-import EditTeacherModal from '@/Components/EditTeacherModal.vue'
+import AddTeacherModal from '@/Components/Admin/AddTeacherModal.vue'
+import EditTeacherModal from '@/Components/Admin/EditTeacherModal.vue'
 
 const props = defineProps({
   teachers: Object,
