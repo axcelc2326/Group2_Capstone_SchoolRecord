@@ -134,17 +134,6 @@ class AnnouncementController extends Controller
         return redirect()->route('teacher.announcements.create')->with('success', 'Class announcement posted.');
     }
 
-    public function editAdmin($id)
-    {
-        $announcement = Announcement::where('id', $id)
-            ->where('created_by', auth()->id()) // Ensure only the owner can edit
-            ->firstOrFail();
-
-        return Inertia::render('Announcement/EditAdmin', [
-            'announcement' => $announcement,
-        ]);
-    }
-
     public function updateAdmin(Request $request, $id)
     {
         $request->validate([

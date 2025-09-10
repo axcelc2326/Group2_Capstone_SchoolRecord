@@ -117,7 +117,6 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     // Admin announcements
     Route::get('/announcements/create', [AnnouncementController::class, 'createAdmin'])->name('announcements.create');
     Route::post('/announcements', [AnnouncementController::class, 'storeAdmin'])->name('announcements.store');
-    Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'editAdmin'])->name('announcements.edit');
     Route::put('/announcements/{id}', [AnnouncementController::class, 'updateAdmin'])->name('announcements.update');
     Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroyAdmin'])->name('announcements.destroy');
 
