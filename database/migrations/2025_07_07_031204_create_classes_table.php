@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->unsignedBigInteger('teacher_id')->nullable()->unique(); // ✅ ensure only one class per teacher
             $table->string('grade_level'); 
             $table->timestamps();
 
-            $table->foreign('teacher_id')->references('id')->on('users');
+            $table->foreign('teacher_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
