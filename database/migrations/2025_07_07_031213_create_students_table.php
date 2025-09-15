@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_id');
+            $table->string('lrn')->unique(); // ✅ Add LRN field
             $table->string('first_name');
             $table->string('last_name');
+            $table->enum('gender', ['male', 'female'])->nullable(); // ✅ Optional gender field
             $table->boolean('approved_by_teacher')->default(false);
             $table->unsignedBigInteger('class_id')->nullable();
             $table->timestamps();

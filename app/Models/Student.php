@@ -11,6 +11,8 @@ class Student extends Model
     protected $fillable = [
         'first_name',
         'last_name',
+        'lrn',                // ✅ Added LRN
+        'gender',             // ✅ Added Gender
         'class_id',
         'parent_id',
         'approved_by_teacher',

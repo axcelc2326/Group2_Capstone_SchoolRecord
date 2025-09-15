@@ -18,6 +18,8 @@ const students = ref([])
 const form = useForm({
   first_name: '',
   last_name: '',
+  lrn: '',        // ✅ Added LRN field
+  gender: '',     // ✅ Added gender field
   class_id: '', // will convert to number before submit
 })
 
@@ -186,8 +188,20 @@ watch(() => props.show, (show) => {
                               <span class="text-sm font-semibold text-white">{{ student.first_name[0] }}{{ student.last_name[0] }}</span>
                             </div>
                             <h4 class="font-medium text-gray-900 dark:text-white">{{ student.first_name }} {{ student.last_name }}</h4>
+                            <!-- ✅ Added gender badge -->
+                            <span class="px-2 py-1 text-xs font-medium rounded-full" 
+                                  :class="student.gender === 'male' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400'">
+                              {{ student.gender ? (student.gender === 'male' ? 'Male' : 'Female') : 'N/A' }}
+                            </span>
                           </div>
                           <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                            <!-- ✅ Added LRN display -->
+                            <div class="flex items-center space-x-1">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                              </svg>
+                              <span>LRN: {{ student.lrn || 'N/A' }}</span>
+                            </div>
                             <div class="flex items-center space-x-1">
                               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -259,6 +273,7 @@ watch(() => props.show, (show) => {
                             required 
                           />
                         </div>
+                        <div v-if="form.errors.first_name" class="text-red-500 text-sm">{{ form.errors.first_name }}</div>
                       </div>
 
                       <div class="space-y-2">
@@ -277,6 +292,59 @@ watch(() => props.show, (show) => {
                             required 
                           />
                         </div>
+                        <div v-if="form.errors.last_name" class="text-red-500 text-sm">{{ form.errors.last_name }}</div>
+                      </div>
+                    </div>
+
+                    <!-- ✅ Added LRN and Gender fields in a new row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Learner Reference Number (LRN)
+                          <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative group">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                          </div>
+                          <input 
+                            v-model="form.lrn" 
+                            type="text" 
+                            placeholder="Enter 12-digit LRN" 
+                            maxlength="12"
+                            pattern="[0-9]{12}"
+                            class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200" 
+                            required 
+                          />
+                        </div>
+                        <div v-if="form.errors.lrn" class="text-red-500 text-sm">{{ form.errors.lrn }}</div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Must be exactly 12 digits</p>
+                      </div>
+
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Gender
+                          <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative group">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                          </div>
+                          <select 
+                            v-model="form.gender" 
+                            class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200" 
+                            required
+                          >
+                            <option value="" disabled>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                          </select>
+                        </div>
+                        <div v-if="form.errors.gender" class="text-red-500 text-sm">{{ form.errors.gender }}</div>
                       </div>
                     </div>
 
@@ -299,6 +367,7 @@ watch(() => props.show, (show) => {
                           </option>
                         </select>
                       </div>
+                      <div v-if="form.errors.class_id" class="text-red-500 text-sm">{{ form.errors.class_id }}</div>
                     </div>
 
                     <button 

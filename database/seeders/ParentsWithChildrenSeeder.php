@@ -30,6 +30,8 @@ class ParentsWithChildrenSeeder extends Seeder
             ]);
         }
 
+        $usedLrns = [];
+
         // Create Parents and Students
         for ($i = 1; $i <= 150; $i++) {
             $parent = User::create([
@@ -42,12 +44,21 @@ class ParentsWithChildrenSeeder extends Seeder
             // Assign each parent to a random class
             $class = ClassModel::inRandomOrder()->first();
 
+            // Generate unique random 12-digit LRN
+            do {
+                $lrn = (string) random_int(100000000000, 999999999999); // 12 digits
+            } while (in_array($lrn, $usedLrns));
+
+            $usedLrns[] = $lrn;
+
             $student = Student::create([
                 'first_name' => "Student",
                 'last_name' => "$i",
                 'class_id' => $class->id,
                 'parent_id' => $parent->id,
-                'approved_by_teacher' => true
+                'approved_by_teacher' => true,
+                'lrn' => $lrn,
+                'gender' => $i % 2 === 0 ? 'Male' : 'Female',
             ]);
 
             // Fetch subjects for this student's grade level

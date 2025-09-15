@@ -30,19 +30,23 @@ class StudentController extends Controller
     {
         $request->validate([
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'class_id' => 'required|exists:classes,id',
+            'last_name'  => 'required|string|max:255',
+            'lrn'        => 'required|digits:12|unique:students,lrn', // ✅ validate LRN
+            'gender'     => 'required|in:male,female',               // ✅ validate gender
+            'class_id'   => 'required|exists:classes,id',
         ]);
 
         Student::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'class_id' => $request->class_id,
-            'parent_id' => $parent,  // use the route parameter
+            'first_name'          => $request->first_name,
+            'last_name'           => $request->last_name,
+            'lrn'                 => $request->lrn,
+            'gender'              => $request->gender,
+            'class_id'            => $request->class_id,
+            'parent_id'           => $parent,  // use the route parameter
             'approved_by_teacher' => true,
         ]);
 
-        return back()->with('success', 'Student Created successfully!');
+        return back()->with('success', 'Student created successfully!');
     }
 
     public function update(Request $request, $parentId, $studentId)
@@ -55,17 +59,21 @@ class StudentController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
+            'lrn'        => 'required|digits:12|unique:students,lrn,' . $student->id, // ✅ allow same LRN for current student
+            'gender'     => 'required|in:male,female',
             'class_id'   => 'required|exists:classes,id',
         ]);
 
         $student->update([
             'first_name'          => $request->first_name,
             'last_name'           => $request->last_name,
+            'lrn'                 => $request->lrn,
+            'gender'              => $request->gender,
             'class_id'            => $request->class_id,
             'approved_by_teacher' => true, // always true
         ]);
 
-        return back()->with('success', 'Student Updated successfully!');
+        return back()->with('success', 'Student updated successfully!');
     }
 
     public function destroy($parentId, $studentId)
