@@ -260,8 +260,8 @@ const roleBasedNavigation = computed(() => {
             
             <Link :href="routeUrl('dashboard')" class="flex items-center space-x-3 group transition-all duration-300">
               <div class="relative">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all duration-300 group-hover:scale-105 group-hover:rotate-6 relative overflow-hidden">
-                  E
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all duration-300 group-hover:scale-105 group-hover:rotate-6 relative overflow-hidden">
+                  <img src="/images/Logo.jpg" alt="Logo" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div class="absolute -inset-1 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-2xl opacity-0 group-hover:opacity-20 transition-all duration-300 blur-sm"></div>

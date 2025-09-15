@@ -17,9 +17,11 @@ const currentYear = new Date().getFullYear()
         <!-- Enhanced Company Info -->
         <div class="flex items-center justify-center space-x-5 md:justify-start group cursor-pointer">
           <div
-            class="relative w-16 h-16 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 text-white rounded-3xl flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-500/30 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-blue-500/50"
+            class="relative w-16 h-16 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 text-white rounded-3xl flex items-center justify-center text-xl font-black shadow-2xl shadow-blue-500/30 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-blue-500/50 overflow-hidden"
           >
-            <span class="relative z-10">E</span>
+            <!-- Logo image -->
+            <img src="/images/Logo.jpg" alt="Logo" class="w-full h-full object-cover rounded-3xl relative z-10" />
+            
             <!-- Inner glow effect -->
             <div class="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>

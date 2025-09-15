@@ -177,7 +177,7 @@ const props = defineProps({
   subject: Object, // subject being edited
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'updated'])
 
 const modalContent = ref(null)
 
@@ -199,7 +199,6 @@ watch(
 )
 
 const handleClose = () => {
-  form.reset()
   emit('close')
 }
 
@@ -219,7 +218,6 @@ const submit = () => {
         timer: 2000,
         showConfirmButton: false,
       })
-      form.reset()
       emit('close')
     },
   })

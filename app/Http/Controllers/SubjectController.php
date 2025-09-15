@@ -36,14 +36,14 @@ class SubjectController extends Controller
             'grade_level' => $request->grade_level,
         ]);
 
-        return redirect()->route('subjects.index')->with('success', 'Subject added successfully!');
+        return redirect()->back()->with('success', 'Subject added successfully!');
     }
 
     public function update(Request $request, Subject $subject)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'grade_level' => 'required|integer|min:1|max:12',
+            'grade_level' => 'required|string|in:K1,K2,1,2,3,4,5,6',
         ]);
 
         $subject->update($request->only('name', 'grade_level'));
