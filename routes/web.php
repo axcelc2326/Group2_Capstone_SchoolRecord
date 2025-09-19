@@ -14,7 +14,8 @@ use App\Http\Controllers\{
     DashboardController,
     UserManagementController,
     TeacherStudentController,
-    SubjectController
+    SubjectController,
+    SF5Controller
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -89,7 +90,8 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     Route::get('/teacher/analytics', [AnalyticsController::class, 'teacherAnalytics'])->name('teacher.analytics');
 
     // SF5 Download (School Form 5)
-    Route::get('/sf5/{class}', [GradeRemarkController::class, 'download'])->name('sf5.download');
+    Route::get('/sf5/form', [SF5Controller::class, 'showForm'])->name('sf5.form');
+    Route::post('/sf5/download', [SF5Controller::class, 'download'])->name('sf5.download');
 });
 
 /*

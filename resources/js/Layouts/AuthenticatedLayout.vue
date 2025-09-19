@@ -100,7 +100,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.students': '/teacher/students',
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
-      'sf5.download': `/sf5/${params.class || 1}`,
+      'sf5.form': '/sf5/form',           // 👈 form input
       'classes.index': '/classes',
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
@@ -174,11 +174,12 @@ const roleBasedNavigation = computed(() => {
         icon: BarChart3,
         description: 'View analytics for my classes'
       },
+      // ✅ New Teacher-only link for SF5 Generator
       {
-        name: 'Download SF5',
-        href: routeUrl('sf5.download', { class: 1 }),
-        icon: Download,
-        description: 'Export class records'
+        name: 'SF5 Generator',
+        href: routeUrl('sf5.form'),
+        icon: ClipboardList,
+        description: 'Input school info & generate SF5 PDF'
       },
       {
         name: 'Parent Management',
