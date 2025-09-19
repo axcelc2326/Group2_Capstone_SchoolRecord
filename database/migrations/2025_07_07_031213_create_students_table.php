@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id');
             $table->string('lrn')->unique(); // ✅ Add LRN field
             $table->string('first_name');
+            $table->string('middle_name')->nullable(); // ✅ Added middle name (optional)
             $table->string('last_name');
             $table->enum('gender', ['male', 'female'])->nullable(); // ✅ Optional gender field
             $table->boolean('approved_by_teacher')->default(false);

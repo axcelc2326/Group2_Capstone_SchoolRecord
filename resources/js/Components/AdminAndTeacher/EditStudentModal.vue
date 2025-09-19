@@ -30,7 +30,7 @@
             <div
               v-if="show"
               ref="modalContent"
-              class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
+              class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
               @click.stop
             >
               <!-- Gradient overlay for visual depth -->
@@ -48,106 +48,152 @@
                   <p class="text-sm text-gray-600 dark:text-gray-400">Update student information</p>
                 </div>
 
-                <!-- First Name Field -->
-                <div class="space-y-2">
-                  <label for="first_name" class="text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
-                  <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
+                <!-- Name Fields in 3-column grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- First Name Field -->
+                  <div class="space-y-2">
+                    <label for="first_name" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      First Name
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                      <input
+                        id="first_name"
+                        v-model="form.first_name"
+                        type="text"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Enter first name"
+                        required
+                      />
                     </div>
-                    <input
-                      id="first_name"
-                      v-model="form.first_name"
-                      type="text"
-                      class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
-                      placeholder="Enter first name"
-                      required
-                    />
+                    <div v-if="form.errors.first_name" class="text-red-500 text-sm mt-1">
+                      {{ form.errors.first_name }}
+                    </div>
                   </div>
-                  <div v-if="form.errors.first_name" class="text-red-500 text-sm mt-1">
-                    {{ form.errors.first_name }}
+
+                  <!-- Middle Name Field -->
+                  <div class="space-y-2">
+                    <label for="middle_name" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Middle Name
+                      <span class="text-gray-400 text-xs">(Optional)</span>
+                    </label>
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                      <input
+                        id="middle_name"
+                        v-model="form.middle_name"
+                        type="text"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Enter middle name"
+                      />
+                    </div>
+                    <div v-if="form.errors.middle_name" class="text-red-500 text-sm mt-1">
+                      {{ form.errors.middle_name }}
+                    </div>
+                  </div>
+
+                  <!-- Last Name Field -->
+                  <div class="space-y-2">
+                    <label for="last_name" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Last Name
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                      <input
+                        id="last_name"
+                        v-model="form.last_name"
+                        type="text"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Enter last name"
+                        required
+                      />
+                    </div>
+                    <div v-if="form.errors.last_name" class="text-red-500 text-sm mt-1">
+                      {{ form.errors.last_name }}
+                    </div>
                   </div>
                 </div>
 
-                <!-- Last Name Field -->
-                <div class="space-y-2">
-                  <label for="last_name" class="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
-                  <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
+                <!-- LRN and Gender Fields in 2-column grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- LRN Field -->
+                  <div class="space-y-2">
+                    <label for="lrn" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Learner Reference Number (LRN)
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                      </div>
+                      <input
+                        id="lrn"
+                        v-model="form.lrn"
+                        type="text"
+                        maxlength="12"
+                        pattern="[0-9]{12}"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Enter 12-digit LRN"
+                        required
+                      />
                     </div>
-                    <input
-                      id="last_name"
-                      v-model="form.last_name"
-                      type="text"
-                      class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
-                      placeholder="Enter last name"
-                      required
-                    />
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Must be exactly 12 digits</p>
+                    <div v-if="form.errors.lrn" class="text-red-500 text-sm mt-1">
+                      {{ form.errors.lrn }}
+                    </div>
                   </div>
-                  <div v-if="form.errors.last_name" class="text-red-500 text-sm mt-1">
-                    {{ form.errors.last_name }}
-                  </div>
-                </div>
 
-                <!-- LRN Field -->
-                <div class="space-y-2">
-                  <label for="lrn" class="text-sm font-medium text-gray-700 dark:text-gray-300">LRN (Learner Reference Number)</label>
-                  <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                      </svg>
+                  <!-- Gender Field -->
+                  <div class="space-y-2">
+                    <label for="gender" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Gender
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                      <select
+                        id="gender"
+                        v-model="form.gender"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200 appearance-none"
+                        required
+                      >
+                        <option value="" disabled class="text-gray-400">Select gender</option>
+                        <option value="male" class="text-gray-900 dark:text-white">Male</option>
+                        <option value="female" class="text-gray-900 dark:text-white">Female</option>
+                      </select>
                     </div>
-                    <input
-                      id="lrn"
-                      v-model="form.lrn"
-                      type="text"
-                      maxlength="12"
-                      pattern="[0-9]{12}"
-                      class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
-                      placeholder="Enter 12-digit LRN"
-                      required
-                    />
-                  </div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Must be exactly 12 digits</p>
-                  <div v-if="form.errors.lrn" class="text-red-500 text-sm mt-1">
-                    {{ form.errors.lrn }}
-                  </div>
-                </div>
-
-                <!-- Gender Field -->
-                <div class="space-y-2">
-                  <label for="gender" class="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
-                  <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
+                    <div v-if="form.errors.gender" class="text-red-500 text-sm mt-1">
+                      {{ form.errors.gender }}
                     </div>
-                    <select
-                      id="gender"
-                      v-model="form.gender"
-                      class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200 appearance-none"
-                      required
-                    >
-                      <option value="" disabled class="text-gray-400">-- Select Gender --</option>
-                      <option value="male" class="text-gray-900 dark:text-white">Male</option>
-                      <option value="female" class="text-gray-900 dark:text-white">Female</option>
-                    </select>
-                  </div>
-                  <div v-if="form.errors.gender" class="text-red-500 text-sm mt-1">
-                    {{ form.errors.gender }}
                   </div>
                 </div>
 
                 <!-- Class Selection Field -->
                 <div class="space-y-2">
-                  <label for="class_id" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Class</label>
+                  <label for="class_id" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Select Class
+                    <span class="text-red-500">*</span>
+                  </label>
                   <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +206,7 @@
                       class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200 appearance-none"
                       required
                     >
-                      <option value="" disabled class="text-gray-400">-- Choose Class --</option>
+                      <option value="" disabled class="text-gray-400">Select a class</option>
                       <option
                         v-for="cls in classes"
                         :key="cls.id"
@@ -254,6 +300,7 @@ const modalContent = ref(null)
 
 const form = useForm({
   first_name: '',
+  middle_name: '', // ✅ Added middle name field
   last_name: '',
   lrn: '',
   gender: '',
@@ -264,6 +311,7 @@ const form = useForm({
 watch(() => props.student, (newStudent) => {
   if (newStudent) {
     form.first_name = newStudent.first_name
+    form.middle_name = newStudent.middle_name || '' // ✅ Handle middle name
     form.last_name = newStudent.last_name
     form.lrn = newStudent.lrn || ''
     form.gender = newStudent.gender || ''

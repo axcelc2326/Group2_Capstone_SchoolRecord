@@ -29,15 +29,17 @@ class StudentController extends Controller
     public function store(Request $request, $parent)
     {
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'lrn'        => 'required|digits:12|unique:students,lrn', // ✅ validate LRN
-            'gender'     => 'required|in:male,female',               // ✅ validate gender
-            'class_id'   => 'required|exists:classes,id',
+            'first_name'  => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',  // ✅ Added middle_name
+            'last_name'   => 'required|string|max:255',
+            'lrn'         => 'required|digits:12|unique:students,lrn', // ✅ validate LRN
+            'gender'      => 'required|in:male,female',               // ✅ validate gender
+            'class_id'    => 'required|exists:classes,id',
         ]);
 
         Student::create([
             'first_name'          => $request->first_name,
+            'middle_name'         => $request->middle_name, // ✅ Added
             'last_name'           => $request->last_name,
             'lrn'                 => $request->lrn,
             'gender'              => $request->gender,
@@ -57,15 +59,17 @@ class StudentController extends Controller
                         ->firstOrFail();
 
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'lrn'        => 'required|digits:12|unique:students,lrn,' . $student->id, // ✅ allow same LRN for current student
-            'gender'     => 'required|in:male,female',
-            'class_id'   => 'required|exists:classes,id',
+            'first_name'  => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255', // ✅ Added middle_name
+            'last_name'   => 'required|string|max:255',
+            'lrn'         => 'required|digits:12|unique:students,lrn,' . $student->id, // ✅ allow same LRN for current student
+            'gender'      => 'required|in:male,female',
+            'class_id'    => 'required|exists:classes,id',
         ]);
 
         $student->update([
             'first_name'          => $request->first_name,
+            'middle_name'         => $request->middle_name, // ✅ Added
             'last_name'           => $request->last_name,
             'lrn'                 => $request->lrn,
             'gender'              => $request->gender,

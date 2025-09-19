@@ -10,6 +10,7 @@ class Student extends Model
 {
     protected $fillable = [
         'first_name',
+        'middle_name',          // ✅ Added Middle Name
         'last_name',
         'lrn',                // ✅ Added LRN
         'gender',             // ✅ Added Gender

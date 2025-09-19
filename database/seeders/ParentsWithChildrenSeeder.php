@@ -53,6 +53,7 @@ class ParentsWithChildrenSeeder extends Seeder
 
             $student = Student::create([
                 'first_name' => "Student",
+                'middle_name' => "M.",   // ✅ Added dummy middle name
                 'last_name' => "$i",
                 'class_id' => $class->id,
                 'parent_id' => $parent->id,

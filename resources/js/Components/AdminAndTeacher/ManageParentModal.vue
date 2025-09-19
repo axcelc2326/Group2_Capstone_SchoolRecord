@@ -17,6 +17,7 @@ const students = ref([])
 // Add student form
 const form = useForm({
   first_name: '',
+  middle_name: '',  // ✅ Added middle name field
   last_name: '',
   lrn: '',        // ✅ Added LRN field
   gender: '',     // ✅ Added gender field
@@ -187,7 +188,12 @@ watch(() => props.show, (show) => {
                             <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                               <span class="text-sm font-semibold text-white">{{ student.first_name[0] }}{{ student.last_name[0] }}</span>
                             </div>
-                            <h4 class="font-medium text-gray-900 dark:text-white">{{ student.first_name }} {{ student.last_name }}</h4>
+                            <!-- ✅ Updated to show full name with middle name -->
+                            <h4 class="font-medium text-gray-900 dark:text-white">
+                              {{ student.first_name }} 
+                              <template v-if="student.middle_name">{{ student.middle_name }} </template>
+                              {{ student.last_name }}
+                            </h4>
                             <!-- ✅ Added gender badge -->
                             <span class="px-2 py-1 text-xs font-medium rounded-full" 
                                   :class="student.gender === 'male' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400'">
@@ -256,9 +262,13 @@ watch(() => props.show, (show) => {
                   </div>
 
                   <form @submit.prevent="addStudent" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- ✅ Updated name fields layout to include middle name in a 3-column grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          First Name
+                          <span class="text-red-500">*</span>
+                        </label>
                         <div class="relative group">
                           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,8 +286,33 @@ watch(() => props.show, (show) => {
                         <div v-if="form.errors.first_name" class="text-red-500 text-sm">{{ form.errors.first_name }}</div>
                       </div>
 
+                      <!-- ✅ Added middle name field -->
                       <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Middle Name
+                          <span class="text-gray-400 text-xs">(Optional)</span>
+                        </label>
+                        <div class="relative group">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                          </div>
+                          <input 
+                            v-model="form.middle_name" 
+                            type="text" 
+                            placeholder="Enter middle name" 
+                            class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200" 
+                          />
+                        </div>
+                        <div v-if="form.errors.middle_name" class="text-red-500 text-sm">{{ form.errors.middle_name }}</div>
+                      </div>
+
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Last Name
+                          <span class="text-red-500">*</span>
+                        </label>
                         <div class="relative group">
                           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +331,7 @@ watch(() => props.show, (show) => {
                       </div>
                     </div>
 
-                    <!-- ✅ Added LRN and Gender fields in a new row -->
+                    <!-- LRN and Gender fields in a 2-column row -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
