@@ -72,13 +72,11 @@ const assignedClassId = props.classes.length ? props.classes[0].id : null
           <label class="block">School Year</label>
           <input name="school_year" class="w-full border p-2 rounded text-black" required />
         </div>
-        <div>
-          <label class="block">School Head</label>
-          <input name="school_head" class="w-full border p-2 rounded text-black" required />
-        </div>
-        <div>
-          <label class="block">SCC Chair</label>
-          <input name="scc_chair" class="w-full border p-2 rounded text-black" required />
+
+        <!-- School Head & SCC Chair combined -->
+        <div class="col-span-2">
+          <label class="block">School Head / SCC Chair</label>
+          <input name="school_head_chair" class="w-full border p-2 rounded text-black" required />
         </div>
 
         <div class="col-span-2 flex justify-end">
