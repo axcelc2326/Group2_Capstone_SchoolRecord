@@ -6,6 +6,7 @@ use App\Models\ClassModel;
 use App\Models\User;
 use App\Models\Grade;
 use App\Models\Announcement;
+use App\Models\GradeRemark;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -27,45 +28,87 @@ class DashboardController extends Controller
                         $allGrades = $class->students->flatMap->grades;
                         $average = $allGrades->avg('grade') ?? 0;
                         return [
-                            'id' => $class->id,
-                            'name' => $class->name,
+                            'id'          => $class->id,
+                            'name'        => $class->name,
                             'grade_level' => $class->grade_level,
-                            'average' => round($average, 2),
+                            'average'     => round($average, 2),
                         ];
                     })
                     ->sortByDesc('average')
-                    ->take(3)
-                    ->values(); // Ensure it's a clean array for Vue
+                    ->take(5)
+                    ->values();
 
                 // 📊 Summary info
                 $summary = [
-                    'total_classes' => ClassModel::count(),
-                    'total_students' => Student::count(),
-                    'total_teachers' => User::role('teacher')->count(),
-                    'total_parents' => User::role('parent')->count(),
+                    'total_classes'   => ClassModel::count(),
+                    'total_students'  => Student::count(),
+                    'total_teachers'  => User::role('teacher')->count(),
+                    'total_parents'   => User::role('parent')->count(),
                     'overall_average' => round(Grade::avg('grade') ?? 0, 2),
                 ];
 
+                // ✅ Promotion & Retention
+                $promoted = GradeRemark::where('remarks', 'Promoted')->count();
+                $retained = GradeRemark::where('remarks', 'Retained')->count();
+
+                // ✅ Honor percentages
+                $studentsWithRemarks = GradeRemark::with('student')->get();
+                $total = max($studentsWithRemarks->count(), 1); // avoid division by zero
+
+                $withHonors        = $studentsWithRemarks->whereBetween('final_average', [90, 94.99])->count();
+                $withHighHonors    = $studentsWithRemarks->whereBetween('final_average', [95, 97.99])->count();
+                $withHighestHonors = $studentsWithRemarks->whereBetween('final_average', [98, 100])->count();
+                $nonHonors         = $total - ($withHonors + $withHighHonors + $withHighestHonors);
+
+                $honorPercentages = [
+                    'with_honors'         => round(($withHonors / $total) * 100, 2),
+                    'with_high_honors'    => round(($withHighHonors / $total) * 100, 2),
+                    'with_highest_honors' => round(($withHighestHonors / $total) * 100, 2),
+                    'non_honor'           => round(($nonHonors / $total) * 100, 2),
+                ];
+
+                // 🌟 Top 5 performing students
+                $topStudents = Student::with('class', 'grades')
+                    ->get()
+                    ->map(function ($student) {
+                        $average = $student->grades->avg('grade') ?? 0;
+
+                        return [
+                            'id'          => $student->id,
+                            'name'        => $student->first_name . ' ' . $student->last_name,
+                            'class'       => $student->class->name ?? '',
+                            'grade_level' => $student->class->grade_level ?? '',
+                            'average'     => round($average, 2),
+                        ];
+                    })
+                    ->sortByDesc('average')
+                    ->take(5)
+                    ->values();
+
                 // 📢 Latest announcements
                 $announcements = Announcement::with('creator:id,name')
-                ->latest()
-                ->take(3)
-                ->get(['id', 'title', 'body', 'created_at', 'created_by'])
-                ->map(function ($announcement) {
-                    return [
-                        'id' => $announcement->id,
-                        'title' => $announcement->title,
-                        'body' => $announcement->body,
-                        'created_at' => $announcement->created_at,
-                        'created_by' => $announcement->creator->name ?? 'Unknown',
-                    ];
-                });
+                    ->latest()
+                    ->take(5)
+                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                    ->map(function ($announcement) {
+                        return [
+                            'id'         => $announcement->id,
+                            'title'      => $announcement->title,
+                            'body'       => $announcement->body,
+                            'created_at' => $announcement->created_at->toDateString(),
+                            'created_by' => $announcement->creator->name ?? 'Unknown',
+                        ];
+                    });
 
                 // 🎯 Send to Inertia Vue page
                 return Inertia::render('Admin/Dashboard', [
-                    'topClasses' => $topClasses,
-                    'summary' => $summary,
-                    'announcements' => $announcements,
+                    'topClasses'       => $topClasses,
+                    'summary'          => $summary,
+                    'announcements'    => $announcements,
+                    'promoted'         => $promoted,
+                    'retained'         => $retained,
+                    'honorPercentages' => $honorPercentages,
+                    'topStudents'      => $topStudents,
                 ]);
 
 
@@ -134,7 +177,7 @@ class DashboardController extends Controller
                         ->orWhereNull('class_id');
                 })
                 ->latest()
-                ->take(3)
+                ->take(5)
                 ->get(['id', 'title', 'body', 'created_at', 'created_by'])
                 ->map(function ($announcement) {
                     return [
@@ -214,7 +257,7 @@ class DashboardController extends Controller
                             ->orWhereNull('class_id'); // Include global announcements
                     })
                     ->latest()
-                    ->take(3)
+                    ->take(5)
                     ->get(['id', 'title', 'body', 'created_at', 'created_by'])
                     ->map(function ($announcement) {
                         return [

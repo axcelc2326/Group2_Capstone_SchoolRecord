@@ -54,6 +54,7 @@ const totalStudents = computed(() => students.value.length)
             <thead class="bg-white/5">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Student</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">LRN</th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Class</th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
               </tr>
@@ -72,9 +73,12 @@ const totalStudents = computed(() => students.value.length)
                       </div>
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-white">{{ student.first_name }} {{ student.last_name }}</div>
+                      <div class="text-sm font-medium text-white">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</div>
                     </div>
                   </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-white">{{ student.lrn }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-white">{{ student.class?.name }}</div>
