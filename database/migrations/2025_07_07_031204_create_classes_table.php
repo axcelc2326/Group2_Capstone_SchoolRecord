@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique(); // ✅ ensure class name is unique
             $table->unsignedBigInteger('teacher_id')->nullable()->unique(); // ✅ ensure only one class per teacher
             $table->string('grade_level'); 
             $table->timestamps();

@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ClassModel;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class ClassController extends Controller
 {
-
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -18,7 +19,7 @@ class ClassController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('grade_level', 'like', "%{$search}%");
+                      ->orWhere('grade_level', 'like', "%{$search}%");
                 });
             })
             ->when($gradeLevel, function ($query, $gradeLevel) {
@@ -46,7 +47,7 @@ class ClassController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:classes,name',
             'grade_level' => 'required|string|in:K1,K2,1,2,3,4,5,6',
         ]);
 
@@ -55,17 +56,23 @@ class ClassController extends Controller
             'grade_level' => $request->grade_level,
         ]);
 
-        return redirect()->route('classes.index')->with('success', 'Class created successfully!');
+        return redirect()->route('classes.index')
+            ->with('success', 'Class created successfully!');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'grade_level' => 'required|string|max:10', // since we allow K1, K2, and numbers
-        ]);
-
         $class = ClassModel::findOrFail($id);
+
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('classes', 'name')->ignore($class->id), // ✅ allow same name for this record
+            ],
+            'grade_level' => 'required|string|in:K1,K2,1,2,3,4,5,6',
+        ]);
 
         $class->update([
             'name' => $request->name,
@@ -82,6 +89,7 @@ class ClassController extends Controller
         $class = ClassModel::findOrFail($id);
         $class->delete();
 
-        return redirect()->route('classes.index')->with('success', 'Class deleted successfully!');
+        return redirect()->route('classes.index')
+            ->with('success', 'Class deleted successfully!');
     }
 }

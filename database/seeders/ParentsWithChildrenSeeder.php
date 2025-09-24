@@ -21,12 +21,15 @@ class ParentsWithChildrenSeeder extends Seeder
         // Define grade levels as strings (K1, K2, 1-6)
         $gradeLevels = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
 
+        // Unique class names (ores/metals)
+        $classNames = ['Gold', 'Silver', 'Diamond', 'Emerald', 'Ruby', 'Sapphire', 'Platinum', 'Titanium'];
+
         // Create Classes for each grade level
-        foreach ($gradeLevels as $grade) {
+        foreach ($gradeLevels as $index => $grade) {
             ClassModel::firstOrCreate([
                 'grade_level' => $grade,
-                'name' => "Section A",
-                'teacher_id' => null, // assign as needed
+                'name' => $classNames[$index], // ✅ now $index is defined
+                'teacher_id' => null,
             ]);
         }
 
