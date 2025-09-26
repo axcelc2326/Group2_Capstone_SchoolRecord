@@ -1,43 +1,60 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, router, Link } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
 import AddTeacherModal from '@/Components/Admin/AddTeacherModal.vue'
-import EditTeacherModal from '@/Components/Admin/EditTeacherModal.vue'
+import TeacherActionsModal from '@/Components/Admin/TeacherActionsModal.vue'
 
 const props = defineProps({
   teachers: Object,
-  filters: Object, // 👈 make sure filters are passed from controller
+  filters: Object,
 })
 
 const showAddModal = ref(false)
-const showEditModal = ref(false)
+const showActionsModal = ref(false)
 const selectedTeacher = ref(null)
 
 // Search state
 const search = ref(props.filters.search || '')
 
+// Statistics
+const totalTeachers = computed(() => props.teachers?.data?.length || 0)
+const totalCreatedTeachers = computed(() => props.teachers?.total || 0)
+
 const searchTeachers = () => {
   router.get(
     route('teachers.index'),
-    { search: search.value }, // send search param
+    { search: search.value },
     { preserveState: true, preserveScroll: true }
   )
 }
 
 const toggleStatus = (id) => {
-  router.put(route('teachers.toggle-status', id))
+  router.put(route('teachers.toggle-status', id), {}, {
+    preserveScroll: true,
+    onSuccess: () => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Status updated successfully',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+      })
+    }
+  })
 }
 
 const confirmDelete = (teacherId) => {
   Swal.fire({
     title: 'Are you sure?',
-    text: 'This will delete the teacher account!',
+    text: 'This will permanently delete the teacher account!',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: '#d33',
+    confirmButtonColor: '#ef4444',
     confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
   }).then((result) => {
     if (result.isConfirmed) {
       router.delete(route('teachers.destroy', teacherId), {
@@ -57,109 +74,271 @@ const confirmDelete = (teacherId) => {
   })
 }
 
-const openEditModal = (teacher) => {
+const openActionsModal = (teacher) => {
   selectedTeacher.value = teacher
-  showEditModal.value = true
+  showActionsModal.value = true
+}
+
+const handleModalAction = (action) => {
+  if (selectedTeacher.value) {
+    switch (action) {
+      case 'toggle-status':
+        toggleStatus(selectedTeacher.value.id)
+        break
+      case 'delete':
+        confirmDelete(selectedTeacher.value.id)
+        break
+    }
+  }
+  showActionsModal.value = false
 }
 </script>
 
 <template>
+  <Head title="Teachers Management" />
+
   <AuthenticatedLayout>
-    <Head title="Teachers Management" />
+    <template #header>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+        <h2 class="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+          Teachers Management
+        </h2>
+        <div class="flex items-center space-x-4">
+          <!-- Quick Stats -->
+          <div class="hidden md:flex items-center space-x-3 text-sm">
+            <div class="backdrop-blur-sm bg-blue-500/20 border border-blue-300/30 px-3 py-1 rounded-full">
+              <span class="text-blue-100">{{ totalCreatedTeachers }} Total Created</span>
+            </div>
+            <div class="backdrop-blur-sm bg-emerald-500/20 border border-emerald-300/30 px-3 py-1 rounded-full">
+              <span class="text-emerald-100">{{ totalTeachers }} Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
 
-    <div class="max-w-6xl mx-auto py-6">
-      <h1 class="text-2xl font-bold mb-6">Teachers Management</h1>
-      <p class="font-semibold mb-4">Total Teachers: {{ teachers.total }}</p>
+    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <!-- Mobile Stats (visible on small screens) -->
+      <div class="md:hidden grid grid-cols-2 gap-4">
+        <div class="backdrop-blur-md bg-blue-500/10 border border-blue-300/30 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-blue-100">{{ totalCreatedTeachers }}</div>
+          <div class="text-sm text-blue-200">Total Created</div>
+        </div>
+        <div class="backdrop-blur-md bg-emerald-500/10 border border-emerald-300/30 rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-emerald-100">{{ totalTeachers }}</div>
+          <div class="text-sm text-emerald-200">Active Teachers</div>
+        </div>
+      </div>
 
-      <!-- Top bar -->
-      <div class="flex justify-between items-center mb-4">
-        <!-- Search -->
-        <div class="flex items-center space-x-2">
-          <input
-            type="text"
-            v-model="search"
-            @keyup.enter="searchTeachers"
-            placeholder="Search teachers..."
-            class="px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
-          />
+      <!-- Search and Controls -->
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <!-- Search Controls -->
+          <div class="flex flex-col md:flex-row md:items-center gap-4 flex-1">
+            <div class="relative">
+              <input
+                v-model="search"
+                @keyup.enter="searchTeachers"
+                type="text"
+                placeholder="Search teachers..."
+                class="w-full md:w-64 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 transition-all duration-150"
+              />
+              <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            
+            <button 
+              @click="searchTeachers"
+              class="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 border border-blue-400/30 hover:border-blue-400/50 rounded-xl transition-all duration-150 backdrop-blur-sm"
+            >
+              <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
+              </svg>
+              Search
+            </button>
+          </div>
+
+          <!-- Add Teacher Button -->
           <button
-            @click="searchTeachers"
-            class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            @click="showAddModal = true"
+            class="px-6 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 border border-emerald-400/30 hover:border-emerald-400/50 rounded-xl transition-all duration-150 backdrop-blur-sm"
           >
-            Search
+            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Register Teacher
           </button>
         </div>
-
-        <!-- Add Teacher -->
-        <button
-          @click="showAddModal = true"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-        >
-          + Register Teacher
-        </button>
       </div>
 
       <!-- Teachers Table -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
-        <table class="w-full">
-          <thead class="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th class="text-left px-4 py-3">Name</th>
-              <th class="text-left px-4 py-3">Email</th>
-              <th class="text-left px-4 py-3">Class</th>
-              <th class="text-left px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="teacher in teachers.data" :key="teacher.id" class="border-t">
-              <td class="px-4 py-3">{{ teacher.name }}</td>
-              <td class="px-4 py-3">{{ teacher.email }}</td>
-              <td class="px-4 py-3">
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/10">
+          <h3 class="text-lg font-semibold text-white">Teachers Directory</h3>
+          <p class="text-sm text-white/70 mt-1">Manage and oversee teacher accounts</p>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-white/10">
+            <thead class="bg-white/5">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Teacher</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Class</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-right text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              <tr
+                v-for="teacher in props.teachers.data"
+                :key="teacher.id"
+                class="hover:bg-white/5 transition-colors duration-150"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
+                        {{ teacher.name.charAt(0) }}
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-white">{{ teacher.name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-white">{{ teacher.email }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <template v-if="teacher.class">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-100 border border-indigo-400/30 backdrop-blur-sm">
+                      {{ teacher.class.name }} - Grade {{ teacher.class.grade_level }}
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span class="text-white/50 italic text-sm">No class assigned</span>
+                  </template>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" :class="{
+                    'bg-green-500/20 text-green-100 border-green-400/30': teacher.status === 'active',
+                    'bg-red-500/20 text-red-100 border-red-400/30': teacher.status !== 'active'
+                  }">
+                    <div class="w-1.5 h-1.5 rounded-full mr-1.5" :class="{
+                      'bg-green-400': teacher.status === 'active',
+                      'bg-red-400': teacher.status !== 'active'
+                    }"></div>
+                    {{ teacher.status === 'active' ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                  <button
+                    @click="openActionsModal(teacher)"
+                    class="inline-flex items-center px-3 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-100 border border-indigo-400/30 hover:border-indigo-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                  >
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                    Actions
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="md:hidden divide-y divide-white/10">
+          <div 
+            v-for="teacher in props.teachers.data" 
+            :key="teacher.id"
+            class="p-6 hover:bg-white/5 transition-colors duration-150"
+          >
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center space-x-3">
+                <div class="flex-shrink-0 h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white font-medium">
+                  {{ teacher.name.charAt(0) }}
+                </div>
+                <div>
+                  <h4 class="text-white font-medium">{{ teacher.name }}</h4>
+                  <p class="text-sm text-white/70">{{ teacher.email }}</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border mt-1" :class="{
+                    'bg-green-500/20 text-green-100 border-green-400/30': teacher.status === 'active',
+                    'bg-red-500/20 text-red-100 border-red-400/30': teacher.status !== 'active'
+                  }">
+                    <div class="w-1.5 h-1.5 rounded-full mr-1" :class="{
+                      'bg-green-400': teacher.status === 'active',
+                      'bg-red-400': teacher.status !== 'active'
+                    }"></div>
+                    {{ teacher.status === 'active' ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Class Assignment -->
+            <div class="mb-4">
+              <p class="text-sm text-white/60 mb-2">Class Assignment:</p>
               <template v-if="teacher.class">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-100 border border-indigo-400/30 backdrop-blur-sm">
                   {{ teacher.class.name }} - Grade {{ teacher.class.grade_level }}
+                </span>
               </template>
               <template v-else>
-                  No class assigned
+                <span class="text-white/50 italic text-sm">No class assigned</span>
               </template>
-              </td>
-              <td class="px-4 py-3 space-x-2">
-                <button 
-                  @click="toggleStatus(teacher.id)" 
-                  class="px-3 py-1 rounded text-white"
-                  :class="teacher.status === 'active' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'">
-                  {{ teacher.status === 'active' ? 'Deactivate' : 'Activate' }}
-                </button>
-                <button
-                  @click="openEditModal(teacher)"
-                  class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="() => confirmDelete(teacher.id)"
-                  class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </div>
+            
+            <div class="flex flex-col space-y-2">
+              <button
+                @click="openActionsModal(teacher)"
+                class="flex justify-center items-center px-3 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-100 border border-indigo-400/30 hover:border-indigo-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+                Actions
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-if="!props.teachers?.data?.length" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-white/80">
+            No teachers found
+          </h3>
+          <p class="mt-1 text-sm text-white/60">
+            Start by registering your first teacher account.
+          </p>
+        </div>
       </div>
 
       <!-- Pagination -->
-      <div class="mt-4 flex justify-center space-x-2">
-        <Link
-          v-for="link in teachers.links"
-          :key="link.url"
-          :href="link.url || ''"
-          v-html="link.label"
-          class="px-3 py-1 rounded"
-          :class="{
-            'bg-blue-600 text-white': link.active,
-            'bg-gray-200 text-gray-700': !link.active
-          }"
-        />
+      <div v-if="props.teachers?.links?.length > 3" class="flex justify-center">
+        <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-2 shadow-2xl">
+          <div class="flex space-x-2">
+            <Link
+              v-for="link in props.teachers.links"
+              :key="link.url"
+              :href="link.url || ''"
+              v-html="link.label"
+              class="px-4 py-2 rounded-xl transition-all duration-150"
+              :class="{
+                'bg-blue-500/30 text-blue-100 border border-blue-400/50 backdrop-blur-sm': link.active,
+                'text-white/70 hover:bg-white/10 hover:text-white border border-transparent': !link.active && link.url,
+                'text-white/40 cursor-not-allowed': !link.url
+              }"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </AuthenticatedLayout>
@@ -170,9 +349,10 @@ const openEditModal = (teacher) => {
     @close="showAddModal = false"
   />
 
-  <EditTeacherModal 
-    :show="showEditModal" 
+  <TeacherActionsModal 
+    :show="showActionsModal" 
     :teacher="selectedTeacher" 
-    @close="showEditModal = false"
+    @close="showActionsModal = false"
+    @action="handleModalAction"
   />
 </template>

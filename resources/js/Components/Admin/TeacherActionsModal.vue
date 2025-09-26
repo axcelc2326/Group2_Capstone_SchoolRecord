@@ -1,128 +1,131 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
   show: Boolean,
-  parent: Object,
+  teacher: Object,
 })
 
 const emit = defineEmits(['close', 'action'])
 
 const activeTab = ref('edit')
-const isSubmitting = ref(false)
 
 // Password visibility toggles
 const showPassword = ref(false)
 const showPasswordConfirmation = ref(false)
 
 // Form data for editing
-const form = ref({
+const form = useForm({
   name: '',
   email: '',
   password: '',
   password_confirmation: '',
 })
 
-// Watch for parent changes to populate form
-watch(() => props.parent, (newParent) => {
-  if (newParent) {
-    form.value = {
-      name: newParent.name || '',
-      email: newParent.email || '',
-      password: '',
-      password_confirmation: '',
-    }
+// Watch for teacher changes to populate form
+watch(() => props.teacher, (newTeacher) => {
+  if (newTeacher) {
+    form.name = newTeacher.name || ''
+    form.email = newTeacher.email || ''
+    form.password = ''
+    form.password_confirmation = ''
+    form.clearErrors()
   }
 }, { immediate: true })
 
-const parentStatus = computed(() => props.parent?.status || 'inactive')
-const isActive = computed(() => parentStatus.value === 'active')
+const teacherStatus = computed(() => props.teacher?.status || 'inactive')
+const isActive = computed(() => teacherStatus.value === 'active')
 
 const handleToggleStatus = () => {
   Swal.fire({
-    title: `${isActive.value ? 'Deactivate' : 'Activate'} Parent?`,
-    text: `This will ${isActive.value ? 'deactivate' : 'activate'} ${props.parent.name}'s account.`,
+    title: `${isActive.value ? 'Deactivate' : 'Activate'} Teacher?`,
+    text: `This will ${isActive.value ? 'deactivate' : 'activate'} ${props.teacher.name}'s account.`,
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: isActive.value ? '#ef4444' : '#10b981',
     confirmButtonText: `Yes, ${isActive.value ? 'deactivate' : 'activate'}!`,
+    background: '#1f2937',
+    color: '#f9fafb',
   }).then((result) => {
     if (result.isConfirmed) {
       emit('action', 'toggle-status')
-      Swal.fire({
-        icon: 'success',
-        title: `Parent ${isActive.value ? 'deactivated' : 'activated'} successfully`,
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-      })
-      emit('close')
     }
   })
 }
 
 const handleEdit = () => {
-  if (!form.value.name.trim() || !form.value.email.trim()) {
+  if (!form.name.trim() || !form.email.trim()) {
     Swal.fire({
       icon: 'error',
       title: 'Validation Error',
       text: 'Name and email are required.',
+      background: '#1f2937',
+      color: '#f9fafb',
+      iconColor: '#ef4444',
     })
     return
   }
 
   // Check password confirmation if password is provided
-  if (form.value.password && form.value.password !== form.value.password_confirmation) {
+  if (form.password && form.password !== form.password_confirmation) {
     Swal.fire({
       icon: 'error',
       title: 'Validation Error',
       text: 'Password confirmation does not match.',
+      background: '#1f2937',
+      color: '#f9fafb',
+      iconColor: '#ef4444',
     })
     return
   }
 
   // Add minimum password length validation if password is provided
-  if (form.value.password && form.value.password.length < 8) {
+  if (form.password && form.password.length < 8) {
     Swal.fire({
       icon: 'error',
       title: 'Validation Error',
       text: 'Password must be at least 8 characters long.',
+      background: '#1f2937',
+      color: '#f9fafb',
+      iconColor: '#ef4444',
     })
     return
   }
 
-  isSubmitting.value = true
-  
-  try {
-    emit('action', 'edit', form.value)
-    
-    // Note: Success message should be handled in the parent component
-    // after the actual API call succeeds, not here
-  } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Update Failed',
-      text: 'An error occurred while updating the parent. Please try again.',
-    })
-  } finally {
-    // Only reset if the parent component doesn't handle it
-    // Consider removing this if the parent component manages the loading state
-    isSubmitting.value = false
-  }
+  form.put(route('teachers.update', props.teacher.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Teacher updated successfully!',
+        background: '#1f2937',
+        color: '#f9fafb',
+        iconColor: '#22c55e',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      })
+      form.reset('password', 'password_confirmation')
+      emit('close')
+    }
+  })
 }
 
 const handleDelete = () => {
   Swal.fire({
     title: 'Are you sure?',
-    text: `This will permanently delete ${props.parent.name} and all their associated data!`,
+    text: `This will permanently delete ${props.teacher.name} and all their associated data!`,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#ef4444',
     confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel'
+    cancelButtonText: 'Cancel',
+    background: '#1f2937',
+    color: '#f9fafb',
   }).then((result) => {
     if (result.isConfirmed) {
       emit('action', 'delete')
@@ -132,6 +135,8 @@ const handleDelete = () => {
 
 const closeModal = () => {
   activeTab.value = 'edit'
+  form.reset()
+  form.clearErrors()
   emit('close')
 }
 </script>
@@ -156,12 +161,12 @@ const closeModal = () => {
         <div class="relative z-10 bg-gradient-to-r from-gray-50/80 to-gray-100/80 dark:from-gray-800/80 dark:to-gray-700/80 px-6 py-4 border-b border-gray-200/50 dark:border-gray-600/50">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center text-white font-medium">
-                {{ parent?.name?.charAt(0) || 'P' }}
+              <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                {{ teacher?.name?.charAt(0) || 'T' }}
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ parent?.name || 'Parent' }}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ parent?.email || '' }}</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ teacher?.name || 'Teacher' }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ teacher?.email || '' }}</p>
               </div>
             </div>
             <button
@@ -175,7 +180,7 @@ const closeModal = () => {
           </div>
           
           <!-- Status Badge -->
-          <div class="mt-3">
+          <div class="mt-3 flex items-center space-x-3">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" :class="{
               'bg-green-500/20 text-green-600 dark:text-green-400 border-green-400/30': isActive,
               'bg-red-500/20 text-red-600 dark:text-red-400 border-red-400/30': !isActive
@@ -186,6 +191,16 @@ const closeModal = () => {
               }"></div>
               {{ isActive ? 'Active' : 'Inactive' }}
             </span>
+            
+            <!-- Class Assignment -->
+            <template v-if="teacher?.class">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-400/30">
+                {{ teacher.class.name }} - Grade {{ teacher.class.grade_level }}
+              </span>
+            </template>
+            <template v-else>
+              <span class="text-gray-500 dark:text-gray-400 italic text-xs">No class assigned</span>
+            </template>
           </div>
         </div>
 
@@ -255,6 +270,7 @@ const closeModal = () => {
                   placeholder="Enter full name"
                   required
                 />
+                <span v-if="form.errors.name" class="text-red-500 text-sm mt-1 block">{{ form.errors.name }}</span>
               </div>
             </div>
 
@@ -275,6 +291,7 @@ const closeModal = () => {
                   placeholder="Enter email address"
                   required
                 />
+                <span v-if="form.errors.email" class="text-red-500 text-sm mt-1 block">{{ form.errors.email }}</span>
               </div>
             </div>
 
@@ -308,6 +325,7 @@ const closeModal = () => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                   </svg>
                 </button>
+                <span v-if="form.errors.password" class="text-red-500 text-sm mt-1 block">{{ form.errors.password }}</span>
               </div>
             </div>
 
@@ -343,20 +361,6 @@ const closeModal = () => {
               </div>
             </div>
 
-            <!-- Students Info (Read-only) -->
-            <div v-if="parent?.students?.length">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Associated Students</label>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="student in parent.students"
-                  :key="student.id"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700"
-                >
-                  {{ student.first_name }} {{ student.last_name }}
-                </span>
-              </div>
-            </div>
-
             <!-- Action Buttons -->
             <div class="flex space-x-3 pt-4">
               <button
@@ -367,12 +371,12 @@ const closeModal = () => {
               </button>
               <button
                 @click="handleEdit"
-                :disabled="isSubmitting"
-                class="flex-1 py-3 px-6 bg-gradient-to-r from-orange-600 to-pink-600 hover:from-orange-700 hover:to-pink-700 focus:ring-4 focus:ring-orange-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-                :class="{ 'opacity-75 cursor-not-allowed transform-none shadow-lg': isSubmitting }"
+                :disabled="form.processing"
+                class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                :class="{ 'opacity-75 cursor-not-allowed transform-none shadow-lg': form.processing }"
               >
                 <div class="flex items-center justify-center space-x-2">
-                  <template v-if="isSubmitting">
+                  <template v-if="form.processing">
                     <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
@@ -402,16 +406,16 @@ const closeModal = () => {
                   'text-red-400': !isActive
                 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path v-if="isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
+                  <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
               </div>
               <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Parent account is currently {{ isActive ? 'Active' : 'Inactive' }}
+                Teacher account is currently {{ isActive ? 'Active' : 'Inactive' }}
               </h4>
               <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">
                 {{ isActive 
-                  ? 'This parent can access their account and view student information.' 
-                  : 'This parent cannot access their account or view student information.' 
+                  ? 'This teacher can access their account and manage their assigned class.' 
+                  : 'This teacher cannot access their account or manage any classes.' 
                 }}
               </p>
               <button
@@ -434,12 +438,12 @@ const closeModal = () => {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.084 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Parent Account</h4>
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Delete Teacher Account</h4>
               <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                This action will permanently delete <strong class="text-gray-900 dark:text-white">{{ parent?.name }}</strong> and cannot be undone.
+                This action will permanently delete <strong class="text-gray-900 dark:text-white">{{ teacher?.name }}</strong> and cannot be undone.
               </p>
               <p class="text-red-600 dark:text-red-400 text-sm mb-6">
-                ⚠️ This will also remove all associated student data and access.
+                ⚠️ This will also remove all associated class assignments and teaching data.
               </p>
               <button
                 @click="handleDelete"
@@ -448,7 +452,7 @@ const closeModal = () => {
                 <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                Delete Parent
+                Delete Teacher
               </button>
             </div>
           </div>
