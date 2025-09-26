@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(ClassModel::class, 'teacher_id');
     }
+    
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
 }

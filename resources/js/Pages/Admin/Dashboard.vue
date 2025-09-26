@@ -171,6 +171,7 @@ const secondarySummaryItems = [
 
 // Honor items for cards
 const honorItems = [
+  { title: 'Non Honors', value: `${props.honorPercentages.non_honor}%`, gradient: 'from-yellow-500 to-orange-600', icon: Award },
   { title: 'With Honors', value: `${props.honorPercentages.with_honors}%`, gradient: 'from-yellow-500 to-orange-600', icon: Award },
   { title: 'With High Honors', value: `${props.honorPercentages.with_high_honors}%`, gradient: 'from-orange-500 to-red-600', icon: Medal },
   { title: 'With Highest Honors', value: `${props.honorPercentages.with_highest_honors}%`, gradient: 'from-purple-500 to-pink-600', icon: Crown }
@@ -496,7 +497,7 @@ export default {
             <div
               v-for="(honor, index) in honorItems"
               :key="honor.title"
-              class="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              class="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 p-5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', honor.gradient]"></div>
               

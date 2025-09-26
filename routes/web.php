@@ -128,6 +128,7 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 
     // Add Teacher User
     Route::resource('teachers', TeacherController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::put('/teachers/{id}/toggle-status', [TeacherController::class, 'toggleStatus'])->name('teachers.toggle-status');
 });
 
 /*
@@ -141,6 +142,7 @@ Route::middleware(['auth', 'role:admin|teacher'])->group(function () {
     Route::post('/parents', [ParentController::class, 'store'])->name('parents.store');
     Route::put('/parents/{parent}', [ParentController::class, 'update'])->name('parents.update');
     Route::delete('/parents/{id}', [ParentController::class, 'destroy'])->name('parents.destroy');
+    Route::put('/parents/{id}/toggle-status', [ParentController::class, 'toggleStatus'])->name('parents.toggle-status');
 
     // Pass the data into the Modal
     Route::get('/parents/{parent}/students', [ParentController::class, 'getStudents'])->name('parents.students.index');

@@ -26,6 +26,10 @@ const searchTeachers = () => {
   )
 }
 
+const toggleStatus = (id) => {
+  router.put(route('teachers.toggle-status', id))
+}
+
 const confirmDelete = (teacherId) => {
   Swal.fire({
     title: 'Are you sure?',
@@ -119,6 +123,12 @@ const openEditModal = (teacher) => {
               </template>
               </td>
               <td class="px-4 py-3 space-x-2">
+                <button 
+                  @click="toggleStatus(teacher.id)" 
+                  class="px-3 py-1 rounded text-white"
+                  :class="teacher.status === 'active' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'">
+                  {{ teacher.status === 'active' ? 'Deactivate' : 'Activate' }}
+                </button>
                 <button
                   @click="openEditModal(teacher)"
                   class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"

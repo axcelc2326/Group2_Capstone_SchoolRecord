@@ -38,6 +38,16 @@ class TeacherController extends Controller
         ]);
     }
 
+    public function toggleStatus($id)
+    {
+        $teacher = User::role('teacher')->findOrFail($id);
+
+        $teacher->status = $teacher->status === 'active' ? 'inactive' : 'active';
+        $teacher->save();
+
+        return back()->with('success', "Teacher account {$teacher->status} successfully.");
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

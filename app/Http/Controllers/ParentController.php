@@ -47,6 +47,16 @@ class ParentController extends Controller
         ]);
     }
 
+    public function toggleStatus($id)
+    {
+        $parent = User::findOrFail($id);
+
+        $parent->status = $parent->status === 'active' ? 'inactive' : 'active';
+        $parent->save();
+
+        return back()->with('success', 'Parent status updated successfully.');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

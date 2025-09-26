@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import RegisterModal from '@/Components/AdminAndTeacher/RegisterModal.vue'
 import ManageParentModal from '@/Components/AdminAndTeacher/ManageParentModal.vue'
-import EditParentModal from '@/Components/AdminAndTeacher/EditParentModal.vue'
+import ParentActionsModal from '@/Components/AdminAndTeacher/ParentActionsModal.vue'
 import { ref, computed } from 'vue'
 import Swal from 'sweetalert2'
 
@@ -16,7 +16,7 @@ const props = defineProps({
 
 const showRegisterModal = ref(false)
 const showManageModal = ref(false)
-const showEditParentModal = ref(false)
+const showActionsModal = ref(false)
 const selectedParent = ref(null)
 
 const search = ref(props.filters.search || '')
@@ -39,35 +39,72 @@ const openManageModal = (parent) => {
   showManageModal.value = true
 }
 
-// Open Edit modal
-const openEditParentModal = (parent) => {
+// Open Actions modal
+const openActionsModal = (parent) => {
   selectedParent.value = parent
-  showEditParentModal.value = true
+  showActionsModal.value = true
 }
 
-// Delete parent
+// Handle actions from the unified modal
+const handleParentAction = (action, parentData = null) => {
+  switch (action) {
+    case 'toggle-status':
+      toggleStatus(selectedParent.value.id)
+      break
+    case 'edit':
+      handleEditParent(parentData)
+      break
+    case 'delete':
+      confirmDeleteParent(selectedParent.value.id)
+      break
+  }
+}
+
+const toggleStatus = (id) => {
+  router.put(route('parents.toggle-status', id), {}, {
+    preserveScroll: true,
+    replace: true, // refresh props with latest data
+  })
+}
+
+const handleEditParent = (updatedParent) => {
+  router.put(route('parents.update', selectedParent.value.id), updatedParent, {
+    preserveScroll: true,
+    onSuccess: () => {
+      // Remove this block - let the server response update the data
+      showActionsModal.value = false
+      Swal.fire({
+        icon: 'success',
+        title: 'Parent updated successfully',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+      })
+    },
+    onError: (errors) => {
+      // Add error handling
+      Swal.fire({
+        icon: 'error',
+        title: 'Update failed',
+        text: 'Please try again'
+      })
+    }
+  })
+}
+
 const confirmDeleteParent = (parentId) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will delete the parent and all their students!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.delete(route('parents.destroy', parentId), {
-        preserveScroll: true,
-        onSuccess: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Parent deleted successfully',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-          })
-        }
+  router.delete(route('parents.destroy', parentId), {
+    preserveScroll: true,
+    onSuccess: () => {
+      showActionsModal.value = false
+      Swal.fire({
+        icon: 'success',
+        title: 'Parent deleted successfully',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
       })
     }
   })
@@ -184,6 +221,7 @@ const confirmDeleteParent = (parentId) => {
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Parent</th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
                 <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Students</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
                 <th class="px-6 py-4 text-right text-xs font-medium text-white uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -220,6 +258,18 @@ const confirmDeleteParent = (parentId) => {
                   </div>
                   <span v-else class="text-white/50 italic text-sm">No students assigned</span>
                 </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" :class="{
+                    'bg-green-500/20 text-green-100 border-green-400/30': parent.status === 'active',
+                    'bg-red-500/20 text-red-100 border-red-400/30': parent.status !== 'active'
+                  }">
+                    <div class="w-1.5 h-1.5 rounded-full mr-1.5" :class="{
+                      'bg-green-400': parent.status === 'active',
+                      'bg-red-400': parent.status !== 'active'
+                    }"></div>
+                    {{ parent.status === 'active' ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
                   <button
                     @click="openManageModal(parent)"
@@ -232,22 +282,13 @@ const confirmDeleteParent = (parentId) => {
                     Manage
                   </button>
                   <button
-                    @click="openEditParentModal(parent)"
-                    class="inline-flex items-center px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-100 border border-yellow-400/30 hover:border-yellow-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                    @click="openActionsModal(parent)"
+                    class="inline-flex items-center px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 border border-blue-400/30 hover:border-blue-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
                   >
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                     </svg>
-                    Edit
-                  </button>
-                  <button
-                    @click="() => confirmDeleteParent(parent.id)"
-                    class="inline-flex items-center px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
-                  >
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
+                    Actions
                   </button>
                 </td>
               </tr>
@@ -270,6 +311,16 @@ const confirmDeleteParent = (parentId) => {
                 <div>
                   <h4 class="text-white font-medium">{{ parent.name }}</h4>
                   <p class="text-sm text-white/70">{{ parent.email }}</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border mt-1" :class="{
+                    'bg-green-500/20 text-green-100 border-green-400/30': parent.status === 'active',
+                    'bg-red-500/20 text-red-100 border-red-400/30': parent.status !== 'active'
+                  }">
+                    <div class="w-1.5 h-1.5 rounded-full mr-1" :class="{
+                      'bg-green-400': parent.status === 'active',
+                      'bg-red-400': parent.status !== 'active'
+                    }"></div>
+                    {{ parent.status === 'active' ? 'Active' : 'Inactive' }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -301,22 +352,13 @@ const confirmDeleteParent = (parentId) => {
                 Manage
               </button>
               <button
-                @click="openEditParentModal(parent)"
-                class="flex-1 inline-flex justify-center items-center px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-100 border border-yellow-400/30 hover:border-yellow-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                @click="openActionsModal(parent)"
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 border border-blue-400/30 hover:border-blue-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
               >
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                 </svg>
-                Edit
-              </button>
-              <button
-                @click="() => confirmDeleteParent(parent.id)"
-                class="flex-1 inline-flex justify-center items-center px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
-              >
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Delete
+                Actions
               </button>
             </div>
           </div>
@@ -370,15 +412,11 @@ const confirmDeleteParent = (parentId) => {
     :classes="props.classes"
     @close="showManageModal = false"
   />
-  <EditParentModal
+  <ParentActionsModal
     v-if="selectedParent"
-    :show="showEditParentModal"
+    :show="showActionsModal"
     :parent="selectedParent"
-    @close="showEditParentModal = false"
-    @updated="(updatedParent) => {
-        const index = props.parents.data.findIndex(p => p.id === updatedParent.id);
-        if (index !== -1) props.parents.data[index] = { ...updatedParent };
-        showEditParentModal.value = false;
-    }"
+    @close="showActionsModal = false"
+    @action="handleParentAction"
   />
 </template>
