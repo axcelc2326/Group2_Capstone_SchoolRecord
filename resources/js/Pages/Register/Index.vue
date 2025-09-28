@@ -46,65 +46,61 @@ const openActionsModal = (parent) => {
 }
 
 // Handle actions from the unified modal
-const handleParentAction = (action, parentData = null) => {
+const handleParentAction = (action) => {
+  if (!selectedParent.value) return
+
   switch (action) {
     case 'toggle-status':
       toggleStatus(selectedParent.value.id)
-      break
-    case 'edit':
-      handleEditParent(parentData)
       break
     case 'delete':
       confirmDeleteParent(selectedParent.value.id)
       break
   }
+  showActionsModal.value = false
 }
 
 const toggleStatus = (id) => {
   router.put(route('parents.toggle-status', id), {}, {
     preserveScroll: true,
-    replace: true, // refresh props with latest data
-  })
-}
-
-const handleEditParent = (updatedParent) => {
-  router.put(route('parents.update', selectedParent.value.id), updatedParent, {
-    preserveScroll: true,
     onSuccess: () => {
-      // Remove this block - let the server response update the data
-      showActionsModal.value = false
       Swal.fire({
         icon: 'success',
-        title: 'Parent updated successfully',
+        title: 'Status updated successfully',
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
         timer: 2000,
-      })
-    },
-    onError: (errors) => {
-      // Add error handling
-      Swal.fire({
-        icon: 'error',
-        title: 'Update failed',
-        text: 'Please try again'
       })
     }
   })
 }
 
 const confirmDeleteParent = (parentId) => {
-  router.delete(route('parents.destroy', parentId), {
-    preserveScroll: true,
-    onSuccess: () => {
-      showActionsModal.value = false
-      Swal.fire({
-        icon: 'success',
-        title: 'Parent deleted successfully',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will permanently delete the parent account!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    background: '#1f2937',
+    color: '#f9fafb',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(route('parents.destroy', parentId), {
+        preserveScroll: true,
+        onSuccess: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Parent deleted successfully',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+          })
+        }
       })
     }
   })
@@ -367,7 +363,7 @@ const confirmDeleteParent = (parentId) => {
         <!-- Empty State -->
         <div v-if="!props.parents?.data?.length" class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <h3 class="mt-2 text-sm font-medium text-white/80">
             No parents found
