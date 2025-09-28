@@ -124,7 +124,7 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
-    Route::get('/analytics/class/{id}/students', [AnalyticsController::class, 'showClassStudents'])->name('analytics.class.students');
+    Route::get('/analytics/grade/{gradeLevel}', [AnalyticsController::class, 'showGradeLevelStudents'])->name('analytics.grade.students');
 
     // Add Teacher User
     Route::resource('teachers', TeacherController::class)->only(['index', 'store', 'update', 'destroy']);

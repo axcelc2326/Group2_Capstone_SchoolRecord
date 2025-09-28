@@ -5,7 +5,6 @@ import { computed } from 'vue'
 import { Trophy, Medal, Award, ArrowLeft, Users } from 'lucide-vue-next'
 
 const props = defineProps({
-  class_name: String,
   grade_level: String,
   students: {
     type: Array,
@@ -51,16 +50,35 @@ const getMedalIcon = (rank) => {
   }
 }
 
-const getGradeColor = (average, rank) => {
+const getGradeColor = (finalAverage, rank) => {
   if (rank <= 3) {
     return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
   }
   
-  const numericAverage = parseFloat(average)
+  const numericAverage = parseFloat(finalAverage)
   if (numericAverage >= 90) return 'bg-green-500/20 text-green-100 border border-green-400/30'
   if (numericAverage >= 80) return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
   if (numericAverage >= 70) return 'bg-yellow-500/20 text-yellow-100 border border-yellow-400/30'
   return 'bg-red-500/20 text-red-100 border border-red-400/30'
+}
+
+const getRemarkColor = (remark) => {
+  const remarkLower = (remark || '').toLowerCase()
+  if (remarkLower.includes('passed') || remarkLower.includes('excellent') || remarkLower.includes('outstanding')) {
+    return 'bg-green-500/20 text-green-100 border border-green-400/30'
+  }
+  if (remarkLower.includes('failed') || remarkLower.includes('needs improvement')) {
+    return 'bg-red-500/20 text-red-100 border border-red-400/30'
+  }
+  if (remarkLower.includes('progress')) {
+    return 'bg-yellow-500/20 text-yellow-100 border border-yellow-400/30'
+  }
+  return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+}
+
+const formatAverage = (finalAverage) => {
+  if (finalAverage === null || finalAverage === undefined) return 'N/A'
+  return typeof finalAverage === 'number' ? finalAverage.toFixed(2) : finalAverage
 }
 </script>
 
@@ -75,7 +93,7 @@ const getGradeColor = (average, rank) => {
             🏆 Student Rankings
           </h2>
           <p class="text-blue-200 font-medium mt-1">
-            {{ class_name }} - Grade {{ grade_level }}
+            Grade {{ grade_level }} Students
           </p>
         </div>
         
@@ -151,14 +169,15 @@ const getGradeColor = (average, rank) => {
                 </h4>
                 
                 <!-- Average Grade -->
-                <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-xl p-4 shadow-sm">
-                  <p class="text-sm text-blue-200 font-semibold uppercase tracking-wide">Average Grade</p>
-                  <p class="text-3xl font-bold text-white mt-1">{{ student.average || 'N/A' }}</p>
+                <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-xl p-4 shadow-sm mb-4">
+                  <p class="text-sm text-blue-200 font-semibold uppercase tracking-wide">Final Average</p>
+                  <p class="text-3xl font-bold text-white mt-1">{{ formatAverage(student.final_average) }}</p>
                 </div>
-                
-                <!-- Action Button -->
-                <div class="mt-6">
-                  <div class="text-sm text-blue-200 font-medium">Excellent Performance!</div>
+
+                <!-- Remarks -->
+                <div class="backdrop-blur-sm rounded-xl p-3 shadow-sm" :class="getRemarkColor(student.remarks)">
+                  <p class="text-xs uppercase tracking-wide font-semibold opacity-90">Remarks</p>
+                  <p class="text-sm font-bold mt-1">{{ student.remarks || 'In Progress' }}</p>
                 </div>
               </div>
             </div>
@@ -176,7 +195,7 @@ const getGradeColor = (average, rank) => {
             </div>
             <div>
               <h3 class="text-lg font-semibold text-white">Complete Rankings</h3>
-              <p class="text-sm text-white/70 mt-1">{{ students.length }} students ranked by performance</p>
+              <p class="text-sm text-white/70 mt-1">{{ students.length }} students ranked by final average</p>
             </div>
           </div>
         </div>
@@ -194,7 +213,10 @@ const getGradeColor = (average, rank) => {
                     Student Name
                   </th>
                   <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
-                    Average Grade
+                    Final Average
+                  </th>
+                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                    Remarks
                   </th>
                 </tr>
               </thead>
@@ -234,9 +256,17 @@ const getGradeColor = (average, rank) => {
                   <td class="px-8 py-6 whitespace-nowrap text-center">
                     <span 
                       class="px-4 py-2 inline-flex text-sm font-bold rounded-lg backdrop-blur-sm"
-                      :class="getGradeColor(student.average, index + 1)"
+                      :class="getGradeColor(student.final_average, index + 1)"
                     >
-                      {{ student.average || 'N/A' }}
+                      {{ formatAverage(student.final_average) }}
+                    </span>
+                  </td>
+                  <td class="px-8 py-6 whitespace-nowrap text-center">
+                    <span 
+                      class="px-3 py-1 inline-flex text-xs font-medium rounded-lg backdrop-blur-sm"
+                      :class="getRemarkColor(student.remarks)"
+                    >
+                      {{ student.remarks || 'In Progress' }}
                     </span>
                   </td>
                 </tr>
@@ -273,13 +303,25 @@ const getGradeColor = (average, rank) => {
                   </div>
                 </div>
               </div>
-              <div class="flex justify-center">
-                <span 
-                  class="px-4 py-2 inline-flex text-sm font-bold rounded-lg backdrop-blur-sm"
-                  :class="getGradeColor(student.average, index + 1)"
-                >
-                  Average: {{ student.average || 'N/A' }}
-                </span>
+              
+              <div class="flex flex-col space-y-3">
+                <div class="flex justify-center">
+                  <span 
+                    class="px-4 py-2 inline-flex text-sm font-bold rounded-lg backdrop-blur-sm"
+                    :class="getGradeColor(student.final_average, index + 1)"
+                  >
+                    Final Average: {{ formatAverage(student.final_average) }}
+                  </span>
+                </div>
+                
+                <div class="flex justify-center">
+                  <span 
+                    class="px-3 py-1 inline-flex text-xs font-medium rounded-lg backdrop-blur-sm"
+                    :class="getRemarkColor(student.remarks)"
+                  >
+                    {{ student.remarks || 'In Progress' }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -289,7 +331,7 @@ const getGradeColor = (average, rank) => {
         <div v-else class="text-center py-12">
           <Users class="mx-auto h-12 w-12 text-white/40 mb-4" />
           <h3 class="mt-2 text-sm font-medium text-white/80">No Students Found</h3>
-          <p class="mt-1 text-sm text-white/60">There are no students to display for this class.</p>
+          <p class="mt-1 text-sm text-white/60">There are no students to display for this grade level.</p>
           <button 
             class="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             @click="$inertia.get(route('students.create'))"

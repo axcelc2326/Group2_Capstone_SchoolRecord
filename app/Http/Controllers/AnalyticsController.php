@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Grade;
 use App\Models\ClassModel;
+use App\Models\GradeRemark;
 use App\Models\Subject; // ✅ Import Subject
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,117 +18,99 @@ class AnalyticsController extends Controller
     {
         $perPage = 1;
 
-        // ✅ Paginate classes with students and grades
-        $classes = ClassModel::with('students.grades')->paginate($perPage);
+        // ✅ Preload classes, students, grades, and remarks
+        $classes = ClassModel::with([
+            'students.grades',
+            'students.gradeRemarks',
+        ])->get();
 
-        // ✅ Map class data
-        $analytics = collect($classes->items())->map(function ($class) {
+        // ✅ Preload all subjects and group by grade_level
+        $allSubjects = Subject::all()->groupBy('grade_level');
+
+        // ✅ Group classes by grade level
+        $grouped = $classes->groupBy('grade_level');
+
+        $analytics = $grouped->map(function ($classes, $gradeLevel) use ($allSubjects) {
             $subjectAverages = [];
 
-            // ✅ Only fetch subjects for this class's grade level
-            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+            // ✅ Get subjects for this grade level from preloaded subjects
+            $subjects = $allSubjects->get($gradeLevel, collect());
 
             foreach ($subjects as $subject) {
-                $grades = $class->students->flatMap(function ($student) use ($subject) {
-                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
-                });
+                // ✅ Collect all grades for this subject
+                $grades = $classes->flatMap->students
+                    ->flatMap->grades
+                    ->where('subject_id', $subject->id)
+                    ->pluck('grade');
 
                 $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
             }
 
-            $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
-            $lowSubject = collect($subjectAverages)->sort()->keys()->first();
+            // ✅ Get all remarks (case-insensitive check)
+            $remarks = $classes->flatMap->students->flatMap->gradeRemarks;
+
+            $promoted = $remarks->filter(fn($r) => strtolower($r->remarks) === 'promoted')->count();
+            $retained = $remarks->filter(fn($r) => strtolower($r->remarks) === 'retained')->count();
 
             return [
-                'class' => $class->name,
-                'grade_level' => $class->grade_level,
+                'grade_level'      => $gradeLevel,
                 'subject_averages' => $subjectAverages,
-                'top_subject' => $topSubject,
-                'low_subject' => $lowSubject,
-                'total_students' => $class->students->count(),
-                'id' => $class->id,
-                'subjects' => $subjects, // ✅ include subjects list
+                'top_subject'      => collect($subjectAverages)->sortDesc()->keys()->first(),
+                'low_subject'      => collect($subjectAverages)->sort()->keys()->first(),
+                'total_students'   => $classes->sum(fn($c) => $c->students->count()),
+                'promoted'         => $promoted,
+                'retained'         => $retained,
+                'subjects'         => $subjects,
             ];
-        });
+        })->values();
 
-        // ✅ Send paginated links and analytics data
+        // ✅ Manual Pagination
+        $page = $request->get('page', 1);
+        $paginated = $analytics->forPage($page, $perPage);
+
         return Inertia::render('Analytics/Index', [
-            'analytics' => $analytics,
+            'analytics' => $paginated->values()->all(),
             'pagination' => [
-                'current_page' => $classes->currentPage(),
-                'last_page' => $classes->lastPage(),
-                'next_page_url' => $classes->nextPageUrl(),
-                'prev_page_url' => $classes->previousPageUrl(),
-                'path' => $classes->path(),
+                'current_page'  => $page,
+                'last_page'     => ceil($analytics->count() / $perPage),
+                'next_page_url' => $page < ceil($analytics->count() / $perPage) ? url()->current() . '?page=' . ($page + 1) : null,
+                'prev_page_url' => $page > 1 ? url()->current() . '?page=' . ($page - 1) : null,
+                'path'          => url()->current(),
             ],
         ]);
     }
 
-    public function teacherAnalytics(Request $request)
+    public function showGradeLevelStudents($gradeLevel)
     {
-        $user = auth()->user();
+        $classes = ClassModel::with([
+            'students.user',
+            'students.grades',
+            'students.gradeRemarks',
+            'students.parent',
+        ])->where('grade_level', $gradeLevel)->get();
 
-        // ✅ Assuming your `ClassModel` has a `teacher_id` column
-        $classes = ClassModel::with('students.grades')
-            ->where('teacher_id', $user->id)
-            ->get();
-
-        $analytics = $classes->map(function ($class) {
-            $subjectAverages = [];
-
-            // ✅ Only fetch subjects for this class's grade level
-            $subjects = Subject::where('grade_level', $class->grade_level)->get();
-
-            foreach ($subjects as $subject) {
-                $grades = $class->students->flatMap(function ($student) use ($subject) {
-                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
-                });
-
-                $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
-            }
-
-            $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
-            $lowSubject = collect($subjectAverages)->sort()->keys()->first();
-
-            return [
-                'class' => $class->name,
-                'grade_level' => $class->grade_level,
-                'subject_averages' => $subjectAverages,
-                'top_subject' => $topSubject,
-                'low_subject' => $lowSubject,
-                'total_students' => $class->students->count(),
-                'id' => $class->id,
-                'subjects' => $subjects,
-            ];
-        });
-
-        return Inertia::render('Analytics/TeacherIndex', [
-            'analytics' => $analytics,
-        ]);
-    }
-
-    public function showClassStudents($id)
-    {
-        $class = ClassModel::with('students.user', 'students.grades')->findOrFail($id);
-
-        $students = $class->students->map(function ($student) {
-            $average = round($student->grades->avg('grade') ?? 0, 2);
-
+        $students = $classes->flatMap->students->map(function ($student) {
             $name = optional($student->parent)->fname
                 ? trim($student->parent->fname . ' ' . $student->parent->lname)
                 : trim($student->first_name . ' ' . $student->last_name);
 
+            // ✅ Latest computed remark
+            $latestRemark = $student->gradeRemarks->sortByDesc('created_at')->first();
+
+            // ✅ Fallback if final_average not yet stored
+            $computedAverage = round($student->grades->avg('grade') ?? 0, 2);
+
             return [
-                'id' => $student->id,
-                'name' => $name,
-                'average' => $average,
+                'id'            => $student->id,
+                'name'          => $name,
+                'final_average' => $latestRemark->final_average ?? $computedAverage,
+                'remarks'       => $latestRemark->remarks ?? 'In Progress',
             ];
-        })->sortByDesc('average')->values()->all();
+        })->sortByDesc('final_average')->values()->all();
 
         return Inertia::render('Analytics/ClassStudents', [
-            'class_name' => $class->name,
-            'grade_level' => $class->grade_level,
-            'students' => $students,
+            'grade_level' => $gradeLevel,
+            'students'    => $students,
         ]);
     }
 }

@@ -10,10 +10,10 @@ class Student extends Model
 {
     protected $fillable = [
         'first_name',
-        'middle_name',          // ✅ Added Middle Name
+        'middle_name',   // ✅ Added Middle Name
         'last_name',
-        'lrn',                // ✅ Added LRN
-        'gender',             // ✅ Added Gender
+        'lrn',           // ✅ Added LRN
+        'gender',        // ✅ Added Gender
         'class_id',
         'parent_id',
         'approved_by_teacher',
@@ -43,7 +43,18 @@ class Student extends Model
         return $this->hasMany(Grade::class);
     }
 
-    public function user()
+    /**
+     * A student has many grade remarks (promoted/retained).
+     */
+    public function gradeRemarks(): HasMany
+    {
+        return $this->hasMany(GradeRemark::class);
+    }
+
+    /**
+     * (Optional) If you want to directly link student ↔ user account.
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

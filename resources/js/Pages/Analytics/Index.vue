@@ -10,26 +10,30 @@ const props = defineProps({
 });
 
 const selectedChart = ref('bar');
-const chartKey = ref(0); // Force re-render key
+const chartKey = ref(0);
 
-// Watch for chart type changes and force re-render
 watch(selectedChart, async () => {
     chartKey.value++;
     await nextTick();
 });
 
-const goToPage = (url) => {
-    if (url) router.visit(url);
+const goToPage = (page) => {
+    if (page && page !== '...') {
+        const baseUrl = props.pagination?.path || '';
+        const url = `${baseUrl}?page=${page}`;
+        router.visit(url);
+    }
 };
 
-const viewClassStudents = (classId) => {
-    router.visit(route('analytics.class.students', { id: classId }))
-}
+const viewGradeLevelStudents = (gradeLevel) => {
+    router.get(route('analytics.grade.students', { gradeLevel }));
+};
 
-// Enhanced chart configurations with glassmorphism styling
+
+// Enhanced chart configurations
 const getDonutChartOptions = (classData, idx) => ({
   chart: {
-    id: `subject-donut-${idx}-${chartKey.value}`, // Unique ID with key
+    id: `subject-donut-${idx}-${chartKey.value}`,
     type: 'donut',
     fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
     background: 'transparent',
@@ -117,7 +121,7 @@ const getDonutChartOptions = (classData, idx) => ({
 
 const getAreaChartOptions = (classData, idx) => ({
   chart: {
-    id: `subject-area-${idx}-${chartKey.value}`, // Unique ID with key
+    id: `subject-area-${idx}-${chartKey.value}`,
     type: 'area',
     fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
     toolbar: { show: false },
@@ -194,7 +198,7 @@ const getAreaChartOptions = (classData, idx) => ({
 
 const getBarChartOptions = (classData, idx) => ({
   chart: {
-    id: `subject-bar-${idx}-${chartKey.value}`, // Unique ID with key
+    id: `subject-bar-${idx}-${chartKey.value}`,
     type: 'bar',
     fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
     toolbar: { show: false },
@@ -308,7 +312,7 @@ const getChartOptions = (classData, idx) => {
   }
 };
 
-// Performance calculations with glassmorphism color scheme
+// Performance calculations
 const getPerformanceLevel = (average) => {
   if (average >= 90) return { 
     label: 'Exceptional', 
@@ -338,6 +342,22 @@ const getOverallAverage = (classData) => {
   return values.reduce((sum, val) => sum + val, 0) / values.length;
 };
 
+// Updated to work with your backend data structure
+const getClassDisplayName = (classData) => {
+  // Since your backend groups by grade_level, we'll create a display name
+  return `Grade ${classData.grade_level} Classes`;
+};
+
+// Updated to handle multiple classes per grade level
+const getTotalStudents = (classData) => {
+  return classData.total_students || 0;
+};
+
+// Updated to get subjects count
+const getSubjectsCount = (classData) => {
+  return Object.keys(classData.subject_averages || {}).length;
+};
+
 const pages = computed(() => {
     if (!props.pagination) return [];
     const current = props.pagination.current_page;
@@ -358,13 +378,6 @@ const pages = computed(() => {
     return pagesArray;
 });
 
-const pageUrl = (page) => {
-    if (page === '...') return null;
-    const baseUrl = props.pagination?.path || '';
-    return `${baseUrl}?page=${page}`;
-};
-
-// Check if chart data is valid
 const hasValidChartData = (classData) => {
   return classData && 
          classData.subject_averages && 
@@ -407,31 +420,9 @@ const icons = {
 
         <!-- Desktop container -->
         <div class="px-8 py-8 space-y-10 max-w-7xl mx-auto">
-          
-          <!-- Chart Type Selector -->
-          <div class="flex justify-end">
-              <div class="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 rounded-xl p-1 shadow-lg transition-all duration-300">
-                  <div class="flex items-center gap-2">
-                      <button
-                          v-for="type in ['bar', 'area', 'donut']"
-                          :key="type"
-                          @click="selectedChart = type"
-                          :class="[
-                              'px-6 py-3 rounded-lg text-base font-semibold transition-all duration-300 capitalize',
-                              selectedChart === type
-                                  ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm'
-                                  : 'text-white/70 hover:text-white hover:bg-white/10'
-                          ]"
-                      >
-                          {{ type }}
-                      </button>
-                  </div>
-              </div>
-          </div>
-
           <!-- Analytics Cards -->
           <div class="space-y-12">
-              <div v-for="(classData, idx) in analytics" :key="`class-${idx}-${classData.id}`" 
+              <div v-for="(classData, idx) in analytics" :key="`class-${idx}-${classData.grade_level}`" 
                     class="group backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
                   
                   <!-- Class Header -->
@@ -442,7 +433,7 @@ const icons = {
                                   {{ classData.grade_level || 'N/A' }}
                               </div>
                               <div>
-                                  <h2 class="text-3xl font-bold text-white mb-2">{{ classData.class || 'Unknown Class' }}</h2>
+                                  <h2 class="text-3xl font-bold text-white mb-2">{{ getClassDisplayName(classData) }}</h2>
                                   <div class="flex items-center gap-4 text-white/70 text-base">
                                       <span class="flex items-center space-x-2">
                                           <div class="w-5 h-5" v-html="icons.school"></div>
@@ -450,11 +441,11 @@ const icons = {
                                       </span>
                                       <span class="flex items-center space-x-2">
                                           <div class="w-5 h-5" v-html="icons.book"></div>
-                                          <span>{{ Object.keys(classData.subject_averages || {}).length }} Subjects</span>
+                                          <span>{{ getSubjectsCount(classData) }} Subjects</span>
                                       </span>
                                       <span class="flex items-center space-x-2">
                                           <div class="w-5 h-5" v-html="icons.users"></div>
-                                          <span>{{ classData.total_students || 0 }} Students</span>
+                                          <span>{{ getTotalStudents(classData) }} Students</span>
                                       </span>
                                   </div>
                               </div>
@@ -463,11 +454,10 @@ const icons = {
                           <div class="flex items-center gap-6">
                               <!-- View Students Button -->
                               <button
-                                  @click="viewClassStudents(classData.id)"
+                                  @click="viewGradeLevelStudents(classData.grade_level)"
                                   class="group/btn backdrop-blur-sm bg-white/15 hover:bg-white/25 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 hover:border-white/30 flex items-center gap-3"
                               >
-                                  <div class="w-5 h-5" v-html="icons.users"></div>
-                                  <span>View Students</span>
+                                  View Students
                               </button>
                               
                               <!-- Overall Average -->
@@ -483,7 +473,7 @@ const icons = {
 
                   <div class="p-10">
                       <!-- Performance Summary Cards -->
-                      <div class="grid grid-cols-3 gap-6 mb-12">
+                      <div class="grid grid-cols-4 gap-6 mb-12">
                           <!-- Overall Performance -->
                           <div class="backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 group/card">
                               <div class="flex items-center gap-6">
@@ -530,6 +520,20 @@ const icons = {
                                   </div>
                               </div>
                           </div>
+
+                          <!-- Promotion/Retention Stats -->
+                          <div class="backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 group/card">
+                              <div class="flex items-center gap-6">
+                                  <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-violet-500/20 to-violet-600/20 flex items-center justify-center text-violet-300 border border-violet-400/30">
+                                      <div class="w-7 h-7" v-html="icons.trending"></div>
+                                  </div>
+                                  <div>
+                                      <div class="text-white/70 text-base mb-1">Student Progress</div>
+                                      <div class="font-semibold text-green-300 text-base mb-1">Promoted: {{ classData.promoted || 0 }}</div>
+                                      <div class="font-semibold text-amber-300 text-base">Retained: {{ classData.retained || 0 }}</div>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
 
                       <!-- Chart Section -->
@@ -539,8 +543,23 @@ const icons = {
                                   <div class="w-8 h-8" v-html="icons.chart"></div>
                                   Performance Visualization
                               </h3>
-                              <div class="px-4 py-2 bg-white/10 rounded-lg text-white/70 text-base font-medium border border-white/20">
-                                  {{ selectedChart.toUpperCase() }} View
+                              <!-- Chart Type Selector moved here -->
+                              <div class="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 rounded-xl p-1 shadow-lg transition-all duration-300">
+                                  <div class="flex items-center gap-2">
+                                      <button
+                                          v-for="type in ['bar', 'area', 'donut']"
+                                          :key="type"
+                                          @click="selectedChart = type"
+                                          :class="[
+                                              'px-6 py-3 rounded-lg text-base font-semibold transition-all duration-300 capitalize',
+                                              selectedChart === type
+                                                  ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm'
+                                                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                                          ]"
+                                      >
+                                          {{ type }}
+                                      </button>
+                                  </div>
                               </div>
                           </div>
                           
@@ -614,13 +633,13 @@ const icons = {
           </div>
 
           <!-- Pagination -->
-          <div v-if="pagination" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl shadow-xl p-8">
+          <div v-if="pagination && pagination.last_page > 1" class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl shadow-xl p-8">
               <div class="flex justify-center items-center gap-3">
 
                   <!-- Previous Button -->
                   <button
-                      @click="goToPage(pagination.prev_page_url)"
-                      :disabled="!pagination.prev_page_url"
+                      @click="goToPage(pagination.current_page - 1)"
+                      :disabled="pagination.current_page === 1"
                       class="group/prev backdrop-blur-sm bg-white/10 hover:bg-white/20 disabled:bg-white/5 text-white disabled:text-white/40 px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:shadow-none border border-white/20 hover:border-white/30 disabled:border-white/10 flex items-center gap-3"
                   >
                       <div class="w-5 h-5" v-html="icons.chevronLeft"></div>
@@ -635,7 +654,7 @@ const icons = {
                       >...</span>
                       <button
                           v-else
-                          @click="goToPage(pageUrl(page))"
+                          @click="goToPage(page)"
                           :class="[
                               'px-4 py-3 rounded-lg text-base font-semibold transition-all duration-300 border',
                               page === pagination.current_page
@@ -649,8 +668,8 @@ const icons = {
 
                   <!-- Next Button -->
                   <button
-                      @click="goToPage(pagination.next_page_url)"
-                      :disabled="!pagination.next_page_url"
+                      @click="goToPage(pagination.current_page + 1)"
+                      :disabled="pagination.current_page === pagination.last_page"
                       class="group/next backdrop-blur-sm bg-white/10 hover:bg-white/20 disabled:bg-white/5 text-white disabled:text-white/40 px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:hover:shadow-none border border-white/20 hover:border-white/30 disabled:border-white/10 flex items-center gap-3"
                   >
                       <span>Next</span>
