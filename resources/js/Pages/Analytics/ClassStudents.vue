@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import { Trophy, Medal, Award, ArrowLeft, Users } from 'lucide-vue-next'
+import { Trophy, Medal, Award, ArrowLeft, Users, School } from 'lucide-vue-next'
 
 const props = defineProps({
   grade_level: String,
@@ -159,14 +159,22 @@ const formatAverage = (finalAverage) => {
                 </div>
                 
                 <!-- Medal Icon -->
-                <div class="text-5xl mb-6 mt-6">
+                <div class="text-5xl mb-4 mt-6">
                   {{ getMedalIcon(index + 1) }}
                 </div>
                 
                 <!-- Student Info -->
-                <h4 class="text-xl font-bold text-white mb-4">
+                <h4 class="text-xl font-bold text-white mb-2">
                   {{ student.name || 'No Name' }}
                 </h4>
+
+                <!-- Class/Section Badge -->
+                <div class="mb-4">
+                  <div class="inline-flex items-center px-3 py-1 bg-white/20 border border-white/30 rounded-lg backdrop-blur-sm">
+                    <School class="w-3 h-3 mr-1.5 text-blue-200" />
+                    <span class="text-sm font-medium text-blue-200">{{ student.class_name || 'No Class' }}</span>
+                  </div>
+                </div>
                 
                 <!-- Average Grade -->
                 <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-xl p-4 shadow-sm mb-4">
@@ -213,6 +221,9 @@ const formatAverage = (finalAverage) => {
                     Student Name
                   </th>
                   <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                    Class/Section
+                  </th>
+                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
                     Final Average
                   </th>
                   <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
@@ -251,6 +262,12 @@ const formatAverage = (finalAverage) => {
                         <div class="text-sm font-medium text-white">{{ student.name || 'No Name' }}</div>
                         <div class="text-xs text-white/60">Student</div>
                       </div>
+                    </div>
+                  </td>
+                  <td class="px-8 py-6 whitespace-nowrap text-center">
+                    <div class="inline-flex items-center px-3 py-1 bg-indigo-500/20 text-indigo-100 border border-indigo-400/30 rounded-lg backdrop-blur-sm">
+                      <School class="w-3 h-3 mr-1.5" />
+                      <span class="text-sm font-medium">{{ student.class_name || 'No Class' }}</span>
                     </div>
                   </td>
                   <td class="px-8 py-6 whitespace-nowrap text-center">
@@ -299,7 +316,10 @@ const formatAverage = (finalAverage) => {
                   </div>
                   <div>
                     <h4 class="text-white font-medium">{{ student.name || 'No Name' }}</h4>
-                    <p class="text-sm text-white/70">Student</p>
+                    <div class="flex items-center text-xs text-white/70 mt-0.5">
+                      <School class="w-3 h-3 mr-1" />
+                      {{ student.class_name || 'No Class' }}
+                    </div>
                   </div>
                 </div>
               </div>

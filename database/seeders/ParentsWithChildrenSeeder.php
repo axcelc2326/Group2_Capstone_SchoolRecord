@@ -19,25 +19,34 @@ class ParentsWithChildrenSeeder extends Seeder
         // Create Parent Role if not exists
         Role::firstOrCreate(['name' => 'parent']);
 
-        // Define grade levels as strings (K1, K2, 1-6)
+        // Define grade levels (K1, K2, 1-6)
         $gradeLevels = ['K1', 'K2', '1', '2', '3', '4', '5', '6'];
 
-        // Unique class names
-        $classNames = ['Gold', 'Silver', 'Diamond', 'Emerald', 'Ruby', 'Sapphire', 'Platinum', 'Titanium'];
+        // 16 unique section names (ores/minerals)
+        $sectionNames = [
+            'Gold', 'Silver', 'Diamond', 'Emerald',
+            'Ruby', 'Sapphire', 'Platinum', 'Titanium',
+            'Quartz', 'Onyx', 'Topaz', 'Amethyst',
+            'Jade', 'Opal', 'Garnet', 'Peridot'
+        ];
 
-        // Create Classes for each grade level
-        foreach ($gradeLevels as $index => $grade) {
-            ClassModel::firstOrCreate([
-                'grade_level' => $grade,
-                'name' => $classNames[$index],
-                'teacher_id' => null,
-            ]);
+        // Create Classes (2 per grade level, each with unique name)
+        $sectionIndex = 0;
+        foreach ($gradeLevels as $grade) {
+            for ($i = 0; $i < 2; $i++) {
+                ClassModel::firstOrCreate([
+                    'grade_level' => $grade,
+                    'name' => $sectionNames[$sectionIndex],
+                    'teacher_id' => null,
+                ]);
+                $sectionIndex++;
+            }
         }
 
         $usedLrns = [];
 
-        // Create Parents and Students
-        for ($i = 1; $i <= 150; $i++) {
+        // Create 300 Parents and Students
+        for ($i = 1; $i <= 300; $i++) {
             $parent = User::create([
                 'name' => "Parent $i",
                 'email' => "parent$i@example.com",
@@ -45,14 +54,13 @@ class ParentsWithChildrenSeeder extends Seeder
             ]);
             $parent->assignRole('parent');
 
-            // Assign each parent to a random class
+            // Assign each student to a random class
             $class = ClassModel::inRandomOrder()->first();
 
             // Generate unique random 12-digit LRN
             do {
                 $lrn = (string) random_int(100000000000, 999999999999);
             } while (in_array($lrn, $usedLrns));
-
             $usedLrns[] = $lrn;
 
             $student = Student::create([
@@ -69,7 +77,7 @@ class ParentsWithChildrenSeeder extends Seeder
             // Fetch subjects for this student's grade level
             $subjects = Subject::where('grade_level', $class->grade_level)->get();
 
-            // ✅ Insert grades for all subjects across 4 quarters
+            // Insert grades for all subjects across 4 quarters
             foreach ($subjects as $subject) {
                 foreach (['Q1', 'Q2', 'Q3', 'Q4'] as $quarter) {
                     Grade::updateOrCreate(
@@ -86,7 +94,7 @@ class ParentsWithChildrenSeeder extends Seeder
                 }
             }
 
-            // ✅ Check if all quarters filled
+            // Check if all quarters filled
             $totalSubjects = $subjects->count();
             $quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
             $allFilled = true;
@@ -103,7 +111,7 @@ class ParentsWithChildrenSeeder extends Seeder
                 }
             }
 
-            // ✅ If all quarters filled, compute final average & insert grade remark
+            // If all quarters filled, compute final average & insert grade remark
             if ($allFilled) {
                 $average = Grade::where('student_id', $student->id)
                     ->where('class_id', $class->id)
