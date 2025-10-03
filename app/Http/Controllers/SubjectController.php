@@ -77,8 +77,12 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
+        // Delete all grades linked to this subject
+        $subject->grades()->delete();
+
+        // Now delete the subject
         $subject->delete();
 
-        return redirect()->back()->with('success', 'Subject deleted successfully.');
+        return redirect()->back()->with('success', 'Subject and related grades deleted successfully.');
     }
 }

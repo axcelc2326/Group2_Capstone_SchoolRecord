@@ -47,6 +47,15 @@ class ParentController extends Controller
         ]);
     }
 
+    public function getStudents(User $parent)
+    {
+        $students = $parent->students()->with('class')->get();
+
+        return response()->json([
+            'students' => $students,
+        ]);
+    }
+
     public function toggleStatus($id)
     {
         $parent = User::findOrFail($id);
@@ -100,21 +109,21 @@ class ParentController extends Controller
     {
         $parent = User::findOrFail($id);
 
-        // Delete all students linked to this parent
-        $parent->students()->delete();
+        // Loop through each student of the parent
+        foreach ($parent->students as $student) {
+            // Delete related grade remarks
+            $student->gradeRemarks()->delete();
 
-        // Delete the parent user account
+            // Delete related grades
+            $student->grades()->delete();
+
+            // Delete the student itself
+            $student->delete();
+        }
+
+        // Finally delete the parent user
         $parent->delete();
 
-        return back()->with('success', 'Parent and their students deleted successfully.');
-    }
-
-    public function getStudents(User $parent)
-    {
-        $students = $parent->students()->with('class')->get();
-
-        return response()->json([
-            'students' => $students,
-        ]);
+        return back()->with('success', 'Parent and their students (with grades/remarks) deleted successfully.');
     }
 }

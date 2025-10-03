@@ -86,10 +86,21 @@ class ClassController extends Controller
     // ✅ Delete a class
     public function destroy($id)
     {
-        $class = ClassModel::findOrFail($id);
+        $class = ClassModel::with('students.grades', 'students.gradeRemarks')->findOrFail($id);
+
+        foreach ($class->students as $student) {
+            // Clear related grades and remarks
+            $student->grades()->delete();
+            $student->gradeRemarks()->delete();
+
+            // Unassign student from class
+            $student->class_id = null;
+            $student->save();
+        }
+
+        // Delete the class itself
         $class->delete();
 
-        return redirect()->route('classes.index')
-            ->with('success', 'Class deleted successfully!');
+        return back()->with('success', 'Class deleted, students unassigned, and related data cleared successfully!');
     }
 }
