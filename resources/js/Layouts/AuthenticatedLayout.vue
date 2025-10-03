@@ -2,7 +2,8 @@
 import { ref, computed, onMounted } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
-import Footer from '@/Components/Footer.vue'
+import Footer from '@/Components/Footer.vue';
+import Sidebar from '@/Components/Sidebar.vue';
 import { 
   ChevronRight, 
   LayoutDashboard, 
@@ -21,7 +22,7 @@ import {
   TrendingUp, 
   Settings,
   Cog
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
@@ -48,18 +49,14 @@ const toggleMobileNavigation = () => {
 const isActiveRoute = (href) => {
   if (!href) return false;
   
-  // Extract the path from href if it's a full URL
   const targetPath = href.startsWith('http') ? new URL(href).pathname : href;
   const currentPath = url;
   
-  // Exact match first
   if (currentPath === targetPath) return true;
   
-  // Special handling for announcements routes to prevent overlap
   if (targetPath === '/announcements' && currentPath.startsWith('/announcements/create')) return false;
   if (targetPath === '/announcements/create' && currentPath === '/announcements') return false;
   
-  // Sub-route match (but avoid matching root with everything)
   if (targetPath !== '/' && currentPath.startsWith(targetPath + '/')) return true;
   
   return false;
@@ -71,7 +68,6 @@ onMounted(() => {
     if (window.innerWidth < 1024) {
       sidebarCollapsed.value = true;
     }
-    // Close mobile menu on resize
     if (window.innerWidth >= 1024) {
       showingNavigationDropdown.value = false;
     }
@@ -83,15 +79,13 @@ onMounted(() => {
   return () => window.removeEventListener('resize', handleResize);
 });
 
-// Helper function to generate route URLs - Fixed route helper
+// Helper function to generate route URLs
 const routeUrl = (routeName, params = {}) => {
   try {
-    // This assumes you have a global route helper available
     if (window.route) {
       return window.route(routeName, params);
     }
     
-    // Fallback mapping for common routes
     const routeMap = {
       'dashboard': '/dashboard',
       'announcements.index': '/announcements',
@@ -100,7 +94,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.students': '/teacher/students',
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
-      'sf5.form': '/sf5/form',           // 👈 form input
+      'sf5.form': '/sf5/form',
       'classes.index': '/classes',
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
@@ -117,7 +111,7 @@ const routeUrl = (routeName, params = {}) => {
   }
 };
 
-// Quick Actions - Available to all users (Updated to use lucide-vue-next)
+// Quick Actions - Available to all users
 const quickActions = computed(() => [
   {
     name: 'Dashboard',
@@ -127,7 +121,7 @@ const quickActions = computed(() => [
   },
 ]);
 
-// Role-specific navigation items with proper unique icons (Updated to use lucide-vue-next)
+// Role-specific navigation items
 const roleBasedNavigation = computed(() => {
   const sections = {};
 
@@ -174,7 +168,6 @@ const roleBasedNavigation = computed(() => {
         icon: BarChart3,
         description: 'View analytics for my classes'
       },
-      // ✅ New Teacher-only link for SF5 Generator
       {
         name: 'SF5 Generator',
         href: routeUrl('sf5.form'),
@@ -223,9 +216,9 @@ const roleBasedNavigation = computed(() => {
         description: 'Performance insights'
       },
       {
-        name: 'Teacher Management', // 👈 new section
+        name: 'Teacher Management',
         href: routeUrl('teachers.index'),
-        icon: Cog, // you can swap for another icon like UserCog or ChalkboardTeacher
+        icon: Cog,
         description: 'Manage Teacher Accounts'
       },
       {
@@ -243,8 +236,8 @@ const roleBasedNavigation = computed(() => {
 
 <template>
   <div class="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white transition-all duration-700">
-    <!-- Enhanced Top Navigation -->
-    <nav class="bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-2xl shadow-black/30 sticky top-0 z-50 transition-all duration-500">
+    <!-- Enhanced Top Navigation - Fixed -->
+    <nav class="bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-2xl shadow-black/30 fixed top-0 left-0 right-0 z-50 transition-all duration-500">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <!-- Left: Logo + School Name + User -->
@@ -345,10 +338,10 @@ const roleBasedNavigation = computed(() => {
       </div>
 
       <!-- Enhanced Mobile Navigation Menu with Scrolling -->
-      <div v-show="showingNavigationDropdown" class="lg:hidden border-t border-white/20 bg-transparent shadow-xl transition-all duration-500 max-h-[80vh] overflow-y-auto">
-        <div class="px-4 py-6 space-y-6">
+      <div v-show="showingNavigationDropdown" class="lg:hidden border-t border-white/20 bg-transparent shadow-xl transition-all duration-500 max-h-[80vh] overflow-y-auto mobile-menu-scroll">
+        <div class="px-4 space-y-6">
           <!-- Mobile User Info -->
-          <div class="flex items-center space-x-3 pb-4 border-b transition-all duration-300 top-0 bg-transparent z-10">
+          <div class="flex items-center space-x-3 pb-4 border-b transition-all duration-300 sticky top-0 bg-transparent backdrop-blur-xl z-10 -mx-4 px-4 pt-2">
             <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-300 relative overflow-hidden">
               {{ user.name.charAt(0).toUpperCase() }}
               <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
@@ -378,7 +371,6 @@ const roleBasedNavigation = computed(() => {
                 ]"
                 @click="showingNavigationDropdown = false"
               >
-                <!-- Active underline effect -->
                 <div 
                   v-if="isActiveRoute(action.href)" 
                   class="absolute bottom-0 left-0 w-full h-[6px]
@@ -396,7 +388,6 @@ const roleBasedNavigation = computed(() => {
                   <ChevronRight class="w-6 h-6 animate-pulse text-sky-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
                 </div>
                 
-                <!-- Hover effect background -->
                 <div 
                   v-if="!isActiveRoute(action.href)" 
                   class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
@@ -431,7 +422,6 @@ const roleBasedNavigation = computed(() => {
                 ]"
                 @click="showingNavigationDropdown = false"
               >
-                <!-- Active underline effect -->
                 <div 
                   v-if="isActiveRoute(item.href)" 
                   class="absolute bottom-0 left-0 w-full h-[6px]
@@ -440,7 +430,6 @@ const roleBasedNavigation = computed(() => {
                         animate-pulse">
                 </div>
 
-                <!-- Icon -->
                 <component 
                   :is="item.icon" 
                   :class="isActiveRoute(item.href) 
@@ -449,18 +438,15 @@ const roleBasedNavigation = computed(() => {
                   class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300"
                 />
 
-                <!-- Text -->
                 <div class="flex flex-col flex-1 relative z-10">
                   <span class="font-semibold transition-all duration-300">{{ item.name }}</span>
                   <span class="text-xs opacity-70 transition-all duration-300">{{ item.description }}</span>
                 </div>
 
-                <!-- Chevron indicator when active -->
                 <div v-if="isActiveRoute(item.href)" class="ml-auto flex items-center">
                   <ChevronRight class="w-6 h-6 animate-pulse text-sky-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
                 </div>
 
-                <!-- Hover effect background -->
                 <div 
                   v-if="!isActiveRoute(item.href)" 
                   class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
@@ -473,226 +459,12 @@ const roleBasedNavigation = computed(() => {
     </nav>
 
     <!-- Layout: Sidebar + Main -->
-    <div class="flex flex-1">
-      <!-- Enhanced Modern Sidebar -->
-      <aside :class="[
-        'bg-white/10 backdrop-blur-xl border-r border-white/20 transition-all duration-500 ease-in-out shadow-2xl shadow-black/20',
-        sidebarCollapsed ? 'w-0 lg:w-20' : 'w-80',
-        'hidden lg:block'
-      ]">
-        <div class="p-6 h-full overflow-hidden">
-          <!-- Sidebar Toggle -->
-          <div class="flex justify-end mb-6" v-if="!sidebarCollapsed">
-            <button 
-              @click="toggleSidebar"
-              class="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105 group"
-            >
-              <svg class="w-5 h-5 transition-all duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-              </svg>
-            </button>
-          </div>
-          
-          <div v-if="sidebarCollapsed" class="flex justify-center mb-8">
-            <button 
-              @click="toggleSidebar"
-              class="p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105 group"
-            >
-              <svg class="w-6 h-6 transition-all duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
-          </div>
-          
-          <!-- Enhanced Navigation -->
-          <nav class="space-y-8" v-if="!sidebarCollapsed">
-            <!-- Quick Actions Section -->
-            <div>
-              <h2 class="text-lg font-bold bg-gradient-to-r from-blue-100 to-indigo-100 bg-clip-text text-transparent mb-6 transition-all duration-300">
-                Quick Actions
-              </h2>
-              
-              <div class="space-y-3">
-                <Link 
-                  v-for="action in quickActions"
-                  :key="action.name"
-                  :href="action.href" 
-                  :class="[
-                    'group flex items-center space-x-4 p-4 rounded-2xl transition-all duration-500 border-l-4 relative overflow-hidden',
-                    isActiveRoute(action.href)
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-xl shadow-blue-500/30 scale-[1.02]'
-                      : 'text-white/80 hover:text-white hover:bg-white/10 border-transparent hover:border-blue-400 hover:scale-[1.02]'
-                  ]"
-                >
-                  <!-- Active underline effect (modernized) -->
-                  <div 
-                    v-if="isActiveRoute(action.href)" 
-                    class="absolute bottom-0 left-0 w-full h-[6px]
-                          bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400
-                          rounded-full shadow-[0_0_12px_rgba(167,139,250,0.8)]
-                          animate-pulse">
-                  </div>
-                  <component :is="action.icon" :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white group-hover:scale-110 transition-all duration-300'" class="w-5 h-5" />
-                  <div class="flex flex-col flex-1 relative z-10">
-                    <span class="font-semibold transition-all duration-300">{{ action.name }}</span>
-                    <span class="text-xs opacity-70 transition-all duration-300">{{ action.description }}</span>
-                  </div>
-                  <div v-if="isActiveRoute(action.href)" class="ml-auto flex items-center">
-                    <ChevronRight class="w-6 h-6 animate-pulse text-sky-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
-                  </div>
-                  <!-- Hover effect background -->
-                  <div 
-                    v-if="!isActiveRoute(action.href)" 
-                    class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
-                  ></div>
-                </Link>
-              </div>
-            </div>
+    <div class="flex flex-1 pt-16"> <!-- Added pt-16 to account for fixed header -->
+      <!-- Use the new Sidebar component -->
+      <Sidebar :collapsed="sidebarCollapsed" @toggle="toggleSidebar" />
 
-            <!-- Role-based Navigation Sections -->
-            <div 
-              v-for="(items, category) in roleBasedNavigation" 
-              :key="category" 
-              class="space-y-4"
-            >
-              <!-- Category Heading -->
-              <h3 class="text-sm font-bold text-white/80 uppercase tracking-wider mb-4 px-2 transition-colors duration-300 flex items-center space-x-2">
-                <div 
-                  class="w-1 h-4 rounded-full animate-pulse"
-                  :class="{
-                    'bg-purple-400 shadow-lg shadow-purple-400/50': category.includes('Administration'),
-                    'bg-emerald-400 shadow-lg shadow-emerald-400/50': category.includes('Teacher'),
-                    'bg-blue-400 shadow-lg shadow-blue-400/50': category.includes('Parent')
-                  }"
-                ></div>
-                <span>{{ category }}</span>
-              </h3>
-
-              <!-- Navigation Links -->
-              <div class="grid grid-cols-1 gap-2">
-                <Link 
-                  v-for="item in items" 
-                  :key="item.name"
-                  :href="item.href" 
-                  :aria-current="isActiveRoute(item.href) ? 'page' : null"
-                  :class="[
-                    'group flex items-center space-x-4 p-4 rounded-2xl transition-all duration-500 border-l-4 relative overflow-hidden',
-                    isActiveRoute(item.href)
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-xl shadow-blue-500/30 scale-[1.02]'
-                      : 'text-white/80 hover:text-white hover:bg-white/10 border-transparent hover:border-blue-400 hover:scale-[1.02]'
-                  ]"
-                >
-                  <!-- Active underline effect (modernized) -->
-                  <div 
-                    v-if="isActiveRoute(item.href)" 
-                    class="absolute bottom-0 left-0 w-full h-[6px]
-                          bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400
-                          rounded-full shadow-[0_0_12px_rgba(167,139,250,0.8)]
-                          animate-pulse">
-                  </div>
-
-                  <!-- Icon -->
-                  <component 
-                    :is="item.icon" 
-                    :class="isActiveRoute(item.href) 
-                      ? 'text-white' 
-                      : 'text-white/70 group-hover:text-white transition-colors duration-300'"
-                    class="w-5 h-5 transform group-hover:scale-110 transition-transform duration-300"
-                  />
-
-                  <!-- Text -->
-                  <div class="flex flex-col flex-1 relative z-10">
-                    <span class="font-semibold transition-all duration-300">{{ item.name }}</span>
-                    <span class="text-xs opacity-70 transition-all duration-300">{{ item.description }}</span>
-                  </div>
-
-                  <!-- Chevron indicator when active -->
-                  <div v-if="isActiveRoute(item.href)" class="ml-auto flex items-center">
-                    <ChevronRight class="w-6 h-6 animate-pulse text-sky-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)]" />
-                  </div>
-
-                  <!-- Hover effect background -->
-                  <div 
-                    v-if="!isActiveRoute(item.href)" 
-                    class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
-                  ></div>
-                </Link>
-              </div>
-            </div>
-          </nav>
-          
-          <!-- Collapsed Navigation -->
-          <nav v-else class="space-y-4">
-            <!-- Collapsed Quick Actions -->
-            <div class="space-y-3">
-              <Link 
-                v-for="action in quickActions"
-                :key="action.name"
-                :href="action.href" 
-                :class="[
-                  'group flex items-center justify-center p-4 rounded-2xl transition-all duration-500 relative',
-                  isActiveRoute(action.href)
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-500/30 scale-110'
-                    : 'text-white/70 hover:text-white hover:bg-white/10 hover:scale-110'
-                ]"
-                :title="action.name"
-              >
-                <component 
-                  :is="action.icon" 
-                  :class="isActiveRoute(action.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'" 
-                  class="w-5 h-5"
-                  :key="`collapsed-action-${action.name}`"
-                />
-                
-                <!-- Active underline effect for collapsed -->
-                <div 
-                  v-if="isActiveRoute(action.href)" 
-                  class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[3px]
-                        bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400
-                        rounded-full shadow-[0_0_8px_rgba(167,139,250,0.8)]
-                        animate-pulse">
-                </div>
-              </Link>
-            </div>
-            
-            <!-- Collapsed Role-based Navigation -->
-            <div v-for="(items, category) in roleBasedNavigation" :key="category" class="space-y-3">
-              <div class="w-full h-px bg-white/20 my-4 transition-colors duration-300"></div>
-              <Link 
-                v-for="item in items" 
-                :key="item.name"
-                :href="item.href" 
-                :class="[
-                  'group flex items-center justify-center p-4 rounded-2xl transition-all duration-500 relative',
-                  isActiveRoute(item.href)
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-500/30 scale-110'
-                    : 'text-white/70 hover:text-white hover:bg-white/10 hover:scale-110'
-                ]"
-                :title="item.name"
-              >
-                <component 
-                  :is="item.icon" 
-                  :class="isActiveRoute(item.href) ? 'text-white' : 'text-white/70 group-hover:text-white transition-colors duration-300'" 
-                  class="w-5 h-5"
-                  :key="`collapsed-${category}-${item.name}`"
-                />
-                
-                <!-- Active underline effect for collapsed -->
-                <div 
-                  v-if="isActiveRoute(item.href)" 
-                  class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-[3px]
-                        bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-400
-                        rounded-full shadow-[0_0_8px_rgba(167,139,250,0.8)]
-                        animate-pulse">
-                </div>
-              </Link>
-            </div>
-          </nav>
-        </div>
-      </aside>
-
-      <!-- Main Content Wrapper -->
-      <div class="flex flex-col flex-1">
+      <!-- Main Content Wrapper - Only this scrolls -->
+      <div class="flex flex-col flex-1 overflow-y-auto main-content-scroll h-[calc(100vh-4rem)]">
         <!-- Main Content -->
         <main class="flex-1 p-6">
           <header v-if="$slots.header" class="mb-8">
@@ -710,10 +482,10 @@ const roleBasedNavigation = computed(() => {
               <slot />
             </div>
           </div>
+          
+          <!-- Enhanced Footer -->
+          <Footer />
         </main>
-
-        <!-- Enhanced Footer -->
-        <Footer />
       </div>
     </div>
   </div>
@@ -742,25 +514,45 @@ const roleBasedNavigation = computed(() => {
 }
 
 /* Custom scrollbar for mobile navigation */
-.lg\:hidden::-webkit-scrollbar {
+.mobile-menu-scroll::-webkit-scrollbar {
   width: 4px;
 }
 
-.lg\:hidden::-webkit-scrollbar-track {
+.mobile-menu-scroll::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
 
-.lg\:hidden::-webkit-scrollbar-thumb {
+.mobile-menu-scroll::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
 }
 
-.lg\:hidden::-webkit-scrollbar-thumb:hover {
+.mobile-menu-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* Smooth scrolling for mobile navigation */
+/* Custom scrollbar for main content */
+.main-content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.main-content-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.main-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Smooth scrolling */
 .overflow-y-auto {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;

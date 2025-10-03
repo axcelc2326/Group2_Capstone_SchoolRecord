@@ -4,7 +4,7 @@ const currentYear = new Date().getFullYear()
 
 <template>
   <!-- Ultra Modern Footer with Enhanced Glassmorphism -->
-  <footer class="relative bg-gradient-to-br from-white/5 via-white/10 to-white/15 backdrop-blur-2xl border-t border-white/30 shadow-[0_-20px_80px_rgba(0,0,0,0.3)] mt-8 overflow-hidden">
+  <footer class="relative bg-gradient-to-br rounded-3xl from-white/5 via-white/10 to-white/15 backdrop-blur-2xl border-t border-white/30 shadow-[0_-20px_80px_rgba(0,0,0,0.3)] mt-8 overflow-hidden">
     <!-- Animated Background Elements -->
     <div class="absolute inset-0 pointer-events-none">
       <div class="absolute -top-4 -right-4 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-2xl animate-pulse"></div>
