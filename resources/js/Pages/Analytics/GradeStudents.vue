@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import { Trophy, Medal, Award, ArrowLeft, Users, School } from 'lucide-vue-next'
+import { Trophy, Medal, Award, ArrowLeft, Users, School, LineChart } from 'lucide-vue-next'
 
 const props = defineProps({
   grade_level: String,
@@ -18,13 +18,13 @@ const remainingStudents = computed(() => props.students.slice(3))
 const getRankBadgeClass = (rank) => {
   switch (rank) {
     case 1:
-      return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md border-2 border-yellow-300/50'
+      return 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white border border-yellow-300/50'
     case 2:
-      return 'bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-md border-2 border-gray-300/50'
+      return 'bg-gradient-to-r from-gray-400 to-gray-500 text-white border border-gray-300/50'
     case 3:
-      return 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md border-2 border-amber-500/50'
+      return 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border border-amber-500/50'
     default:
-      return 'backdrop-blur-sm bg-white/20 text-white border-2 border-white/30'
+      return 'backdrop-blur-sm bg-white/20 text-white border border-white/30'
   }
 }
 
@@ -87,60 +87,50 @@ const formatAverage = (finalAverage) => {
 
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
-        <div>
-          <h2 class="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-            🏆 Student Rankings
-          </h2>
-          <p class="text-blue-200 font-medium mt-1">
-            Grade {{ grade_level }} Students
-          </p>
-        </div>
-        
-        <!-- Header Actions -->
-        <div class="flex items-center space-x-4">
-          <!-- Quick Stats -->
-          <div class="hidden md:flex items-center space-x-3 text-sm">
-            <div class="backdrop-blur-sm bg-blue-500/20 border border-blue-300/30 px-3 py-1 rounded-full">
-              <span class="text-blue-100">{{ students.length }} Students</span>
-            </div>
+      <div class="space-y-1">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-white">
+              Student Rankings
+            </h2>
+            <p class="text-white/70 mt-1">
+              Grade {{ grade_level }} Students
+            </p>
           </div>
-          
-          <button
-            @click="$inertia.get(route('analytics.index'))"
-            class="group relative inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/20"
-          >
-            <ArrowLeft class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
-            Back to Analytics
-          </button>
+          <LineChart class="w-8 h-8 text-white/60" />
         </div>
       </div>
     </template>
 
-    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-      <!-- Mobile Stats (visible on small screens) -->
-      <div class="md:hidden">
-        <div class="backdrop-blur-md bg-blue-500/10 border border-blue-300/30 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-blue-100">{{ students.length }}</div>
-          <div class="text-sm text-blue-200">Total Students</div>
+    <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <!-- Header Actions -->
+      <div class="flex justify-between items-center">
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-2">
+          <span class="text-white/80 text-sm">{{ students.length }} Students</span>
         </div>
+        
+        <button
+          @click="$inertia.get(route('analytics.index'))"
+          class="backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center gap-2"
+        >
+          <ArrowLeft class="w-4 h-4" />
+          Back to Analytics
+        </button>
       </div>
 
       <!-- Top 3 Students - Podium Style -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden" v-if="topThree.length > 0">
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl overflow-hidden" v-if="topThree.length > 0">
         <!-- Section Header -->
-        <div class="bg-gradient-to-r from-purple-500/30 to-blue-600/30 backdrop-blur-sm border-b border-white/10 px-8 py-6">
-          <div class="flex items-center justify-center">
-            <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mr-3">
-              <Trophy class="w-4 h-4 text-white" />
-            </div>
-            <h3 class="text-2xl font-bold text-white">Top Performers</h3>
+        <div class="bg-white/5 border-b border-white/10 px-6 py-4">
+          <div class="flex items-center">
+            <Trophy class="w-5 h-5 text-yellow-400 mr-2" />
+            <h3 class="text-xl font-semibold text-white">Top Performers</h3>
           </div>
         </div>
         
         <!-- Podium Cards -->
-        <div class="p-8">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
               v-for="(student, index) in topThree"
               :key="student.id || index"
@@ -149,41 +139,41 @@ const formatAverage = (finalAverage) => {
               <!-- Podium Card -->
               <div 
                 :class="getPodiumClass(index + 1)"
-                class="rounded-2xl border-2 p-8 text-center transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                class="rounded-xl border p-6 text-center transition-all duration-200"
               >
                 <!-- Crown/Rank Badge -->
-                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                  <div :class="getRankBadgeClass(index + 1)" class="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div :class="getRankBadgeClass(index + 1)" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">
                     {{ index + 1 }}
                   </div>
                 </div>
                 
                 <!-- Medal Icon -->
-                <div class="text-5xl mb-4 mt-6">
+                <div class="text-4xl mb-3 mt-4">
                   {{ getMedalIcon(index + 1) }}
                 </div>
                 
                 <!-- Student Info -->
-                <h4 class="text-xl font-bold text-white mb-2">
+                <h4 class="text-lg font-bold text-white mb-2">
                   {{ student.name || 'No Name' }}
                 </h4>
 
                 <!-- Class/Section Badge -->
-                <div class="mb-4">
-                  <div class="inline-flex items-center px-3 py-1 bg-white/20 border border-white/30 rounded-lg backdrop-blur-sm">
+                <div class="mb-3">
+                  <div class="inline-flex items-center px-2 py-1 bg-white/20 border border-white/30 rounded-lg backdrop-blur-sm">
                     <School class="w-3 h-3 mr-1.5 text-blue-200" />
-                    <span class="text-sm font-medium text-blue-200">{{ student.class_name || 'No Class' }}</span>
+                    <span class="text-xs font-medium text-blue-200">{{ student.class_name || 'No Class' }}</span>
                   </div>
                 </div>
                 
                 <!-- Average Grade -->
-                <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-xl p-4 shadow-sm mb-4">
-                  <p class="text-sm text-blue-200 font-semibold uppercase tracking-wide">Final Average</p>
-                  <p class="text-3xl font-bold text-white mt-1">{{ formatAverage(student.final_average) }}</p>
+                <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-lg p-3 mb-3">
+                  <p class="text-xs text-blue-200 font-semibold uppercase tracking-wide">Final Average</p>
+                  <p class="text-2xl font-bold text-white mt-1">{{ formatAverage(student.final_average) }}</p>
                 </div>
 
                 <!-- Remarks -->
-                <div class="backdrop-blur-sm rounded-xl p-3 shadow-sm" :class="getRemarkColor(student.remarks)">
+                <div class="backdrop-blur-sm rounded-lg p-2" :class="getRemarkColor(student.remarks)">
                   <p class="text-xs uppercase tracking-wide font-semibold opacity-90">Remarks</p>
                   <p class="text-sm font-bold mt-1">{{ student.remarks || 'In Progress' }}</p>
                 </div>
@@ -194,13 +184,11 @@ const formatAverage = (finalAverage) => {
       </div>
 
       <!-- Complete Rankings Table -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl overflow-hidden">
         <!-- Table Header -->
         <div class="px-6 py-4 border-b border-white/10">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-              <Award class="w-4 h-4 text-white" />
-            </div>
+            <Award class="w-5 h-5 text-purple-300" />
             <div>
               <h3 class="text-lg font-semibold text-white">Complete Rankings</h3>
               <p class="text-sm text-white/70 mt-1">{{ students.length }} students ranked by final average</p>
@@ -214,19 +202,19 @@ const formatAverage = (finalAverage) => {
             <table class="min-w-full divide-y divide-white/10">
               <thead class="bg-white/5">
                 <tr>
-                  <th class="px-8 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Rank
                   </th>
-                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                     Student Name
                   </th>
-                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
                     Class/Section
                   </th>
-                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
                     Final Average
                   </th>
-                  <th class="px-8 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
                     Remarks
                   </th>
                 </tr>
@@ -235,52 +223,49 @@ const formatAverage = (finalAverage) => {
                 <tr
                   v-for="(student, index) in students"
                   :key="student.id || index"
-                  class="hover:bg-white/5 transition-colors duration-200"
-                  :class="{
-                    'bg-gradient-to-r from-white/5 to-transparent': index < 3
-                  }"
+                  class="hover:bg-white/5 transition-colors duration-150"
                 >
-                  <td class="px-8 py-6 whitespace-nowrap">
+                  <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <span 
                         :class="getRankBadgeClass(index + 1)" 
-                        class="px-4 py-2 rounded-lg text-sm font-bold min-w-[3rem] text-center backdrop-blur-sm"
+                        class="px-3 py-1 rounded text-sm font-bold min-w-[2.5rem] text-center backdrop-blur-sm"
                       >
                         #{{ index + 1 }}
                       </span>
-                      <span class="ml-3 text-xl" v-if="index < 3">{{ getMedalIcon(index + 1) }}</span>
+                      <span class="ml-2 text-lg" v-if="index < 3">{{ getMedalIcon(index + 1) }}</span>
                     </div>
                   </td>
-                  <td class="px-8 py-6 whitespace-nowrap">
-                    <div class="flex items-center justify-center">
-                      <div class="flex-shrink-0 h-10 w-10">
-                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-8 w-8">
+                        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm">
                           {{ (student.name || 'N').charAt(0).toUpperCase() }}
                         </div>
                       </div>
-                      <div class="ml-4">
+                      <div class="ml-3">
                         <div class="text-sm font-medium text-white">{{ student.name || 'No Name' }}</div>
                         <div class="text-xs text-white/60">Student</div>
                       </div>
                     </div>
                   </td>
-                  <td class="px-8 py-6 whitespace-nowrap text-center">
-                    <div class="inline-flex items-center px-3 py-1 bg-indigo-500/20 text-indigo-100 border border-indigo-400/30 rounded-lg backdrop-blur-sm">
-                      <School class="w-3 h-3 mr-1.5" />
-                      <span class="text-sm font-medium">{{ student.class_name || 'No Class' }}</span>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="inline-flex items-center px-2 py-1 bg-indigo-500/20 text-indigo-100 border border-indigo-400/30 rounded backdrop-blur-sm">
+                      <School class="w-3 h-3 mr-1" />
+                      <span class="text-xs font-medium">{{ student.class_name || 'No Class' }}</span>
                     </div>
                   </td>
-                  <td class="px-8 py-6 whitespace-nowrap text-center">
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span 
-                      class="px-4 py-2 inline-flex text-sm font-bold rounded-lg backdrop-blur-sm"
+                      class="px-3 py-1 inline-flex text-sm font-bold rounded backdrop-blur-sm"
                       :class="getGradeColor(student.final_average, index + 1)"
                     >
                       {{ formatAverage(student.final_average) }}
                     </span>
                   </td>
-                  <td class="px-8 py-6 whitespace-nowrap text-center">
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span 
-                      class="px-3 py-1 inline-flex text-xs font-medium rounded-lg backdrop-blur-sm"
+                      class="px-2 py-1 inline-flex text-xs font-medium rounded backdrop-blur-sm"
                       :class="getRemarkColor(student.remarks)"
                     >
                       {{ student.remarks || 'In Progress' }}
@@ -296,26 +281,23 @@ const formatAverage = (finalAverage) => {
             <div 
               v-for="(student, index) in students"
               :key="student.id || index"
-              class="p-6 hover:bg-white/5 transition-colors duration-150"
-              :class="{
-                'bg-gradient-to-r from-white/5 to-transparent': index < 3
-              }"
+              class="p-4 hover:bg-white/5 transition-colors duration-150"
             >
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center space-x-3">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2">
                   <span 
                     :class="getRankBadgeClass(index + 1)" 
-                    class="px-3 py-1 rounded-lg text-sm font-bold backdrop-blur-sm"
+                    class="px-2 py-1 rounded text-xs font-bold backdrop-blur-sm"
                   >
                     #{{ index + 1 }}
                   </span>
-                  <span class="text-xl" v-if="index < 3">{{ getMedalIcon(index + 1) }}</span>
+                  <span class="text-lg" v-if="index < 3">{{ getMedalIcon(index + 1) }}</span>
                   
-                  <div class="flex-shrink-0 h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold">
+                  <div class="flex-shrink-0 h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm">
                     {{ (student.name || 'N').charAt(0).toUpperCase() }}
                   </div>
                   <div>
-                    <h4 class="text-white font-medium">{{ student.name || 'No Name' }}</h4>
+                    <h4 class="text-white text-sm font-medium">{{ student.name || 'No Name' }}</h4>
                     <div class="flex items-center text-xs text-white/70 mt-0.5">
                       <School class="w-3 h-3 mr-1" />
                       {{ student.class_name || 'No Class' }}
@@ -324,10 +306,10 @@ const formatAverage = (finalAverage) => {
                 </div>
               </div>
               
-              <div class="flex flex-col space-y-3">
+              <div class="flex flex-col space-y-2">
                 <div class="flex justify-center">
                   <span 
-                    class="px-4 py-2 inline-flex text-sm font-bold rounded-lg backdrop-blur-sm"
+                    class="px-3 py-1 inline-flex text-sm font-bold rounded backdrop-blur-sm"
                     :class="getGradeColor(student.final_average, index + 1)"
                   >
                     Final Average: {{ formatAverage(student.final_average) }}
@@ -336,7 +318,7 @@ const formatAverage = (finalAverage) => {
                 
                 <div class="flex justify-center">
                   <span 
-                    class="px-3 py-1 inline-flex text-xs font-medium rounded-lg backdrop-blur-sm"
+                    class="px-2 py-1 inline-flex text-xs font-medium rounded backdrop-blur-sm"
                     :class="getRemarkColor(student.remarks)"
                   >
                     {{ student.remarks || 'In Progress' }}
@@ -348,12 +330,12 @@ const formatAverage = (finalAverage) => {
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <Users class="mx-auto h-12 w-12 text-white/40 mb-4" />
-          <h3 class="mt-2 text-sm font-medium text-white/80">No Students Found</h3>
+        <div v-else class="text-center py-8">
+          <Users class="mx-auto h-10 w-10 text-white/40 mb-3" />
+          <h3 class="text-sm font-medium text-white/80">No Students Found</h3>
           <p class="mt-1 text-sm text-white/60">There are no students to display for this grade level.</p>
           <button 
-            class="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            class="mt-4 inline-flex items-center px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30"
             @click="$inertia.get(route('students.create'))"
           >
             <Users class="w-4 h-4 mr-2" />
@@ -364,3 +346,41 @@ const formatAverage = (finalAverage) => {
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Glassmorphism base effects */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+button:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+</style>

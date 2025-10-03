@@ -34,16 +34,18 @@ class AnalyticsController extends Controller
             $subjectAverages = [];
             $subjectStats = [];
 
-            // ✅ Get subjects for this grade level from preloaded subjects
+            // ✅ Collect class names for this grade level
+            $classNames = $classes->pluck('name')->all(); // or 'class_name' if that's the column
+
+            // ✅ Get subjects for this grade level
             $subjects = $allSubjects->get($gradeLevel, collect());
 
             foreach ($subjects as $subject) {
-                // ✅ Collect all grades for this subject
                 $grades = $classes->flatMap->students
                     ->flatMap->grades
                     ->where('subject_id', $subject->id)
                     ->pluck('grade')
-                    ->filter(fn($grade) => is_numeric($grade) && $grade >= 0 && $grade <= 100); // Validate grades
+                    ->filter(fn($grade) => is_numeric($grade) && $grade >= 0 && $grade <= 100);
 
                 if ($grades->isNotEmpty()) {
                     $average = round($grades->avg(), 2);
@@ -57,24 +59,22 @@ class AnalyticsController extends Controller
                 }
             }
 
-            // ✅ Get all remarks (case-insensitive check)
             $remarks = $classes->flatMap->students->flatMap->gradeRemarks;
             $promoted = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'promoted')->count();
             $retained = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'retained')->count();
 
-            // ✅ Calculate overall statistics
             $totalStudents = $classes->sum(fn($c) => $c->students->count());
             $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg(), 2) : 0;
 
-            // ✅ Determine top and low subjects
             $sortedSubjects = collect($subjectAverages)->sort();
             $topSubject = $sortedSubjects->sortDesc()->keys()->first();
             $lowSubject = $sortedSubjects->keys()->first();
 
             return [
-                'grade_level' => $gradeLevel, // Keep as string to support K1, K2, etc.
+                'grade_level' => $gradeLevel,
+                'class_names' => $classNames, // ✅ added here
                 'subject_averages' => $subjectAverages,
-                'subject_stats' => $subjectStats, // Additional stats if needed
+                'subject_stats' => $subjectStats,
                 'top_subject' => $topSubject,
                 'low_subject' => $lowSubject,
                 'total_students' => $totalStudents,
@@ -83,11 +83,10 @@ class AnalyticsController extends Controller
                 'overall_average' => $overallAverage,
                 'subjects_count' => count($subjectAverages),
                 'classes_count' => $classes->count(),
-                // Add metadata for debugging
                 'has_data' => !empty($subjectAverages),
                 'last_updated' => now()->toISOString(),
             ];
-        })->values()->filter(fn($item) => $item['has_data']); // Only include grades with data
+        })->values()->filter(fn($item) => $item['has_data']);
 
         // ✅ Manual Pagination
         $page = max(1, (int) $request->get('page', 1));
@@ -151,7 +150,7 @@ class AnalyticsController extends Controller
             ];
         })->sortByDesc('final_average')->values()->all();
 
-        return Inertia::render('Analytics/ClassStudents', [
+        return Inertia::render('Analytics/GradeStudents', [
             'grade_level' => $gradeLevel,
             'students'    => $students,
         ]);

@@ -70,37 +70,33 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
   
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
-        <h2 class="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-          👨‍🏫 Teacher Assignment Portal
-        </h2>
-        <div class="flex items-center space-x-4">
-          <!-- Quick Stats -->
-          <div class="hidden md:flex items-center space-x-3 text-sm">
-            <div class="backdrop-blur-sm bg-emerald-500/20 border border-emerald-300/30 px-3 py-1 rounded-full">
-              <span class="text-emerald-100">{{ totalAssignments }} Assignments</span>
-            </div>
+      <div class="space-y-1">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-white">
+              Teacher Assignment Portal
+            </h2>
+            <p class="text-white/70 mt-1">
+              Manage class-teacher assignments efficiently
+            </p>
           </div>
+          <UserCheck class="w-8 h-8 text-white/60" />
         </div>
       </div>
     </template>
 
-    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-      
-      <!-- Mobile Stats (visible on small screens) -->
-      <div class="md:hidden">
-        <div class="backdrop-blur-md bg-emerald-500/10 border border-emerald-300/30 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-emerald-100">{{ totalAssignments }}</div>
-          <div class="text-sm text-emerald-200">Total Assignments</div>
+    <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <!-- Header Actions -->
+      <div class="flex justify-between items-center">
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-2">
+          <span class="text-white/80 text-sm">{{ totalAssignments }} Assignments</span>
         </div>
       </div>
 
       <!-- Assignment Form Card -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl">
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
         <div class="flex items-center space-x-3 mb-6">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <UserCheck class="w-4 h-4 text-white" />
-          </div>
+          <UserCheck class="w-5 h-5 text-blue-300" />
           <div>
             <h3 class="text-lg font-semibold text-white">Assign Teacher to Class</h3>
             <p class="text-sm text-white/70 mt-1">Manage class-teacher assignments efficiently</p>
@@ -118,7 +114,7 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
               <div class="relative">
                 <select 
                   v-model="form.class_id" 
-                  class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-4 py-3 pr-10 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                  class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 pr-10 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
                   required
                 >
                   <option value="" disabled class="bg-gray-800 text-white">Choose a class...</option>
@@ -131,11 +127,6 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
                     {{ cls.displayName }} — {{ cls.status }}
                   </option>
                 </select>
-                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
               </div>
             </div>
 
@@ -148,7 +139,7 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
               <div class="relative">
                 <select 
                   v-model="form.teacher_id" 
-                  class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl px-4 py-3 pr-10 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                  class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 pr-10 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
                   required
                 >
                   <option value="" disabled class="bg-gray-800 text-white">Choose a teacher...</option>
@@ -164,11 +155,6 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
                     {{ teacher.name }}
                   </option>
                 </select>
-                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
               </div>
             </div>
           </div>
@@ -178,14 +164,12 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
             <button
               type="submit"
               :disabled="form.processing || isSubmitting"
-              class="group relative inline-flex items-center px-8 py-3 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              class="backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span v-if="!form.processing && !isSubmitting" class="flex items-center gap-2">
-                <Plus class="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                Assign Teacher
-              </span>
+              <Plus class="w-4 h-4" />
+              <span v-if="!form.processing && !isSubmitting">Assign Teacher</span>
               <span v-else class="flex items-center gap-2">
-                <Loader class="w-5 h-5 animate-spin" />
+                <Loader class="w-4 h-4 animate-spin" />
                 Processing...
               </span>
             </button>
@@ -194,12 +178,10 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
       </div>
 
       <!-- Current Assignments Card -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl overflow-hidden">
         <div class="px-6 py-4 border-b border-white/10">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-              <Users class="w-4 h-4 text-white" />
-            </div>
+            <Users class="w-5 h-5 text-purple-300" />
             <div>
               <h3 class="text-lg font-semibold text-white">Current Assignments</h3>
               <p class="text-sm text-white/70 mt-1">{{ hasAssignments ? props.assignments.data.length : 0 }} assignments shown</p>
@@ -213,10 +195,10 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
             <table class="min-w-full divide-y divide-white/10">
               <thead class="bg-white/5">
                 <tr>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">#</th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Class</th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Grade Level</th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Teacher</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">#</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Class</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Grade Level</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Teacher</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/10">
@@ -230,37 +212,37 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                      <div class="flex-shrink-0 h-12 w-12">
-                        <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
                           {{ cls.grade_level }}
                         </div>
                       </div>
-                      <div class="ml-4">
+                      <div class="ml-3">
                         <div class="text-sm font-medium text-white">{{ cls.name }}</div>
                         <div class="text-xs text-white/60">Class Information</div>
                       </div>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 border border-blue-400/30 text-blue-100">
+                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-500/20 border border-blue-400/30 text-blue-100">
                       <span v-if="cls.grade_level === 'K1'">Kinder 1</span>
                       <span v-else-if="cls.grade_level === 'K2'">Kinder 2</span>
                       <span v-else>Grade {{ cls.grade_level }}</span>
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div v-if="cls.teacher?.name" class="flex items-center space-x-3">
+                    <div v-if="cls.teacher?.name" class="flex items-center space-x-2">
                       <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center">
-                          <Users class="w-4 h-4 text-white" />
+                          <Users class="w-3 h-3 text-white" />
                         </div>
                       </div>
                       <div class="text-sm font-medium text-white">{{ cls.teacher.name }}</div>
                     </div>
-                    <div v-else class="flex items-center space-x-3 text-white/60">
+                    <div v-else class="flex items-center space-x-2 text-white/60">
                       <div class="flex-shrink-0">
                         <div class="w-8 h-8 bg-white/10 border border-white/20 rounded-full flex items-center justify-center">
-                          <Plus class="w-4 h-4 text-white/40" />
+                          <Plus class="w-3 h-3 text-white/40" />
                         </div>
                       </div>
                       <div class="text-sm italic">Unassigned</div>
@@ -276,16 +258,16 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
             <div 
               v-for="(cls, index) in props.assignments.data" 
               :key="cls.id"
-              class="p-6 hover:bg-white/5 transition-colors duration-150"
+              class="p-4 hover:bg-white/5 transition-colors duration-150"
             >
-              <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center space-x-3">
-                  <div class="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center space-x-2">
+                  <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
                     {{ cls.grade_level }}
                   </div>
                   <div>
-                    <h4 class="text-white font-medium">{{ cls.name }}</h4>
-                    <p class="text-sm text-white/70">
+                    <h4 class="text-white font-medium text-sm">{{ cls.name }}</h4>
+                    <p class="text-xs text-white/70">
                       <span v-if="cls.grade_level === 'K1'">Kinder 1</span>
                       <span v-else-if="cls.grade_level === 'K2'">Kinder 2</span>
                       <span v-else>Grade {{ cls.grade_level }}</span>
@@ -293,23 +275,23 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
                   </div>
                 </div>
               </div>
-              <div class="border-t border-white/10 pt-4">
-                <div v-if="cls.teacher?.name" class="flex items-center space-x-3">
-                  <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center">
-                    <Users class="w-4 h-4 text-white" />
+              <div class="border-t border-white/10 pt-3">
+                <div v-if="cls.teacher?.name" class="flex items-center space-x-2">
+                  <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center">
+                    <Users class="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div class="text-sm text-white/70">Assigned Teacher</div>
-                    <div class="text-white font-medium">{{ cls.teacher.name }}</div>
+                    <div class="text-xs text-white/70">Assigned Teacher</div>
+                    <div class="text-white font-medium text-sm">{{ cls.teacher.name }}</div>
                   </div>
                 </div>
-                <div v-else class="flex items-center space-x-3 text-white/60">
-                  <div class="w-8 h-8 bg-white/10 border border-white/20 rounded-full flex items-center justify-center">
-                    <Plus class="w-4 h-4 text-white/40" />
+                <div v-else class="flex items-center space-x-2 text-white/60">
+                  <div class="w-6 h-6 bg-white/10 border border-white/20 rounded-full flex items-center justify-center">
+                    <Plus class="w-3 h-3 text-white/40" />
                   </div>
                   <div>
-                    <div class="text-sm text-white/50">Status</div>
-                    <div class="italic">No teacher assigned</div>
+                    <div class="text-xs text-white/50">Status</div>
+                    <div class="italic text-sm">No teacher assigned</div>
                   </div>
                 </div>
               </div>
@@ -323,21 +305,71 @@ const totalAssignments = computed(() => props.assignments?.total || 0)
             </div>
             <div class="flex space-x-1">
               <template v-for="(link, index) in props.assignments.links" :key="index">
-                <span v-if="!link.url" class="px-3 py-2 text-white/40 cursor-not-allowed text-sm" v-html="link.label"></span>
-                <Link v-else :href="link.url" class="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150"
-                  :class="link.active ? 'bg-blue-500/30 text-white border border-blue-400/50' : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'" v-html="link.label" />
+                <span 
+                  v-if="!link.url" 
+                  class="px-3 py-2 text-white/40 cursor-not-allowed text-sm" 
+                  v-html="link.label">
+                </span>
+                <Link 
+                  v-else 
+                  :href="link.url" 
+                  class="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150"
+                  :class="link.active 
+                    ? 'bg-blue-500/30 text-white border border-blue-400/50' 
+                    : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'" 
+                  v-html="link.label" 
+                />
               </template>
             </div>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <Users class="mx-auto h-12 w-12 text-white/40 mb-4" />
-          <h3 class="mt-2 text-sm font-medium text-white/80">No assignments found</h3>
+        <div v-else class="text-center py-8">
+          <Users class="mx-auto h-10 w-10 text-white/40 mb-3" />
+          <h3 class="text-sm font-medium text-white/80">No assignments found</h3>
           <p class="mt-1 text-sm text-white/60">Start by assigning teachers to classes using the form above.</p>
         </div>
       </div>
     </div>
   </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Glassmorphism base effects */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+</style>

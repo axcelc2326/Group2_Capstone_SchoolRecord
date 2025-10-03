@@ -141,11 +141,14 @@ const getRankStyling = (index) => {
   };
 };
 
-// Convert summary object to array for easier iteration
-const summaryItems = [
+// Convert summary object to array with specific ordering
+const summaryItemsFirstRow = [
   { key: 'total_students', value: props.summary.total_students },
   { key: 'total_subjects', value: props.summary.total_subjects },
-  { key: 'class_average', value: `${props.summary.class_average}%` },
+  { key: 'class_average', value: `${props.summary.class_average}%` }
+];
+
+const summaryItemsSecondRow = [
   { key: 'top_subject', value: props.summary.top_subject || 'N/A' },
   { key: 'worst_subject', value: props.summary.worst_subject || 'N/A' }
 ];
@@ -182,13 +185,15 @@ const summaryItems = [
 
     <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       <!-- Enhanced Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        <div
-          v-for="(item, index) in summaryItems"
-          :key="item.key"
-          class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
-          :style="{ 'animation-delay': `${index * 100}ms` }"
-        >
+      <div class="space-y-4 lg:space-y-6">
+        <!-- First Row: Total Students, Active Subjects, Class Average -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+          <div
+            v-for="(item, index) in summaryItemsFirstRow"
+            :key="item.key"
+            class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+            :style="{ 'animation-delay': `${index * 100}ms` }"
+          >
           <!-- Gradient overlay -->
           <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
           
@@ -216,6 +221,45 @@ const summaryItems = [
             <!-- Hover effect -->
             <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>
+        </div>
+        </div>
+
+        <!-- Second Row: Top Performing, Needs Attention -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+          <div
+            v-for="(item, index) in summaryItemsSecondRow"
+            :key="item.key"
+            class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+            :style="{ 'animation-delay': `${(index + 3) * 100}ms` }"
+          >
+          <!-- Gradient overlay -->
+          <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
+          
+          <!-- Content with side-by-side layout -->
+          <div class="relative p-6">
+            <div class="flex items-center justify-between">
+              <!-- Icon and content side by side -->
+              <div class="flex items-center space-x-4">
+                <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
+                  <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+                </div>
+                
+                <!-- Text content beside icon -->
+                <div class="space-y-1">
+                  <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
+                    {{ item.value }}
+                  </div>
+                  <div class="text-sm text-white/70 font-medium">
+                    {{ formatCardTitle(item.key) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Hover effect -->
+            <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
+          </div>
+        </div>
         </div>
       </div>
 
