@@ -114,12 +114,32 @@ class GradeController extends Controller
     {
         $parent = Auth::user();
 
-        // Load parent’s students with their classes, subjects, and grades
+        // ✅ Load student's class, subjects, grades, and latest grade remark
         $students = Student::with([
             'class',
-            'grades' => fn ($q) => $q->orderBy('quarter'),
+            'grades' => fn($q) => $q->orderBy('quarter'),
             'grades.subject',
-        ])->where('parent_id', $parent->id)->get();
+            'gradeRemarks' => fn($q) => $q->latest(), // Load latest remark
+        ])->where('parent_id', $parent->id)->get()
+        ->map(function ($student) {
+            $latestRemark = $student->gradeRemarks->first(); // latest() loads newest first
+
+            return [
+                'id'             => $student->id,
+                'name'           => trim(($student->first_name ?? '') . ' ' . ($student->middle_name ?? '') . ' ' . ($student->last_name ?? '')),
+                'class'          => $student->class?->name,
+                'class_grade_level'=> $student->class?->grade_level,
+                'grades'         => $student->grades->map(function ($grade) {
+                    return [
+                        'subject' => $grade->subject?->name,
+                        'quarter' => $grade->quarter,
+                        'grade'   => $grade->grade,
+                    ];
+                }),
+                'final_average'  => $latestRemark->final_average ?? round($student->grades->avg('grade') ?? 0, 2),
+                'remarks'        => $latestRemark->remarks ?? 'In Progress',
+            ];
+        });
 
         return Inertia::render('Parent/ViewGrades', [
             'students' => $students,

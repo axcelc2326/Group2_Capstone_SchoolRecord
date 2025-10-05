@@ -162,42 +162,86 @@ class AnalyticsController extends Controller
     {
         $user = auth()->user();
 
-        // ✅ Assuming your `ClassModel` has a `teacher_id` column
-        $classes = ClassModel::with('students.grades')
+        // ✅ Get only the teacher's assigned classes, with students, grades, and remarks
+        $classes = ClassModel::with([
+            'students.grades.subject',
+            'students.gradeRemarks',
+        ])
             ->where('teacher_id', $user->id)
             ->get();
 
-        $analytics = $classes->map(function ($class) {
-            $subjectAverages = [];
+        // ✅ Preload all subjects grouped by grade level
+        $allSubjects = Subject::all()->groupBy('grade_level');
 
-            // ✅ Only fetch subjects for this class's grade level
-            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+        // ✅ Compute analytics per class
+        $analytics = $classes->map(function ($class) use ($allSubjects) {
+            $subjectAverages = [];
+            $subjectStats = [];
+
+            $gradeLevel = $class->grade_level;
+            $subjects = $allSubjects->get($gradeLevel, collect());
 
             foreach ($subjects as $subject) {
-                $grades = $class->students->flatMap(function ($student) use ($subject) {
-                    return $student->grades->where('subject_id', $subject->id)->pluck('grade');
-                });
+                $grades = $class->students
+                    ->flatMap->grades
+                    ->where('subject_id', $subject->id)
+                    ->pluck('grade')
+                    ->filter(fn($grade) => is_numeric($grade) && $grade >= 0 && $grade <= 100);
 
-                $subjectAverages[$subject->name] = round($grades->avg() ?? 0, 2);
+                if ($grades->isNotEmpty()) {
+                    $average = round($grades->avg(), 2);
+                    $subjectAverages[$subject->name] = $average;
+                    $subjectStats[$subject->name] = [
+                        'average' => $average,
+                        'count'   => $grades->count(),
+                        'min'     => $grades->min(),
+                        'max'     => $grades->max(),
+                    ];
+                }
             }
 
-            $topSubject = collect($subjectAverages)->sortDesc()->keys()->first();
-            $lowSubject = collect($subjectAverages)->sort()->keys()->first();
+            // ✅ Compute promoted and retained
+            $remarks = $class->students->flatMap->gradeRemarks;
+            $promoted = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'promoted')->count();
+            $retained = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'retained')->count();
+
+            $totalStudents = $class->students->count();
+            $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg(), 2) : 0;
+
+            $sortedSubjects = collect($subjectAverages)->sort();
+            $topSubject = $sortedSubjects->sortDesc()->keys()->first();
+            $lowSubject = $sortedSubjects->keys()->first();
 
             return [
-                'class' => $class->name,
-                'grade_level' => $class->grade_level,
+                'class_id'         => $class->id,
+                'class_name'       => $class->name,
+                'grade_level'      => $gradeLevel,
                 'subject_averages' => $subjectAverages,
-                'top_subject' => $topSubject,
-                'low_subject' => $lowSubject,
-                'total_students' => $class->students->count(),
-                'id' => $class->id,
-                'subjects' => $subjects,
+                'subject_stats'    => $subjectStats,
+                'top_subject'      => $topSubject,
+                'low_subject'      => $lowSubject,
+                'total_students'   => $totalStudents,
+                'promoted'         => $promoted,
+                'retained'         => $retained,
+                'overall_average'  => $overallAverage,
+                'subjects_count'   => count($subjectAverages),
+                'has_data'         => !empty($subjectAverages),
+                'last_updated'     => now()->toISOString(),
             ];
-        });
+        })->filter(fn($item) => $item['has_data'])->values();
+
+        // ✅ Summary for teacher's dashboard
+        $summary = [
+            'total_classes'     => $analytics->count(),
+            'total_students'    => $classes->sum(fn($c) => $c->students->count()),
+            'total_promoted'    => $analytics->sum('promoted'),
+            'total_retained'    => $analytics->sum('retained'),
+            'overall_average'   => round($analytics->avg('overall_average') ?? 0, 2),
+        ];
 
         return Inertia::render('Analytics/TeacherIndex', [
             'analytics' => $analytics,
+            'summary'   => $summary,
         ]);
     }
 }

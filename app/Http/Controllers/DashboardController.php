@@ -204,50 +204,53 @@ class DashboardController extends Controller
             ]);
 
 
-            //Parent Dashboard
+            // Parent Dashboard
             case 'parent':
                 $parentId = $user->id;
 
-                // 📚 Get all students linked to this parent (with grades & class info)
-                $students = Student::with('grades', 'class')
+                // 📚 Get all APPROVED students linked to this parent (with grades, class & remarks)
+                $students = Student::with([
+                    'grades',
+                    'class',
+                    'gradeRemarks' => fn($q) => $q->latest(), // load latest remark
+                ])
                     ->where('parent_id', $parentId)
+                    ->where('approved_by_teacher', 1)
                     ->get();
 
                 // 🧮 Student stats
-                $totalRegistered = $students->count();
-                $totalEnrolled = $students->where('approved_by_teacher', 1)->count();
-                $totalPending = $students->where('approved_by_teacher', 0)->count();
+                $totalRegistered = $students->count(); 
+                $totalEnrolled = $totalRegistered; 
 
-                // 📊 Average grade (overall) - exclude pending students
-                $enrolledGrades = $students
-                    ->where('approved_by_teacher', 1)
-                    ->flatMap->grades;
+                // 📊 Overall average grade
+                $enrolledGrades = $students->flatMap->grades;
                 $averageGrade = round($enrolledGrades->avg('grade') ?? 0, 2);
 
-                // 👦 Individual child performance with class name & grade level
+                // 👦 Individual child performance with class name, grade level, and remarks
                 $childrenPerformance = $students->map(function ($student) {
-                    $className = $student->class->name ?? null;
-                    $gradeLevel = $student->class->grade_level ?? null;
-
-                    if ($student->approved_by_teacher != 1) {
-                        return [
-                            'name' => "{$student->first_name} {$student->last_name}",
-                            'class_name' => $className ?? 'No Class Assigned',
-                            'grade_level' => $gradeLevel ?? 'No Grade Level',
-                            'average' => null,
-                            'status' => 'Pending Approval',
-                        ];
-                    }
-
+                    $className = $student->class->name ?? 'No Class Assigned';
+                    $gradeLevel = $student->class->grade_level ?? 'No Grade Level';
                     $avg = round($student->grades->avg('grade') ?? 0, 2);
+
+                    // Get latest grade remark
+                    $latestRemark = $student->gradeRemarks->first();
+                    $finalAverage = $latestRemark->final_average ?? $avg;
+                    $remarkText = $latestRemark->remarks ?? ($avg >= 75 ? 'Passed' : 'Failed');
+
                     return [
-                        'name' => "{$student->first_name} {$student->last_name}",
-                        'class_name' => $className ?? 'No Class Assigned',
-                        'grade_level' => $gradeLevel ?? 'No Grade Level',
+                        'name' => "{$student->first_name} {$student->middle_name} {$student->last_name}",
+                        'class_name' => $className,
+                        'grade_level' => $gradeLevel,
                         'average' => $avg,
-                        'status' => $avg >= 75 ? 'Doing Good' : 'Terrible',
+                        'final_average' => $finalAverage,
+                        'remarks' => $remarkText,
+                        'status' => $finalAverage >= 75 ? 'Promoted' : 'Failed',
                     ];
                 });
+
+                // 🧾 Count promoted and failed students
+                $promotedCount = $childrenPerformance->where('status', 'Promoted')->count();
+                $failedCount = $childrenPerformance->where('status', 'Failed')->count();
 
                 // 📢 Latest announcements (class-specific + global)
                 $classIds = $students->pluck('class_id')->unique();
@@ -274,8 +277,9 @@ class DashboardController extends Controller
                     'summary' => [
                         'total_registered' => $totalRegistered,
                         'total_enrolled' => $totalEnrolled,
-                        'total_pending' => $totalPending,
                         'average_grade' => $averageGrade,
+                        'promoted' => $promotedCount,   // ✅ New
+                        'failed' => $failedCount,       // ✅ New
                     ],
                     'childrenPerformance' => $childrenPerformance,
                     'announcements' => $announcements,
