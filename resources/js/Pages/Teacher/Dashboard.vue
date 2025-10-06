@@ -21,6 +21,7 @@ import {
   Sparkles,
   Activity,
   Flame,
+  Info
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -78,6 +79,18 @@ const formatCardTitle = (key) => {
     worst_subject: 'Needs Attention',
   };
   return titles[key] || key.replace('_', ' ');
+};
+
+// Helper function to get card descriptions
+const getCardDescription = (key) => {
+  const descriptions = {
+    total_students: 'Students enrolled in your classes',
+    total_subjects: 'Subjects you are currently teaching',
+    class_average: 'Overall class performance percentage',
+    top_subject: 'Subject with highest average score',
+    worst_subject: 'Subject requiring additional focus'
+  };
+  return descriptions[key] || '';
 };
 
 // Helper function to format date and time
@@ -194,20 +207,17 @@ const summaryItemsSecondRow = [
             class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
             :style="{ 'animation-delay': `${index * 100}ms` }"
           >
-          <!-- Gradient overlay -->
-          <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
-          
-          <!-- Content with side-by-side layout -->
-          <div class="relative p-6">
-            <div class="flex items-center justify-between">
-              <!-- Icon and content side by side -->
-              <div class="flex items-center space-x-4">
+            <!-- Gradient overlay -->
+            <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
+            
+            <!-- Content -->
+            <div class="relative p-6">
+              <div class="flex items-center space-x-4 mb-3">
                 <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
                   <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
                 </div>
                 
-                <!-- Text content beside icon -->
-                <div class="space-y-1">
+                <div class="flex-1 space-y-1">
                   <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
                     {{ item.value }}
                   </div>
@@ -216,12 +226,14 @@ const summaryItemsSecondRow = [
                   </div>
                 </div>
               </div>
+              
+              <p class="text-xs lg:text-sm text-white/60 leading-relaxed">
+                {{ getCardDescription(item.key) }}
+              </p>
+              
+              <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
             </div>
-            
-            <!-- Hover effect -->
-            <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>
-        </div>
         </div>
 
         <!-- Second Row: Top Performing, Needs Attention -->
@@ -232,20 +244,17 @@ const summaryItemsSecondRow = [
             class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"
             :style="{ 'animation-delay': `${(index + 3) * 100}ms` }"
           >
-          <!-- Gradient overlay -->
-          <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
-          
-          <!-- Content with side-by-side layout -->
-          <div class="relative p-6">
-            <div class="flex items-center justify-between">
-              <!-- Icon and content side by side -->
-              <div class="flex items-center space-x-4">
+            <!-- Gradient overlay -->
+            <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
+            
+            <!-- Content -->
+            <div class="relative p-6">
+              <div class="flex items-center space-x-4 mb-3">
                 <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
                   <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
                 </div>
                 
-                <!-- Text content beside icon -->
-                <div class="space-y-1">
+                <div class="flex-1 space-y-1">
                   <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
                     {{ item.value }}
                   </div>
@@ -254,12 +263,14 @@ const summaryItemsSecondRow = [
                   </div>
                 </div>
               </div>
+              
+              <p class="text-xs lg:text-sm text-white/60 leading-relaxed">
+                {{ getCardDescription(item.key) }}
+              </p>
+              
+              <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
             </div>
-            
-            <!-- Hover effect -->
-            <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -280,6 +291,17 @@ const summaryItemsSecondRow = [
                 <p class="text-white/70 text-sm">Leading performers this month</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="px-6 pt-4 pb-2">
+          <div class="flex items-start space-x-3">
+            <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+            <p class="text-white/60 text-sm leading-relaxed">
+              Celebrate academic excellence! These students have demonstrated outstanding performance across all subjects. 
+              Use these insights to identify successful learning patterns and provide recognition where it's deserved.
+            </p>
           </div>
         </div>
         
@@ -371,6 +393,17 @@ const summaryItemsSecondRow = [
               <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
               <span class="text-xs text-white/70">Live</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="px-6 pt-4 pb-2">
+          <div class="flex items-start space-x-3">
+            <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+            <p class="text-white/60 text-sm leading-relaxed">
+              Important updates and communications from school administration. Stay informed about upcoming events, 
+              policy changes, and important reminders that affect your classroom.
+            </p>
           </div>
         </div>
 

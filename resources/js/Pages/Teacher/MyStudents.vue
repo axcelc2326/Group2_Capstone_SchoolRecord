@@ -24,8 +24,9 @@ watch(search, (value) => {
   router.get(route('teacher.students'), { search: value }, { preserveState: true, replace: true })
 })
 
-// Statistics
-const totalStudents = computed(() => props.students.total || 0)
+// Statistics with safe fallbacks
+const totalStudents = computed(() => props.students?.total || 0)
+const hasStudents = computed(() => props.students?.data && props.students.data.length > 0)
 
 // 🚀 Modal State
 const showGradeModal = ref(false)
@@ -75,11 +76,11 @@ function removeStudent() {
     showCancelButton: true,
     confirmButtonText: 'Yes, unapprove',
     cancelButtonText: 'Cancel',
-    confirmButtonColor: '#ef4444', // red-500
-    cancelButtonColor: '#6b7280', // gray-500
-    background: '#1f2937', // slate-800
-    color: '#f9fafb',       // gray-50
-    iconColor: '#ef4444',   // red-500
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+    background: '#1f2937',
+    color: '#f9fafb',
+    iconColor: '#ef4444',
     backdrop: 'rgba(0,0,0,0.8)',
     customClass: {
       popup: 'rounded-xl border border-gray-700 shadow-lg',
@@ -130,6 +131,8 @@ function clearGrades() {
 
 // Bulk actions
 function unapproveAll() {
+  if (!hasStudents.value) return
+  
   showSettingsModal.value = false
   Swal.fire({
     title: 'Unapprove ALL students?',
@@ -162,6 +165,8 @@ function unapproveAll() {
 }
 
 function clearAllGrades() {
+  if (!hasStudents.value) return
+  
   showSettingsModal.value = false
   Swal.fire({
     title: 'Clear ALL grades?',
@@ -243,8 +248,8 @@ function clearAllGrades() {
             </div>
           </div>
 
-          <!-- Settings Button -->
-          <div class="relative">
+          <!-- Settings Button (only show if there are students) -->
+          <div v-if="hasStudents" class="relative">
             <button
               @click="openSettingsModal"
               class="group relative inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/20"
@@ -271,10 +276,10 @@ function clearAllGrades() {
       <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-6 py-4 border-b border-white/10">
           <h3 class="text-lg font-semibold text-white">My Students</h3>
-          <p class="text-sm text-white/70 mt-1">{{ students.data.length }} students shown</p>
+          <p class="text-sm text-white/70 mt-1">{{ students?.data?.length || 0 }} students shown</p>
         </div>
 
-        <div v-if="students.data.length">
+        <div v-if="hasStudents">
           <!-- Desktop Table -->
           <div class="hidden md:block overflow-x-auto">
             <table class="min-w-full divide-y divide-white/10">
@@ -292,7 +297,7 @@ function clearAllGrades() {
                   class="hover:bg-white/5 transition-colors duration-150"
                 >
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-white">{{ index + 1 + (students.current_page - 1) * students.per_page }}</div>
+                    <div class="text-sm text-white">{{ index + 1 + ((students.current_page || 1) - 1) * (students.per_page || 10) }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
@@ -327,7 +332,7 @@ function clearAllGrades() {
                       Input Grades
                     </button>
                     
-                    <!-- Individual Settings Button (replaces dropdown) -->
+                    <!-- Individual Settings Button -->
                     <button
                       @click="openIndividualModal(student)"
                       class="inline-flex items-center px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-100 border border-purple-400/30 hover:border-purple-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
@@ -359,7 +364,7 @@ function clearAllGrades() {
                   <div>
                     <h4 class="text-white font-medium">{{ student.first_name }} {{ student.last_name }}</h4>
                     <p class="text-sm text-white/70">Parent: {{ student.parent_name }}</p>
-                    <p class="text-xs text-white/50">#{{ index + 1 + (students.current_page - 1) * students.per_page }}</p>
+                    <p class="text-xs text-white/50">#{{ index + 1 + ((students.current_page || 1) - 1) * (students.per_page || 10) }}</p>
                   </div>
                 </div>
               </div>
@@ -396,10 +401,10 @@ function clearAllGrades() {
             </div>
           </div>
 
-          <!-- Pagination -->
-          <div class="px-6 py-4 border-t border-white/10 flex justify-between items-center">
+          <!-- Pagination (only show if there are students) -->
+          <div v-if="students.last_page > 1" class="px-6 py-4 border-t border-white/10 flex justify-between items-center">
             <div class="text-sm text-white/70">
-              Showing {{ students.from }} to {{ students.to }} of {{ students.total }} students
+              Showing {{ students.from || 0 }} to {{ students.to || 0 }} of {{ students.total || 0 }} students
             </div>
             <div class="flex space-x-1">
               <button
@@ -419,20 +424,33 @@ function clearAllGrades() {
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <svg class="mx-auto h-12 w-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-white/80">
-            {{ search ? 'No students found' : 'No approved students found' }}
+        <div v-else class="text-center py-16 px-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
+            <svg class="h-10 w-10 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-white/90 mb-2">
+            {{ search ? 'No students found' : 'Once the admin assigns you to a class, they’ll appear here' }}
           </h3>
-          <p class="mt-1 text-sm text-white/60">
-            {{ search ? 'Try adjusting your search terms.' : 'Students need to be approved before they appear here.' }}
+          <p class="text-sm text-white/60 max-w-sm mx-auto">
+            {{ search ? 'Try adjusting your search terms or clear the search to see all students.' : 'No students assigned yet. Please wait for the admin to assign you a class.' }}
           </p>
+          <button
+            v-if="search"
+            @click="search = ''"
+            class="mt-6 inline-flex items-center px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-100 border border-blue-400/30 hover:border-blue-400/50 rounded-lg transition-all duration-150"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear Search
+          </button>
         </div>
       </div>
     </div>
   </AuthenticatedLayout>
+  
   <!-- Settings Modal Component -->
   <SettingsModal
     :show="showSettingsModal"

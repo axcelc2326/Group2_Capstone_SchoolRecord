@@ -22,7 +22,8 @@ import {
   Calendar,
   Clock,
   BarChart3,
-  Settings
+  Settings,
+  Info
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -369,6 +370,16 @@ export default {
             </div>
           </div>
         </div>
+
+        <!-- Description -->
+        <div class="px-6 pt-4 pb-2">
+          <div class="flex items-start space-x-3">
+            <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+            <p class="text-white/60 text-sm leading-relaxed">
+              Track the highest performing classes across the institution. These analytics help identify successful teaching approaches and resource allocation strategies that can be replicated across other classes.
+            </p>
+          </div>
+        </div>
         
         <div class="p-6">
           <div v-if="topClasses.length > 0">
@@ -411,6 +422,16 @@ export default {
               </div>
             </div>
           </div>
+
+          <!-- Description -->
+          <div class="px-6 pt-4 pb-2">
+            <div class="flex items-start space-x-3">
+              <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+              <p class="text-white/60 text-sm leading-relaxed">
+                Recognize and celebrate academic excellence across the institution. These top performers demonstrate exceptional dedication and can serve as mentors and role models for their peers.
+              </p>
+            </div>
+          </div>
           
           <div class="p-6">
             <div v-if="topStudents.length" class="space-y-3">
@@ -443,9 +464,9 @@ export default {
                         {{ student.name }}
                       </h3>
                       <div class="flex items-center space-x-2 text-xs text-white/70">
-                        <span>{{ student.class }}</span>
-                        <span>•</span>
                         <span>Grade {{ student.grade_level }}</span>
+                        <span>•</span>
+                        <span>Section - {{ student.class }}</span>
                       </div>
                     </div>
                   </div>
@@ -490,6 +511,16 @@ export default {
                   <p class="text-white/70 text-sm">Academic recognition distribution</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="px-6 pt-4 pb-2">
+            <div class="flex items-start space-x-3">
+              <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+              <p class="text-white/60 text-sm leading-relaxed">
+                Monitor the distribution of academic honors across the student body. These metrics help assess overall institutional academic performance and identify opportunities for academic support programs.
+              </p>
             </div>
           </div>
           
@@ -541,6 +572,16 @@ export default {
               <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
               <span class="text-xs text-white/70">Live</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="px-6 pt-4 pb-2">
+          <div class="flex items-start space-x-3">
+            <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+            <p class="text-white/60 text-sm leading-relaxed">
+              Stay informed with the latest institutional communications and updates. Review important announcements, policy changes, and system-wide notifications to ensure smooth operations across all departments.
+            </p>
           </div>
         </div>
 

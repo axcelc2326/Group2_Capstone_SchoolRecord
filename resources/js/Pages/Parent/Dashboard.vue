@@ -556,6 +556,16 @@ const getStatusInfo = (child) => {
                 </div>
               </div>
             </div>
+            
+            <!-- Description -->
+            <div class="px-6 pt-4 pb-2">
+              <div class="flex items-start space-x-3">
+                <Info class="w-5 h-5 text-white/60 mt-0.5 flex-shrink-0" />
+                <p class="text-white/60 text-sm leading-relaxed">
+                  Stay informed with the latest institutional communications and updates. Review important announcements, policy changes, and system-wide notifications to ensure smooth operations across all departments.
+                </p>
+              </div>
+            </div>
 
             <!-- Announcements List -->
             <div class="p-4 sm:p-6">
