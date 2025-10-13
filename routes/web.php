@@ -92,6 +92,10 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     // SF5 Download (School Form 5)
     Route::get('/sf5/form', [SF5Controller::class, 'showForm'])->name('sf5.form');
     Route::post('/sf5/download', [SF5Controller::class, 'download'])->name('sf5.download');
+    Route::get('/sf5/{id}/edit', [SF5Controller::class, 'edit'])->name('sf5.edit');
+    Route::put('/sf5/{id}', [SF5Controller::class, 'update'])->name('sf5.update');
+    Route::delete('/sf5/{id}', [SF5Controller::class, 'destroy'])->name('sf5.destroy');
+    Route::get('/sf5/download-again/{id}', [SF5Controller::class, 'downloadAgain'])->name('sf5.download.again');
 });
 
 /*
