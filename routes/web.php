@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     UserManagementController,
     TeacherStudentController,
     SubjectController,
-    SF5Controller
+    SF5Controller,
+    HonorRollController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -96,6 +97,12 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     Route::put('/sf5/{id}', [SF5Controller::class, 'update'])->name('sf5.update');
     Route::delete('/sf5/{id}', [SF5Controller::class, 'destroy'])->name('sf5.destroy');
     Route::get('/sf5/download-again/{id}', [SF5Controller::class, 'downloadAgain'])->name('sf5.download.again');
+
+    // Honor Download Form
+    Route::get('/honorlist', [HonorRollController::class, 'index'])->name('honorlist.index');
+    Route::post('/honorlist/generate', [HonorRollController::class, 'store'])->name('honorlist.generate');
+    Route::delete('/honor-rolls/{honorRoll}', [HonorRollController::class, 'destroy'])->name('honor-rolls.destroy');
+    Route::get('/honorlist/{id}/download', [HonorRollController::class, 'download'])->name('honorlist.download');
 });
 
 /*

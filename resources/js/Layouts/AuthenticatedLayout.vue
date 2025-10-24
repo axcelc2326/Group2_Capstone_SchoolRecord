@@ -11,17 +11,16 @@ import {
   Users, 
   User, 
   ClipboardList, 
-  UserCheck, 
   MessageCirclePlus, 
   BarChart3, 
-  Download, 
   School, 
   BookOpen, 
   UserPlus, 
   Megaphone, 
   TrendingUp, 
   Settings,
-  Cog
+  Cog,
+  Award
 } from 'lucide-vue-next';
 import { Link, usePage } from '@inertiajs/vue3';
 
@@ -95,6 +94,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
       'sf5.form': '/sf5/form',
+      'honorlist.index': '/honorlist',
       'classes.index': '/classes',
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
@@ -175,6 +175,12 @@ const roleBasedNavigation = computed(() => {
         description: 'Input school info & generate SF5 PDF'
       },
       {
+        name: 'Honor List',
+        href: routeUrl('honorlist.index'),
+        icon: Award, 
+        description: 'Generate and view class honor roll reports'
+      },
+      {
         name: 'Parent Management',
         href: routeUrl('parents.index'),
         icon: Settings,
@@ -184,7 +190,7 @@ const roleBasedNavigation = computed(() => {
   }
 
   if (isAdmin.value) {
-    sections['Administration'] = [
+    sections['Admin Portal'] = [
       {
         name: 'Create Class',
         href: routeUrl('classes.index'),
@@ -302,7 +308,7 @@ const roleBasedNavigation = computed(() => {
                   <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                   <div class="relative flex items-center">
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-xl flex items-center justify-center text-sm font-bold mr-3 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden">
-                      {{ user.name.charAt(0).toUpperCase() }}
+                      <User class="w-5 h-5" />
                       <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div class="text-left hidden sm:block">
@@ -343,7 +349,7 @@ const roleBasedNavigation = computed(() => {
           <!-- Mobile User Info -->
           <div class="flex items-center space-x-3 pb-4 border-b transition-all duration-300 sticky top-0 bg-transparent backdrop-blur-xl z-10 -mx-4 px-4 pt-2">
             <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg transition-all duration-300 relative overflow-hidden">
-              {{ user.name.charAt(0).toUpperCase() }}
+                <User class="w-5 h-5" />
               <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
             </div>
             <div>

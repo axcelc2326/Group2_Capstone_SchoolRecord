@@ -8,17 +8,16 @@ import {
   Users, 
   User, 
   ClipboardList, 
-  UserCheck, 
   MessageCirclePlus, 
   BarChart3, 
-  Download, 
   School, 
   BookOpen, 
   UserPlus, 
   Megaphone, 
   TrendingUp, 
   Settings,
-  Cog
+  Cog,
+  Award
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -72,6 +71,7 @@ const routeUrl = (routeName, params = {}) => {
       'teacher.announcements.create': '/teacher/announcements/create',
       'teacher.analytics': '/teacher/analytics',
       'sf5.form': '/sf5/form',
+      'honorlist.index': '/honorlist',
       'classes.index': '/classes',
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
@@ -152,6 +152,12 @@ const roleBasedNavigation = computed(() => {
         description: 'Input school info & generate SF5 PDF'
       },
       {
+        name: 'Honor List',
+        href: routeUrl('honorlist.index'),
+        icon: Award, 
+        description: 'Generate and view class honor roll reports'
+      },
+      {
         name: 'Parent Management',
         href: routeUrl('parents.index'),
         icon: Settings,
@@ -161,7 +167,7 @@ const roleBasedNavigation = computed(() => {
   }
 
   if (isAdmin.value) {
-    sections['Administration'] = [
+    sections['Admin Portal'] = [
       {
         name: 'Create Class',
         href: routeUrl('classes.index'),
