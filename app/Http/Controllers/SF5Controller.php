@@ -24,7 +24,7 @@ class SF5Controller extends Controller
         $sf5Records = SF5Record::with('class')
             ->where('teacher_id', $teacherId)
             ->latest()
-            ->get(['id', 'region', 'division', 'school_id', 'school_name', 'school_year', 'class_id', 'created_at']);
+            ->get(['id', 'region', 'division', 'school_id', 'school_name', 'school_year', 'school_head_chair', 'class_id', 'created_at']);
 
         return Inertia::render('Teacher/SF5Form', [
             'classes' => $classes,
@@ -122,16 +122,6 @@ class SF5Controller extends Controller
         ])->setPaper('legal', 'portrait');
 
         return $pdf->download('SF5_Report.pdf');
-    }
-
-    // ✏️ Edit an existing SF5 record (render edit form)
-    public function edit($id)
-    {
-        $record = SF5Record::with('class')->findOrFail($id);
-
-        return Inertia::render('Teacher/EditSF5', [
-            'record' => $record,
-        ]);
     }
 
     // 💾 Update existing SF5 record

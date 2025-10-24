@@ -1,167 +1,403 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import EditSF5Modal from '@/Components/Teacher/EditSF5Modal.vue'
+import { FileText, Download, Edit, Trash2, Plus, Loader } from 'lucide-vue-next'
 
 const props = defineProps({
-  classes: Array,      // Teacher's assigned classes
-  sf5Records: Array    // Existing SF5 records from controller
+  classes: Array,
+  sf5Records: Array
 })
 
-// Grab CSRF token from <meta> tag
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-
-// Assume teacher only has one assigned class
 const assignedClassId = props.classes.length ? props.classes[0].id : null
 
-// Methods
+const showModal = ref(false)
+const selectedRecord = ref(null)
+const isSubmitting = ref(false)
+
 const deleteRecord = (id) => {
   if (confirm('Are you sure you want to delete this SF5 record?')) {
     router.delete(`/sf5/${id}`)
   }
 }
 
-const editRecord = (id) => {
-  router.get(`/sf5/${id}/edit`)
+const editRecord = (record) => {
+  selectedRecord.value = record
+  showModal.value = true
 }
 
 const downloadAgain = (id) => {
   window.open(`/sf5/download-again/${id}`, '_blank')
 }
+
+const handleSubmit = (e) => {
+  isSubmitting.value = true
+  // Form will submit naturally, reset after delay
+  setTimeout(() => {
+    isSubmitting.value = false
+  }, 2000)
+}
 </script>
 
 <template>
+  <Head title="Generate SF5 Report" />
+  
   <AuthenticatedLayout>
-    <Head title="Generate SF5 Report" />
+    <template #header>
+      <div class="space-y-1">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-white">
+              SF5 Report Generator
+            </h2>
+            <p class="text-white/70 mt-1">
+              Generate and manage School Form 5 reports
+            </p>
+          </div>
+          <FileText class="w-8 h-8 text-white/60" />
+        </div>
+      </div>
+    </template>
 
-    <div class="max-w-4xl mx-auto bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-200">
-      <!-- Header -->
-      <h1 class="text-2xl font-bold text-gray-800 mb-4">Generate SF5 Report</h1>
-      <p class="text-gray-600 mb-6 text-sm">
-        Fill out the form below to generate and download a new School Form 5 (SF5) report.
-      </p>
+    <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <!-- Header Stats -->
+      <div class="flex justify-between items-center">
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-2">
+          <span class="text-white/80 text-sm">{{ props.sf5Records?.length || 0 }} Generated Reports</span>
+        </div>
+      </div>
 
-      <!-- Form -->
-      <form method="POST" action="/sf5/download" target="_blank" class="grid grid-cols-2 gap-4">
-        <input type="hidden" name="_token" :value="csrfToken" />
-        <input type="hidden" name="class_id" :value="assignedClassId" />
-
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Region</label>
-          <select name="region" class="w-full border p-2 rounded text-gray-900" required>
-            <option value="">-- Select Region --</option>
-            <option value="NCR">NCR - National Capital Region</option>
-            <option value="CAR">CAR - Cordillera Administrative Region</option>
-            <option value="Region I">Region I - Ilocos Region</option>
-            <option value="Region II">Region II - Cagayan Valley</option>
-            <option value="Region III">Region III - Central Luzon</option>
-            <option value="Region IV-A">Region IV-A - CALABARZON</option>
-            <option value="MIMAROPA">MIMAROPA Region</option>
-            <option value="Region V">Region V - Bicol Region</option>
-            <option value="Region VI">Region VI - Western Visayas</option>
-            <option value="Region VII">Region VII - Central Visayas</option>
-            <option value="Region VIII">Region VIII - Eastern Visayas</option>
-            <option value="Region IX">Region IX - Zamboanga Peninsula</option>
-            <option value="Region X">Region X - Northern Mindanao</option>
-            <option value="Region XI">Region XI - Davao Region</option>
-            <option value="Region XII">Region XII - SOCCSKSARGEN</option>
-            <option value="Region XIII">Region XIII - Caraga</option>
-            <option value="BARMM">BARMM - Bangsamoro Autonomous Region in Muslim Mindanao</option>
-          </select>
+      <!-- Form Card -->
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+        <div class="flex items-center space-x-3 mb-6">
+          <Plus class="w-5 h-5 text-blue-300" />
+          <div>
+            <h3 class="text-lg font-semibold text-white">Generate New SF5 Report</h3>
+            <p class="text-sm text-white/70 mt-1">Fill out the form below to generate and download a new School Form 5 report</p>
+          </div>
         </div>
 
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">Division</label>
-          <input name="division" class="w-full border p-2 rounded text-gray-900" required />
-        </div>
+        <form method="POST" action="/sf5/download" target="_blank" @submit="handleSubmit" class="space-y-6">
+          <input type="hidden" name="_token" :value="csrfToken" />
+          <input type="hidden" name="class_id" :value="assignedClassId" />
 
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">School ID</label>
-          <input name="school_id" class="w-full border p-2 rounded text-gray-900" required />
-        </div>
+          <div class="grid md:grid-cols-2 gap-6">
+            <!-- Region -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                Region
+                <span class="text-red-400">*</span>
+              </label>
+              <select 
+                name="region" 
+                class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              >
+                <option value="" disabled class="bg-gray-800 text-white">-- Select Region --</option>
+                <option value="NCR" class="bg-gray-800 text-white">NCR - National Capital Region</option>
+                <option value="CAR" class="bg-gray-800 text-white">CAR - Cordillera Administrative Region</option>
+                <option value="Region I" class="bg-gray-800 text-white">Region I - Ilocos Region</option>
+                <option value="Region II" class="bg-gray-800 text-white">Region II - Cagayan Valley</option>
+                <option value="Region III" class="bg-gray-800 text-white">Region III - Central Luzon</option>
+                <option value="Region IV-A" class="bg-gray-800 text-white">Region IV-A - CALABARZON</option>
+                <option value="MIMAROPA" class="bg-gray-800 text-white">MIMAROPA Region</option>
+                <option value="Region V" class="bg-gray-800 text-white">Region V - Bicol Region</option>
+                <option value="Region VI" class="bg-gray-800 text-white">Region VI - Western Visayas</option>
+                <option value="Region VII" selected class="bg-gray-800 text-white">Region VII - Central Visayas</option>
+                <option value="Region VIII" class="bg-gray-800 text-white">Region VIII - Eastern Visayas</option>
+                <option value="Region IX" class="bg-gray-800 text-white">Region IX - Zamboanga Peninsula</option>
+                <option value="Region X" class="bg-gray-800 text-white">Region X - Northern Mindanao</option>
+                <option value="Region XI" class="bg-gray-800 text-white">Region XI - Davao Region</option>
+                <option value="Region XII" class="bg-gray-800 text-white">Region XII - SOCCSKSARGEN</option>
+                <option value="Region XIII" class="bg-gray-800 text-white">Region XIII - Caraga</option>
+                <option value="BARMM" class="bg-gray-800 text-white">BARMM - Bangsamoro Autonomous Region</option>
+              </select>
+            </div>
 
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">School Name</label>
-          <input name="school_name" class="w-full border p-2 rounded text-gray-900" required />
-        </div>
+            <!-- Division -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                Division
+                <span class="text-red-400">*</span>
+              </label>
+              <input
+                name="division"
+                value="Bohol Division"
+                class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              />
+            </div>
 
-        <div>
-          <label class="block font-medium mb-1 text-gray-700">School Year</label>
-          <input name="school_year" class="w-full border p-2 rounded text-gray-900" placeholder="e.g., 2025 - 2026" required />
-        </div>
+            <!-- School ID -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                School ID
+                <span class="text-red-400">*</span>
+              </label>
+              <input
+                name="school_id"
+                class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              />
+            </div>
 
-        <div class="col-span-2">
-          <label class="block font-medium mb-1 text-gray-700">School Head / SCC Chair</label>
-          <input name="school_head_chair" class="w-full border p-2 rounded text-gray-900" required />
-        </div>
+            <!-- School Name -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                School Name
+                <span class="text-red-400">*</span>
+              </label>
+              <input
+                name="school_name"
+                value="Mater Dei College"
+                class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              />
+            </div>
 
-        <div class="col-span-2 flex justify-end">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition-all">
-            Generate PDF
-          </button>
-        </div>
-      </form>
+            <!-- School Year -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                School Year
+                <span class="text-red-400">*</span>
+              </label>
+              <input
+                name="school_year"
+                placeholder="e.g., 2025 - 2026"
+                class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              />
+            </div>
 
-      <!-- Divider -->
-      <hr class="my-8 border-gray-300" />
+            <!-- School Head -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-white">
+                School Head / SCC Chair
+                <span class="text-red-400">*</span>
+              </label>
+              <input
+                name="school_head_chair"
+                class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+                required
+              />
+            </div>
+          </div>
 
-      <!-- Table of Existing Records -->
-      <h2 class="text-lg font-semibold text-gray-800 mb-3">Generated SF5 Reports</h2>
-
-      <div v-if="props.sf5Records?.length" class="overflow-x-auto">
-        <table class="w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
-          <thead class="bg-gray-100 text-gray-700">
-            <tr>
-              <th class="border p-2">#</th>
-              <th class="border p-2">School Year</th>
-              <th class="border p-2">Class</th>
-              <th class="border p-2">School Name</th>
-              <th class="border p-2">Division</th>
-              <th class="border p-2">Created</th>
-              <th class="border p-2 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(record, index) in props.sf5Records"
-              :key="record.id"
-              class="odd:bg-white even:bg-gray-50 hover:bg-blue-50 transition-colors text-black"
+          <!-- Submit Button -->
+          <div class="flex justify-end pt-4">
+            <button
+              type="submit"
+              :disabled="isSubmitting"
+              class="backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <td class="border p-2 text-center">{{ index + 1 }}</td>
-              <td class="border p-2">{{ record.school_year }}</td>
-              <td class="border p-2">
-                {{ record.class?.grade_level }} - {{ record.class?.name }}
-              </td>
-              <td class="border p-2">{{ record.school_name }}</td>
-              <td class="border p-2">{{ record.division }}</td>
-              <td class="border p-2 text-center">
-                {{ new Date(record.created_at).toLocaleDateString() }}
-              </td>
-              <td class="border p-2 text-center space-x-2">
-                <button
-                  @click="editRecord(record.id)"
-                  class="text-blue-600 hover:underline"
+              <Download class="w-4 h-4" />
+              <span v-if="!isSubmitting">Generate PDF</span>
+              <span v-else class="flex items-center gap-2">
+                <Loader class="w-4 h-4 animate-spin" />
+                Generating...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Generated Reports Card -->
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/10">
+          <div class="flex items-center space-x-3">
+            <FileText class="w-5 h-5 text-purple-300" />
+            <div>
+              <h3 class="text-lg font-semibold text-white">Generated SF5 Reports</h3>
+              <p class="text-sm text-white/70 mt-1">{{ props.sf5Records?.length || 0 }} reports available</p>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="props.sf5Records?.length">
+          <!-- Desktop View -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-white/10">
+              <thead class="bg-white/5">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">#</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">School Year</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Class</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">School Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Division</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Created</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/10">
+                <tr 
+                  v-for="(record, index) in props.sf5Records" 
+                  :key="record.id" 
+                  class="hover:bg-white/5 transition-colors duration-150"
                 >
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-white">{{ index + 1 }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-white">{{ record.school_year }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                          {{ record.class?.grade_level }}
+                        </div>
+                      </div>
+                      <div class="ml-3">
+                        <div class="text-sm font-medium text-white">{{ record.class?.name }}</div>
+                        <div class="text-xs text-white/60">{{ record.class?.grade_level }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-white">{{ record.school_name }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-white">{{ record.division }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-white">{{ new Date(record.created_at).toLocaleDateString() }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center space-x-2">
+                      <button
+                        @click="editRecord(record)"
+                        class="p-2 rounded-lg backdrop-blur-sm bg-blue-500/20 border border-blue-400/30 text-blue-100 hover:bg-blue-500/30 transition-all duration-150"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                      </button>
+                      <button
+                        @click="downloadAgain(record.id)"
+                        class="p-2 rounded-lg backdrop-blur-sm bg-green-500/20 border border-green-400/30 text-green-100 hover:bg-green-500/30 transition-all duration-150"
+                        title="Download"
+                      >
+                        <Download class="w-4 h-4" />
+                      </button>
+                      <button
+                        @click="deleteRecord(record.id)"
+                        class="p-2 rounded-lg backdrop-blur-sm bg-red-500/20 border border-red-400/30 text-red-100 hover:bg-red-500/30 transition-all duration-150"
+                        title="Delete"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Cards -->
+          <div class="md:hidden divide-y divide-white/10">
+            <div 
+              v-for="(record, index) in props.sf5Records" 
+              :key="record.id"
+              class="p-4 hover:bg-white/5 transition-colors duration-150"
+            >
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center space-x-2">
+                  <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                    {{ record.class?.grade_level }}
+                  </div>
+                  <div>
+                    <h4 class="text-white font-medium text-sm">{{ record.school_year }}</h4>
+                    <p class="text-xs text-white/70">{{ record.class?.name }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-2 mb-3">
+                <div class="text-xs text-white/70">School: <span class="text-white">{{ record.school_name }}</span></div>
+                <div class="text-xs text-white/70">Division: <span class="text-white">{{ record.division }}</span></div>
+                <div class="text-xs text-white/70">Created: <span class="text-white">{{ new Date(record.created_at).toLocaleDateString() }}</span></div>
+              </div>
+              <div class="flex items-center space-x-2 pt-3 border-t border-white/10">
+                <button
+                  @click="editRecord(record)"
+                  class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-blue-500/20 border border-blue-400/30 text-blue-100 hover:bg-blue-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
+                >
+                  <Edit class="w-4 h-4" />
                   Edit
                 </button>
                 <button
-                  @click="deleteRecord(record.id)"
-                  class="text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
-                <button
                   @click="downloadAgain(record.id)"
-                  class="text-green-600 hover:underline"
+                  class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-green-500/20 border border-green-400/30 text-green-100 hover:bg-green-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
                 >
+                  <Download class="w-4 h-4" />
                   Download
                 </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <button
+                  @click="deleteRecord(record.id)"
+                  class="py-2 px-3 rounded-lg backdrop-blur-sm bg-red-500/20 border border-red-400/30 text-red-100 hover:bg-red-500/30 transition-all duration-150 text-sm"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <p v-else class="text-gray-500 text-sm italic mt-4">No SF5 reports generated yet.</p>
+        <!-- Empty State -->
+        <div v-else class="text-center py-8">
+          <FileText class="mx-auto h-10 w-10 text-white/40 mb-3" />
+          <h3 class="text-sm font-medium text-white/80">No SF5 reports generated yet</h3>
+          <p class="mt-1 text-sm text-white/60">Start by filling out the form above to generate your first report.</p>
+        </div>
+      </div>
     </div>
   </AuthenticatedLayout>
+
+  <!-- Edit Modal -->
+  <EditSF5Modal
+    v-if="selectedRecord"
+    :show="showModal"
+    :record="selectedRecord"
+    @close="showModal = false"
+  />
 </template>
+
+<style scoped>
+/* Glassmorphism base effects */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+</style>
