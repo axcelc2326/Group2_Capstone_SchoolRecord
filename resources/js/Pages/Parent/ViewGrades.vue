@@ -285,7 +285,7 @@ const summary = computed(() => {
                               <div 
                                   v-for="subject in [...new Set(student.grades.map(g => g.subject))]" 
                                   :key="subject"
-                                  class="backdrop-blur-sm bg-white/10 rounded-lg border border-white/20 overflow-hidden"
+                                  class="backdrop-blur-sm bg-black/10 rounded-lg border border-white/20 overflow-hidden"
                               >
                                   <!-- Subject Header -->
                                   <div class="bg-white/5 px-3 py-2 border-b border-white/10">

@@ -22,7 +22,7 @@
         }
 
         .header img {
-            width: 70px; /* ✅ Adjust logo size here */
+            width: 100px; /* ✅ Adjust logo size here */
             height: auto;
             margin-right: 20px;
         }

@@ -100,8 +100,9 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     // Honor Download Form
     Route::get('/honorlist', [HonorRollController::class, 'index'])->name('honorlist.index');
     Route::post('/honorlist/generate', [HonorRollController::class, 'store'])->name('honorlist.generate');
+    Route::put('/honor-roll/{id}', [HonorRollController::class, 'update'])->name('honorroll.update');
     Route::delete('/honor-rolls/{honorRoll}', [HonorRollController::class, 'destroy'])->name('honor-rolls.destroy');
-    Route::get('/honorlist/{id}/download', [HonorRollController::class, 'download'])->name('honorlist.download');
+    Route::get('/honorlist/{honorRoll}/download', [HonorRollController::class, 'download'])->name('honorlist.download');
 });
 
 /*

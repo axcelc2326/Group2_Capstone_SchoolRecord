@@ -28,9 +28,6 @@ return new class extends Migration
             $table->integer('with_highest_honors_count')->default(0);
             $table->integer('achievers_count')->default(0);
 
-            // 💾 File path for re-download
-            $table->string('pdf_path')->nullable();
-
             $table->timestamps();
         });
     }

@@ -35,34 +35,34 @@ const submit = () => {
         <Head title="Log in" />
 
         <!-- Page Header -->
-        <div class="text-center mb-8 animate-fade-in">
-            <h2 class="text-4xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-3">
+        <div class="text-center mb-6 animate-fade-in">
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-2">
                 Welcome Back
             </h2>
-            <p class="text-lg text-white/70 font-medium">
+            <p class="text-base text-white/70 font-medium">
                 Sign in to your EduPortal account
             </p>
         </div>
 
         <!-- Status Message -->
-        <div v-if="status" class="mb-6 bg-green-500/20 backdrop-blur-xl border border-green-400/30 rounded-2xl p-4 shadow-xl shadow-green-500/10 animate-slide-in">
+        <div v-if="status" class="mb-4 bg-green-500/20 backdrop-blur-xl border border-green-400/30 rounded-2xl p-3 shadow-xl shadow-green-500/10 animate-slide-in">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25">
-                        <CheckCircle2 class="h-5 w-5 text-white" />
+                    <div class="w-7 h-7 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25">
+                        <CheckCircle2 class="h-4 w-4 text-white" />
                     </div>
                 </div>
-                <p class="ml-4 text-sm font-medium text-green-100">{{ status }}</p>
+                <p class="ml-3 text-sm font-medium text-green-100">{{ status }}</p>
             </div>
         </div>
 
         <!-- Login Form -->
-        <form @submit.prevent="submit" class="space-y-6 animate-fade-in-up">
+        <form @submit.prevent="submit" class="space-y-4 animate-fade-in-up">
             <!-- Email Field -->
-            <div class="space-y-3 group">
+            <div class="space-y-2 group">
                 <InputLabel for="email" value="Email Address" class="text-sm font-semibold text-white/90 group-focus-within:text-white transition-colors duration-300" />
-                <div class="relative group-focus-within:scale-[1.02] transition-all duration-300">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                         <div class="p-1.5 bg-blue-500/20 rounded-lg group-focus-within:bg-blue-500/30 transition-all duration-300">
                             <Mail class="h-4 w-4 text-blue-300 group-focus-within:text-blue-200 transition-colors duration-300" />
                         </div>
@@ -70,7 +70,7 @@ const submit = () => {
                     <TextInput
                         id="email"
                         type="email"
-                        class="pl-16 pr-4 py-4 block w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl shadow-black/20 focus:bg-white/15 focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/20 text-white placeholder-white/50 transition-all duration-300 hover:bg-white/[0.12] hover:shadow-2xl"
+                        class="pl-14 pr-4 py-3 block w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl shadow-black/20 focus:bg-white/15 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/20 text-white placeholder-white/50 transition-all duration-300 hover:bg-white/[0.12]"
                         v-model="form.email"
                         required
                         autofocus
@@ -78,14 +78,14 @@ const submit = () => {
                         placeholder="parent@gmail.com"
                     />
                 </div>
-                <InputError class="mt-2 text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-xl px-3 py-2" :message="form.errors.email" />
+                <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.email" />
             </div>
 
             <!-- Password Field -->
-            <div class="space-y-3 group">
+            <div class="space-y-2 group">
                 <InputLabel for="password" value="Password" class="text-sm font-semibold text-white/90 group-focus-within:text-white transition-colors duration-300" />
-                <div class="relative group-focus-within:scale-[1.02] transition-all duration-300">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                         <div class="p-1.5 bg-indigo-500/20 rounded-lg group-focus-within:bg-indigo-500/30 transition-all duration-300">
                             <Lock class="h-4 w-4 text-indigo-300 group-focus-within:text-indigo-200 transition-colors duration-300" />
                         </div>
@@ -93,55 +93,52 @@ const submit = () => {
                     <TextInput
                         id="password"
                         type="password"
-                        class="pl-16 pr-4 py-4 block w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl shadow-black/20 focus:bg-white/15 focus:border-indigo-400/50 focus:ring-4 focus:ring-indigo-500/20 text-white placeholder-white/50 transition-all duration-300 hover:bg-white/[0.12] hover:shadow-2xl"
+                        class="pl-14 pr-4 py-3 block w-full bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-xl shadow-black/20 focus:bg-white/15 focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-500/20 text-white placeholder-white/50 transition-all duration-300 hover:bg-white/[0.12]"
                         v-model="form.password"
                         required
                         autocomplete="current-password"
                         placeholder="Enter your password"
                     />
                 </div>
-                <InputError class="mt-2 text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-xl px-3 py-2" :message="form.errors.password" />
+                <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.password" />
             </div>
 
-            <!-- Forgot Password Link -->
-            <div v-if="canResetPassword" class="flex justify-end">
-                <Link
-                    :href="route('password.request')"
-                    class="text-sm text-white/60 hover:text-white/90 transition-colors duration-300 hover:underline hover:scale-105 transform inline-block"
-                >
-                    Forgot your password?
-                </Link>
-            </div>
-
-            <!-- Remember Me -->
-            <div class="flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group">
-                <div class="flex items-center">
-                    <div class="relative">
-                        <Checkbox 
-                            name="remember" 
-                            v-model:checked="form.remember"
-                            class="h-5 w-5 text-blue-500 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-transparent border-white/30 rounded-lg bg-white/10 backdrop-blur-xl transition-all duration-300 hover:scale-110"
-                        />
-                    </div>
-                    <label class="ml-4 text-sm text-white/70 cursor-pointer select-none group-hover:text-white/90 transition-colors duration-300 font-medium">
-                        Keep me signed in
-                    </label>
-                </div>
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2 hover:bg-white/10 transition-all duration-300">
+                <Checkbox 
+                    name="remember" 
+                    v-model:checked="form.remember"
+                    class="h-4 w-4 text-blue-500 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-transparent border-white/30 rounded bg-white/10 backdrop-blur-xl transition-all duration-300"
+                />
+                <label class="ml-2 text-xs text-white/70 cursor-pointer select-none hover:text-white/90 transition-colors duration-300 font-medium">
+                    Keep me signed in
+                </label>
             </div>
 
             <!-- Submit Button -->
             <PrimaryButton
                 type="submit"
-                class="w-full group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:translate-y-0"
+                class="w-full group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 :disabled="form.processing"
             >
-                <div class="relative flex items-center justify-center space-x-3">
+                <div class="relative flex items-center justify-center space-x-2">
                     <Loader2 v-if="form.processing" class="animate-spin h-5 w-5 text-white" />
                     <LogIn v-else class="h-5 w-5 text-white group-hover:scale-110 transition-transform duration-300" />
-                    <span class="text-lg font-bold">{{ form.processing ? 'Signing in...' : 'Sign In' }}</span>
+                    <span class="text-base font-bold">{{ form.processing ? 'Signing in...' : 'Sign In' }}</span>
                 </div>
             </PrimaryButton>
-            <div class="text-center pt-6 border-t border-white/20 relative"></div>
+
+            <!-- No Account Notice -->
+            <div class="text-center pt-4 border-t border-white/20">
+                <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3 hover:bg-white/10 transition-all duration-300">
+                    <p class="text-xs text-white/70 leading-relaxed">
+                        Don't have an account? 
+                        <span class="block mt-1 text-white/90 font-medium">
+                            Please contact your teacher or administrator to request account access.
+                        </span>
+                    </p>
+                </div>
+            </div>
         </form>
     </GuestLayout>
 </template>
@@ -181,40 +178,6 @@ const submit = () => {
     }
 }
 
-@keyframes float {
-    0%, 100% { 
-        transform: translateY(0px) rotate(0deg); 
-    }
-    33% {
-        transform: translateY(-8px) rotate(1deg);
-    }
-    66% {
-        transform: translateY(4px) rotate(-1deg);
-    }
-}
-
-@keyframes shimmer {
-    0% {
-        background-position: -200px 0;
-    }
-    100% {
-        background-position: 200px 0;
-    }
-}
-
-@keyframes pulse-glow {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-        box-shadow: 0 0 5px currentColor;
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.05);
-        box-shadow: 0 0 20px currentColor;
-    }
-}
-
 /* Animation classes */
 .animate-fade-in {
     animation: fade-in 0.6s ease-out;
@@ -228,38 +191,11 @@ const submit = () => {
     animation: slide-in 0.5s ease-out;
 }
 
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse {
-    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
 /* Enhanced backdrop blur support */
 @supports (backdrop-filter: blur(20px)) {
     .backdrop-blur-xl {
         backdrop-filter: blur(20px);
     }
-}
-
-/* Input field enhancements */
-input:focus {
-    transform: scale(1.02);
-}
-
-/* Button shimmer effect */
-.shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    background-size: 200px 100%;
-    animation: shimmer 2s infinite;
-}
-
-/* Custom focus states */
-input:focus,
-button:focus,
-a:focus {
-    outline: none;
 }
 
 /* Smooth transitions for all interactive elements */
@@ -269,63 +205,13 @@ a:focus {
     transition-duration: 300ms;
 }
 
-/* Enhanced hover effects */
-.group:hover .group-hover\:scale-105 {
-    transform: scale(1.05);
-}
-
-.group:hover .group-hover\:scale-110 {
-    transform: scale(1.1);
-}
-
-/* Micro-interactions */
-.group:active {
-    transform: scale(0.98);
-    transition-duration: 100ms;
-}
-
 /* Ensure animations respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
     .animate-fade-in,
     .animate-fade-in-up,
-    .animate-slide-in,
-    .animate-float,
-    .animate-pulse {
+    .animate-slide-in {
         animation: none !important;
     }
-    
-    .group:hover .group-hover\:scale-105,
-    .group:hover .group-hover\:scale-110,
-    input:focus {
-        transform: none !important;
-    }
-}
-
-/* Enhanced glass effect for inputs */
-.glass-input {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-input:focus {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(59, 130, 246, 0.5);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-}
-
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
 }
 
 /* Loading state enhancements */
