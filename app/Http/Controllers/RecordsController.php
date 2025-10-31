@@ -12,56 +12,49 @@ use Illuminate\Support\Facades\Auth;
 
 class RecordsController extends Controller
 {
-    // Admin index: supports search + filters
+    // Admin index: supports status filter + pagination (no search)
     public function index(Request $request)
     {
         $request->validate([
-            'q' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|integer|exists:users,id',
             'type' => 'nullable|in:sf5,honor,all',
+            'status' => 'nullable|in:pending,reviewed,all',
         ]);
 
-        $q = $request->q;
         $teacherId = $request->teacher_id;
         $type = $request->type ?? 'all';
+        $status = $request->status ?? 'all';
 
-        // Query builders
+        // Query for SF5
         $sf5Query = SF5Record::with(['class', 'teacher'])
-            ->when($q, fn($qB) => $qB->where(function($q2) use ($q) {
-                $q2->where('school_name', 'like', "%$q%")
-                   ->orWhere('school_year', 'like', "%$q%")
-                   ->orWhereHas('teacher', fn($t) => $t->where('name', 'like', "%$q%"));
-            }))
-            ->when($teacherId, fn($qB) => $qB->where('teacher_id', $teacherId));
+            ->when($teacherId, fn($q) => $q->where('teacher_id', $teacherId))
+            ->when($status !== 'all', fn($q) => $q->where('status', $status));
 
+        // Query for Honor Rolls
         $honorQuery = HonorRoll::with(['class', 'teacher'])
-            ->when($q, fn($qB) => $qB->where(function($q2) use ($q) {
-                $q2->where('school_year', 'like', "%$q%")
-                   ->orWhere('quarter', 'like', "%$q%")
-                   ->orWhereHas('teacher', fn($t) => $t->where('name', 'like', "%$q%"));
-            }))
-            ->when($teacherId, fn($qB) => $qB->where('teacher_id', $teacherId));
+            ->when($teacherId, fn($q) => $q->where('teacher_id', $teacherId))
+            ->when($status !== 'all', fn($q) => $q->where('status', $status));
 
-        // Execute depending on type
+        // Execute based on type
         if ($type === 'sf5') {
-            $sf5Records = $sf5Query->latest()->get();
+            $sf5Records = $sf5Query->latest()->paginate(5)->withQueryString();
             $honorLists = collect();
         } elseif ($type === 'honor') {
             $sf5Records = collect();
-            $honorLists = $honorQuery->latest()->get();
+            $honorLists = $honorQuery->latest()->paginate(5)->withQueryString();
         } else {
-            $sf5Records = $sf5Query->latest()->get();
-            $honorLists = $honorQuery->latest()->get();
+            $sf5Records = $sf5Query->latest()->paginate(5)->withQueryString();
+            $honorLists = $honorQuery->latest()->paginate(5)->withQueryString();
         }
 
-        // list teachers for filter
-        $teachers = User::role('teacher')->select('id','name')->get();
+        // Teachers for dropdown filter
+        $teachers = User::role('teacher')->select('id', 'name')->get();
 
         return inertia('Admin/RecordsIndex', [
             'sf5Records' => $sf5Records,
             'honorLists' => $honorLists,
             'teachers' => $teachers,
-            'filters' => $request->only(['q','teacher_id','type']),
+            'filters' => $request->only(['teacher_id', 'type', 'status']),
         ]);
     }
 
@@ -132,8 +125,7 @@ class RecordsController extends Controller
                 'school_year' => $record->school_year,
                 'quarter' => $record->quarter,
                 'principal' => $record->principal_name,
-                // IMPORTANT: pass honorStudents as the Blade expects it
-                'honorStudents' => $honorStudents,
+                'honorStudents' => $record->data ?? [], // ✅ directly from DB
             ])->setPaper('legal', 'portrait');
 
             return $pdf->download("HonorRoll_{$record->class->name}_{$record->school_year}_Q{$record->quarter}.pdf");

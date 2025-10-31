@@ -19,7 +19,11 @@ class HonorRoll extends Model
         'with_high_honors_count',
         'with_highest_honors_count',
         'achievers_count',
-        'pdf_path',
+        'data', // ✅ allow fill
+    ];
+
+    protected $casts = [
+        'data' => 'array', // ✅ auto decode JSON
     ];
 
     public function teacher()

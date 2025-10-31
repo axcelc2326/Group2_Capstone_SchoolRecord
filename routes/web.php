@@ -142,17 +142,11 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     Route::resource('teachers', TeacherController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::put('/teachers/{id}/toggle-status', [TeacherController::class, 'toggleStatus'])->name('teachers.toggle-status');
 
-    // Record Tracker
+    // Reports Management 
     Route::get('/records', [RecordsController::class, 'index'])->name('admin.records.index');
-
-    // JSON endpoint for modal details
-    Route::get('/records/{type}/{id}', [RecordsController::class, 'show'])->name('admin.records.show');
-
-    // re-generate & download PDF
-    Route::get('/records/{type}/{id}/download', [RecordsController::class, 'download'])->name('admin.records.download');
-
-    // toggle mark reviewed/unreviewed
-    Route::post('/records/{type}/{id}/toggle-reviewed', [RecordsController::class, 'toggleReviewed'])->name('admin.records.toggleReviewed');
+    Route::get('/records/{type}/{id}', [RecordsController::class, 'show'])->name('admin.records.show');// JSON endpoint for modal details
+    Route::get('/records/{type}/{id}/download', [RecordsController::class, 'download'])->name('admin.records.download');// re-generate & download PDF
+    Route::post('/records/{type}/{id}/toggle-reviewed', [RecordsController::class, 'toggleReviewed'])->name('admin.records.toggleReviewed');// toggle mark reviewed/unreviewed
 });
 
 /*

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->integer('with_high_honors_count')->default(0);
             $table->integer('with_highest_honors_count')->default(0);
             $table->integer('achievers_count')->default(0);
+            $table->json('data')->nullable(); // 🧠 Store the student list
 
             $table->timestamps();
         });

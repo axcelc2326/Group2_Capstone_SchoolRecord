@@ -117,6 +117,7 @@ class HonorRollController extends Controller
             'with_high_honors_count' => $withHighHonors,
             'with_highest_honors_count' => $withHighestHonors,
             'achievers_count' => 0,
+            'data' => $honorStudents, // ✅ store the student list
         ]);
 
         // 🖨️ Generate PDF with ordered data
