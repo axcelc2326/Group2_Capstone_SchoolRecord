@@ -20,7 +20,8 @@ import {
   TrendingUp, 
   Settings,
   Cog,
-  Award
+  Award,
+  FileText
 } from 'lucide-vue-next';
 import { Link, usePage } from '@inertiajs/vue3';
 
@@ -99,8 +100,9 @@ const routeUrl = (routeName, params = {}) => {
       'subjects.index': '/subjects',
       'admin.assign-teacher': '/admin/classes/assign',
       'announcements.create': '/announcements/create',
-      'teachers.index': '/teachers',
+      'admin.records.index': '/admin/records',
       'analytics.index': '/analytics',
+      'teachers.index': '/teachers',
       'parents.index': '/parents'
     };
     
@@ -214,6 +216,12 @@ const roleBasedNavigation = computed(() => {
         href: routeUrl('announcements.create'),
         icon: Megaphone,
         description: 'School-wide updates'
+      },
+      {
+        name: 'Reports Management',
+        href: routeUrl('admin.records.index'),
+        icon: FileText, // you can import FileText from lucide-react or similar
+        description: 'All SF5 and Honor Roll submissions'
       },
       {
         name: 'View Analytics',

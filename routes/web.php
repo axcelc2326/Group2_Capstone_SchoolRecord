@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     TeacherStudentController,
     SubjectController,
     SF5Controller,
-    HonorRollController
+    HonorRollController,
+    RecordsController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -140,6 +141,18 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     // Add Teacher User
     Route::resource('teachers', TeacherController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::put('/teachers/{id}/toggle-status', [TeacherController::class, 'toggleStatus'])->name('teachers.toggle-status');
+
+    // Record Tracker
+    Route::get('/records', [RecordsController::class, 'index'])->name('admin.records.index');
+
+    // JSON endpoint for modal details
+    Route::get('/records/{type}/{id}', [RecordsController::class, 'show'])->name('admin.records.show');
+
+    // re-generate & download PDF
+    Route::get('/records/{type}/{id}/download', [RecordsController::class, 'download'])->name('admin.records.download');
+
+    // toggle mark reviewed/unreviewed
+    Route::post('/records/{type}/{id}/toggle-reviewed', [RecordsController::class, 'toggleReviewed'])->name('admin.records.toggleReviewed');
 });
 
 /*
