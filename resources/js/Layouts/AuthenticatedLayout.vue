@@ -260,17 +260,15 @@ const roleBasedNavigation = computed(() => {
             
             <Link :href="routeUrl('dashboard')" class="flex items-center space-x-3 group transition-all duration-300">
               <div class="relative">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all duration-300 group-hover:scale-105 group-hover:rotate-6 relative overflow-hidden">
-                  <img src="/images/Logo.jpg" alt="Logo" class="w-full h-full object-cover" />
-                  <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:shadow-lg group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 relative overflow-hidden">
+                  <img src="/images/Logo.jpg" alt="Logo" class="w-full h-full object-cover rounded-full" />
                 </div>
-                <div class="absolute -inset-1 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-2xl opacity-0 group-hover:opacity-20 transition-all duration-300 blur-sm"></div>
               </div>
               <div class="hidden sm:block">
                 <div class="text-xl font-bold bg-gradient-to-r from-blue-100 via-white to-indigo-100 bg-clip-text text-transparent transition-all duration-300 group-hover:from-blue-200 group-hover:to-indigo-200">
-                  EduPortal
+                  MDC-Connect
                 </div>
-                <div class="text-xs text-white/70 font-medium transition-colors duration-300 group-hover:text-white/90">Learning Management System</div>
+                <div class="text-xs text-white/70 font-medium transition-colors duration-300 group-hover:text-white/90">Announcements and Academic<br></br>Monitoring Portal</div>
               </div>
             </Link>
             
@@ -408,7 +406,7 @@ const roleBasedNavigation = computed(() => {
               <div 
                 class="w-1 h-4 rounded-full animate-pulse"
                 :class="{
-                  'bg-purple-400 shadow-lg shadow-purple-400/50': category.includes('Administration'),
+                  'bg-purple-400 shadow-lg shadow-purple-400/50': category.includes('Admin'),
                   'bg-emerald-400 shadow-lg shadow-emerald-400/50': category.includes('Teacher'),
                   'bg-blue-400 shadow-lg shadow-blue-400/50': category.includes('Parent')
                 }"
@@ -465,7 +463,7 @@ const roleBasedNavigation = computed(() => {
     </nav>
 
     <!-- Layout: Sidebar + Main -->
-    <div class="flex flex-1 pt-16"> <!-- Added pt-16 to account for fixed header -->
+    <div class="flex flex-1 pt-16">
       <!-- Use the new Sidebar component -->
       <Sidebar :collapsed="sidebarCollapsed" @toggle="toggleSidebar" />
 

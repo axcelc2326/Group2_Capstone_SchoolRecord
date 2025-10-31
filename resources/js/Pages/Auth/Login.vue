@@ -40,7 +40,7 @@ const submit = () => {
                 Welcome Back
             </h2>
             <p class="text-base text-white/70 font-medium">
-                Sign in to your EduPortal account
+                Sign in to your MDC-Connect account
             </p>
         </div>
 
@@ -134,7 +134,7 @@ const submit = () => {
                     <p class="text-xs text-white/70 leading-relaxed">
                         Don't have an account? 
                         <span class="block mt-1 text-white/90 font-medium">
-                            Please contact your teacher or administrator to request account access.
+                            Please contact your child's teacher or the principal to request account access.
                         </span>
                     </p>
                 </div>

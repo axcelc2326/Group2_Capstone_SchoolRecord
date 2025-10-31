@@ -135,7 +135,7 @@ const totalStudents = computed(() => students.value.length)
                     :class="student.approved_by_teacher ? 'bg-emerald-400' : 'bg-amber-400'"
                     class="w-1.5 h-1.5 rounded-full mr-2"
                   ></span>
-                  {{ student.approved_by_teacher ? 'Approved' : 'Pending' }}
+                  {{ student.approved_by_teacher ? 'Enrolled' : 'Unenrolled' }}
                 </span>
               </div>
             </div>

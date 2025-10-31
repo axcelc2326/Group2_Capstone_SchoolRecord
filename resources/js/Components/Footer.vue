@@ -29,12 +29,12 @@ const currentYear = new Date().getFullYear()
             <div
               class="text-3xl font-black bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent transition-all duration-500 group-hover:bg-gradient-to-r group-hover:from-blue-200 group-hover:to-purple-200"
             >
-              EduPortal
+              MDC-Connect
             </div>
             <div
               class="text-sm text-white/60 font-semibold tracking-wide uppercase transition-all duration-300 group-hover:text-white/80 group-hover:tracking-wider"
             >
-              Learning Management System
+              Announcements and Academic<br></br>Monitoring Portal
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@ const currentYear = new Date().getFullYear()
           <div
             class="text-sm text-white/70 transition-all duration-300 hover:text-white/90 font-medium flex items-center space-x-2"
           >
-            <span>© {{ currentYear }} EduPortal. All rights reserved.</span>
+            <span>© {{ currentYear }} MDC-Connect. All rights reserved.</span>
             <span class="hidden sm:inline">•</span>
             <span class="hidden sm:inline-flex items-center space-x-1">
               <span>Built with</span>
