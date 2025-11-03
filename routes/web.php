@@ -87,7 +87,9 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     Route::put('/teacher/students/unapprove-all', [TeacherStudentController::class, 'unapproveAll'])->name('teacher.students.unapproveAll');
     Route::delete('/teacher/students/{student}/clear-grades', [TeacherStudentController::class, 'clearGrades'])->name('teacher.students.clearGrades');
     Route::delete('/teacher/students/clear-all-grades', [TeacherStudentController::class, 'clearAllGrades'])->name('teacher.students.clearAllGrades');
-
+    Route::get('/teacher/classes/available', [TeacherStudentController::class, 'getAvailableClasses'])->name('teacher.classes.available');
+    Route::put('/teacher/students/promote', [TeacherStudentController::class, 'promoteStudents'])->name('teacher.students.promote');
+    
     // Teachers Analytics
     Route::get('/teacher/analytics', [AnalyticsController::class, 'teacherAnalytics'])->name('teacher.analytics');
 

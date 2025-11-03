@@ -2,13 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Grade;
+use App\Models\GradeRemark;
 use App\Models\ClassModel; // Ensure this model exists for your classes
 
 class TeacherStudentController extends Controller
 {
+    public function promoteStudents(Request $request)
+    {
+        $request->validate([
+            'target_class_id' => 'required|exists:classes,id',
+        ]);
+
+        $teacherId = auth()->id();
+        $targetClassId = $request->input('target_class_id');
+
+        try {
+            $promotedCount = 0;
+
+            DB::transaction(function () use ($teacherId, $targetClassId, &$promotedCount) {
+                // Get all students handled by this teacher who have grade remarks
+                $students = Student::whereHas('class', function ($query) use ($teacherId) {
+                        $query->where('teacher_id', $teacherId);
+                    })
+                    ->whereHas('gradeRemarks')
+                    ->get();
+
+                $promotedCount = $students->count();
+
+                if ($promotedCount > 0) {
+                    // Get all student IDs for cleanup
+                    $studentIds = $students->pluck('id');
+
+                    // ✅ Bulk promote students
+                    Student::whereIn('id', $studentIds)->update([
+                        'class_id' => $targetClassId,
+                        'approved_by_teacher' => true,
+                    ]);
+
+                    // ✅ Bulk delete all grades for promoted students
+                    Grade::whereIn('student_id', $studentIds)->delete();
+                    
+                    // ✅ Bulk delete all grade remarks for promoted students
+                    GradeRemark::whereIn('student_id', $studentIds)->delete();
+                    
+                    \Log::info("{$promotedCount} students promoted to class {$targetClassId}, grades and remarks cleared");
+                }
+            });
+
+            if ($promotedCount > 0) {
+                return back()->with('success', "{$promotedCount} students with grade remarks have been promoted to the new class. All grades and grade remarks have been cleared.");
+            } else {
+                return back()->with('error', 'No students with grade remarks found to promote.');
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Promotion failed: ' . $e->getMessage());
+            return back()->with('error', 'Failed to promote students: ' . $e->getMessage());
+        }
+    }
+
     // ✅ Unapprove all students in a class and remove their class assignment
     public function unapproveAll(Request $request)
     {
@@ -19,51 +75,88 @@ class TeacherStudentController extends Controller
         })->get();
 
         foreach ($students as $student) {
-            // Unapprove
+            // Unapprove student
             $student->approved_by_teacher = false;
-            // Remove from class
+
+            // Remove class assignment
             $student->class_id = null;
             $student->save();
 
             // Delete all grades
             $student->grades()->delete();
+
+            // ✅ Delete grade remarks if they exist
+            $student->gradeRemarks()->delete();
         }
 
-        return back()->with('message', 'All students unapproved, grades cleared, and class assignments removed.');
+        return back()->with('message', 'All students unapproved, grades and grade remarks cleared, and class assignments removed.');
     }
 
-    // ✅ Clear all grades for all students in a class
+    // ✅ Clear all grades (and grade remarks) for all students in a class
     public function clearAllGrades(Request $request)
     {
         $teacherId = auth()->id();
 
+        // Get all student IDs handled by this teacher
         $studentIds = Student::whereHas('class', function ($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })->pluck('id');
 
+        // Delete all grades for those students
         Grade::whereIn('student_id', $studentIds)->delete();
 
-        return back()->with('message', 'All grades cleared.');
+        // ✅ Delete all grade remarks for those students
+        GradeRemark::whereIn('student_id', $studentIds)->delete();
+
+        return back()->with('message', 'All grades and grade remarks cleared.');
     }
 
-    // ✅ Unapprove a single student, clear their grades, and remove class assignment
+    // ✅ Unapprove a single student, clear their grades and remarks, and remove class assignment
     public function unapproveStudent(Student $student)
     {
         $student->approved_by_teacher = false;
         $student->class_id = null;
-        $student->grades()->delete();
         $student->save();
 
-        return back()->with('success', 'Student unapproved, grades cleared, and removed from class.');
+        // Delete all grades
+        $student->grades()->delete();
+
+        // ✅ Delete grade remarks if any
+        $student->gradeRemarks()->delete();
+
+        return back()->with('success', 'Student unapproved, grades and grade remarks cleared, and removed from class.');
     }
 
-    // ✅ Clear grades for a single student
+    // ✅ Clear grades (and grade remarks) for a single student
     public function clearGrades($studentId)
     {
         $student = Student::findOrFail($studentId);
 
+        // Delete grades
         Grade::where('student_id', $student->id)->delete();
 
-        return back()->with('message', 'Grades cleared for the student.');
+        // ✅ Delete grade remarks as well
+        GradeRemark::where('student_id', $student->id)->delete();
+
+        return back()->with('message', 'Grades and grade remarks cleared for the student.');
+    }
+    
+    public function getAvailableClasses()
+    {
+        $teacherId = auth()->id();
+        
+        // Get all classes except the current teacher's classes
+        $availableClasses = ClassModel::where('teacher_id', '!=', $teacherId)
+            ->orWhereNull('teacher_id')
+            ->get(['id', 'name', 'grade_level'])
+            ->map(function ($class) {
+                return [
+                    'id' => $class->id,
+                    'name' => $class->name,
+                    'grade_level' => $class->grade_level,
+                ];
+            });
+        
+        return response()->json($availableClasses);
     }
 }

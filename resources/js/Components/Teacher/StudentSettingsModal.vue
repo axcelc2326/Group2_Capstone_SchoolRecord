@@ -32,6 +32,25 @@
 
       <!-- Settings Options -->
       <div class="space-y-3">
+        
+        <!-- Promote Students -->
+        <button
+          @click="$emit('promote-students')"
+          class="w-full flex items-center px-4 py-4 text-left text-green-100 bg-green-500/10 hover:bg-green-500/20 border border-green-400/30 hover:border-green-400/50 rounded-xl transition-all duration-150 group"
+        >
+          <div class="flex-shrink-0 p-2 bg-green-500/20 rounded-lg mr-4 group-hover:bg-green-500/30 transition-colors">
+            <svg class="w-5 h-5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <div class="font-medium">Promote Students</div>
+            <div class="text-sm text-green-200/70">
+              Move students to the next grade level
+            </div>
+          </div>
+        </button>
+
         <!-- Unapprove All -->
         <button
           @click="$emit('unapprove-all')"
@@ -83,5 +102,5 @@ defineProps({
   }
 })
 
-defineEmits(['close', 'unapprove-all', 'clear-all-grades'])
+defineEmits(['close', 'unapprove-all', 'clear-all-grades', 'promote-students'])
 </script>

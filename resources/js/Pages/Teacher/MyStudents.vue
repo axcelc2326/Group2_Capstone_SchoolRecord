@@ -7,6 +7,7 @@ import axios from 'axios'
 import GradeInputModal from '@/Components/Teacher/GradeInputModal.vue'
 import SettingsModal from '@/Components/Teacher/StudentSettingsModal.vue'
 import IndividualStudentModal from '@/Components/Teacher/StudentSettingsIndividualModal.vue'
+import PromoteStudentsModal from '@/Components/Teacher/PromoteStudentsModal.vue'
 
 const props = defineProps({
   students: Object,
@@ -18,6 +19,7 @@ const search = ref(props.filters?.search || '')
 const showSettingsModal = ref(false)
 const showIndividualModal = ref(false)
 const selectedStudent = ref(null)
+const showPromoteModal = ref(false)
 
 // 🔍 Search filter
 watch(search, (value) => {
@@ -31,6 +33,12 @@ const hasStudents = computed(() => props.students?.data && props.students.data.l
 // 🚀 Modal State
 const showGradeModal = ref(false)
 const InputGrade = ref(null)
+
+// Update the promoteStudents function in SettingsModal
+const promoteStudents = () => {
+  showSettingsModal.value = false
+  showPromoteModal.value = true
+}
 
 // 🔹 Fetch data for a student and open modal
 const openGradeModal = async (studentId) => {
@@ -60,6 +68,43 @@ const openSettingsModal = () => {
 
 const closeSettingsModal = () => {
   showSettingsModal.value = false
+}
+
+// Handle the actual promotion
+const handlePromoteStudents = async (targetClassId) => {
+  showPromoteModal.value = false
+  
+  try {
+    await router.put(route('teacher.students.promote'), {
+      target_class_id: targetClassId
+    })
+    
+    // Show success message
+    Swal.fire({
+      title: 'Success!',
+      text: 'Students have been promoted successfully.',
+      icon: 'success',
+      confirmButtonColor: '#10b981',
+      background: '#1f2937',
+      color: '#f9fafb',
+      customClass: {
+        popup: 'rounded-xl border border-gray-700 shadow-lg',
+      }
+    })
+  } catch (error) {
+    console.error('Promotion failed:', error)
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to promote students.',
+      icon: 'error',
+      confirmButtonColor: '#ef4444',
+      background: '#1f2937',
+      color: '#f9fafb',
+      customClass: {
+        popup: 'rounded-xl border border-gray-700 shadow-lg',
+      }
+    })
+  }
 }
 
 // 🔻 Individual student actions (called from modal)
@@ -457,6 +502,14 @@ function clearAllGrades() {
     @close="closeSettingsModal"
     @unapprove-all="unapproveAll"
     @clear-all-grades="clearAllGrades"
+    @promote-students="promoteStudents"
+  />
+  
+  <!-- Promote Students Modal -->
+  <PromoteStudentsModal
+    :show="showPromoteModal"
+    @close="showPromoteModal = false"
+    @promote="handlePromoteStudents"
   />
 
   <!-- Individual Student Modal Component -->
