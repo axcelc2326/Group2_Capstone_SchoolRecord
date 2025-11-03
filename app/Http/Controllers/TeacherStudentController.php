@@ -8,6 +8,8 @@ use App\Models\Student;
 use App\Models\Grade;
 use App\Models\GradeRemark;
 use App\Models\ClassModel; // Ensure this model exists for your classes
+use App\Models\SF5;
+use App\Models\HonorRoll;
 
 class TeacherStudentController extends Controller
 {
@@ -48,13 +50,23 @@ class TeacherStudentController extends Controller
                     
                     // ✅ Bulk delete all grade remarks for promoted students
                     GradeRemark::whereIn('student_id', $studentIds)->delete();
+
+                    // ✅ Delete the teacher's SF5 and HonorRoll records for their current classes
+                    $classIds = $students->pluck('class_id')->unique();
+                    SF5::whereIn('class_id', $classIds)
+                        ->where('teacher_id', $teacherId)
+                        ->delete();
+
+                    HonorRoll::whereIn('class_id', $classIds)
+                        ->where('teacher_id', $teacherId)
+                        ->delete();
                     
-                    \Log::info("{$promotedCount} students promoted to class {$targetClassId}, grades and remarks cleared");
+                    \Log::info("{$promotedCount} students promoted to class {$targetClassId}, grades, remarks, SF5, and HonorRoll cleared");
                 }
             });
 
             if ($promotedCount > 0) {
-                return back()->with('success', "{$promotedCount} students with grade remarks have been promoted to the new class. All grades and grade remarks have been cleared.");
+                return back()->with('success', "{$promotedCount} students with grade remarks have been promoted to the new class. All grades, grade remarks, SF5, and HonorRoll records have been cleared.");
             } else {
                 return back()->with('error', 'No students with grade remarks found to promote.');
             }
@@ -65,7 +77,7 @@ class TeacherStudentController extends Controller
         }
     }
 
-    // ✅ Unapprove all students in a class and remove their class assignment
+    /** ✅ Unapprove all students in a class and remove their class assignment */
     public function unapproveAll(Request $request)
     {
         $teacherId = auth()->id();
@@ -85,14 +97,19 @@ class TeacherStudentController extends Controller
             // Delete all grades
             $student->grades()->delete();
 
-            // ✅ Delete grade remarks if they exist
+            // ✅ Delete grade remarks
             $student->gradeRemarks()->delete();
         }
 
-        return back()->with('message', 'All students unapproved, grades and grade remarks cleared, and class assignments removed.');
+        // ✅ Delete the teacher's SF5 and HonorRoll records for all their classes
+        $classIds = ClassModel::where('teacher_id', $teacherId)->pluck('id');
+        SF5::whereIn('class_id', $classIds)->delete();
+        HonorRoll::whereIn('class_id', $classIds)->delete();
+
+        return back()->with('message', 'All students unapproved, grades, grade remarks, SF5, and HonorRoll records cleared, and class assignments removed.');
     }
 
-    // ✅ Clear all grades (and grade remarks) for all students in a class
+    /** ✅ Clear all grades (and grade remarks) for all students in a class */
     public function clearAllGrades(Request $request)
     {
         $teacherId = auth()->id();
@@ -108,7 +125,12 @@ class TeacherStudentController extends Controller
         // ✅ Delete all grade remarks for those students
         GradeRemark::whereIn('student_id', $studentIds)->delete();
 
-        return back()->with('message', 'All grades and grade remarks cleared.');
+        // ✅ Delete the teacher's SF5 and HonorRoll records for their classes
+        $classIds = ClassModel::where('teacher_id', $teacherId)->pluck('id');
+        SF5::whereIn('class_id', $classIds)->delete();
+        HonorRoll::whereIn('class_id', $classIds)->delete();
+
+        return back()->with('message', 'All grades, grade remarks, SF5, and HonorRoll records cleared.');
     }
 
     // ✅ Unapprove a single student, clear their grades and remarks, and remove class assignment

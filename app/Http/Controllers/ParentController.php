@@ -70,19 +70,34 @@ class ParentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
         ]);
+
+        // Extract first word from full name (preserve original case)
+        $firstName = explode(' ', trim($validated['name']))[0];
+        
+        // Generate email: firstname@gmail.com (lowercase for email)
+        $email = strtolower($firstName) . '@gmail.com';
+        
+        // Generate password: first 3 letters + _2025 (keeps original case)
+        $password = substr($firstName, 0, 3) . '_2025';
+
+        // Check if email already exists and make it unique if needed
+        $baseEmail = $email;
+        $counter = 1;
+        while (User::where('email', $email)->exists()) {
+            $email = str_replace('@gmail.com', $counter . '@gmail.com', $baseEmail);
+            $counter++;
+        }
 
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'email' => $email,
+            'password' => bcrypt($password),
         ]);
 
-        $user->assignRole('parent'); // 👈 auto parent role
+        $user->assignRole('parent');
 
-        return back()->with('success', 'Parent registered successfully!');
+        return back()->with('success', 'Parent registered successfully! Email: ' . $email . ' | Password: ' . $password);
     }
 
     public function update(Request $request, User $parent)

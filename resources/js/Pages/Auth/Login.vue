@@ -75,10 +75,9 @@ const submit = () => {
                         required
                         autofocus
                         autocomplete="username"
-                        placeholder="parent@gmail.com"
+                        placeholder="Enter your email address"
                     />
                 </div>
-                <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.email" />
             </div>
 
             <!-- Password Field -->
@@ -115,10 +114,12 @@ const submit = () => {
                 </label>
             </div>
 
+            <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.email" />
+            
             <!-- Submit Button -->
             <PrimaryButton
                 type="submit"
-                class="w-full group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                class="w-full group relative overflow-hidden flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 :disabled="form.processing"
             >
                 <div class="relative flex items-center justify-center space-x-2">
