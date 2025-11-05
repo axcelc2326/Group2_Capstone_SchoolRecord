@@ -223,6 +223,16 @@ const isFormValid = computed(() => {
          form.name.trim().length <= 255
 })
 
+// Check for duplicate subject name error
+const duplicateError = computed(() => {
+  return form.errors.name && (
+    form.errors.name.toLowerCase().includes('already') ||
+    form.errors.name.toLowerCase().includes('taken') ||
+    form.errors.name.toLowerCase().includes('exists') ||
+    form.errors.name.toLowerCase().includes('duplicate')
+  )
+})
+
 // Helper function to display grade level in a user-friendly format
 const getGradeLevelDisplay = (gradeLevel) => {
   const gradeLevelMap = {
@@ -289,18 +299,85 @@ const submit = () => {
   form.put(route('subjects.update', props.subject.id), {
     onSuccess: () => {
       Swal.fire({
-        title: 'Success!',
-        text: 'Subject updated successfully.',
+        title: 'Subject Updated!',
+        text: 'Subject has been updated successfully.',
         icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        emit('updated') // Emit updated event for parent component
+        emit('close')
       })
-      emit('updated') // Emit updated event for parent component
-      emit('close')
     },
     onError: (errors) => {
       // Errors are automatically handled by Inertia and will appear in form.errors
       console.log('Validation errors:', errors)
+      
+      // Show specific error for duplicate subject names
+      if (duplicateError.value) {
+        Swal.fire({
+          title: 'Subject Name Exists',
+          text: 'A subject with this name already exists. Please choose a different name.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 focus:ring-4 focus:ring-yellow-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-yellow-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'OK'
+        })
+      } 
+      // Show general error for other validation issues
+      else if (Object.keys(errors).length > 0) {
+        Swal.fire({
+          title: 'Validation Error',
+          text: 'Please check the form and fix any errors.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-red-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'Try Again'
+        })
+      }
     },
     preserveScroll: true,
   })

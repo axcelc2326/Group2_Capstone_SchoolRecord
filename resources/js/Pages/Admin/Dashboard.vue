@@ -95,6 +95,20 @@ const formatCardTitle = (key) => {
   return titles[key] || key.replace('_', ' ');
 };
 
+// Helper function to get card descriptions
+const getCardDescription = (key) => {
+  const descriptions = {
+    total_parents: 'Registered parents actively engaged in the system',
+    total_students: 'Students currently enrolled across all grade levels',
+    total_teachers: 'Active teaching staff members in the institution',
+    total_classes: 'Total number of active classes this academic year',
+    overall_average: 'Institution-wide academic performance percentage',
+    promoted: 'Students who successfully advanced to the next level',
+    retained: 'Students requiring additional academic support'
+  };
+  return descriptions[key] || '';
+};
+
 // Helper function to format date and time
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
@@ -297,22 +311,24 @@ export default {
           <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
           
           <div class="relative p-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
-                  <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+            <div class="flex items-center space-x-4 mb-3">
+              <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
+                <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+              </div>
+              
+              <div class="flex-1 space-y-1">
+                <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
+                  {{ item.value }}
                 </div>
-                
-                <div class="space-y-1">
-                  <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
-                    {{ item.value }}
-                  </div>
-                  <div class="text-sm text-white/70 font-medium">
-                    {{ formatCardTitle(item.key) }}
-                  </div>
+                <div class="text-sm text-white/70 font-medium">
+                  {{ formatCardTitle(item.key) }}
                 </div>
               </div>
             </div>
+            
+            <p class="text-xs lg:text-sm text-white/60 leading-relaxed">
+              {{ getCardDescription(item.key) }}
+            </p>
             
             <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>
@@ -330,22 +346,24 @@ export default {
           <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500', getCardGradient(item.key)]"></div>
           
           <div class="relative p-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-4">
-                <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
-                  <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+            <div class="flex items-center space-x-4 mb-3">
+              <div :class="['w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3', getCardGradient(item.key)]">
+                <component :is="getSummaryIcon(item.key)" class="w-6 h-6 text-white" />
+              </div>
+              
+              <div class="flex-1 space-y-1">
+                <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
+                  {{ item.value }}
                 </div>
-                
-                <div class="space-y-1">
-                  <div class="text-2xl sm:text-3xl font-bold text-white group-hover:text-white/90 transition-colors">
-                    {{ item.value }}
-                  </div>
-                  <div class="text-sm text-white/70 font-medium">
-                    {{ formatCardTitle(item.key) }}
-                  </div>
+                <div class="text-sm text-white/70 font-medium">
+                  {{ formatCardTitle(item.key) }}
                 </div>
               </div>
             </div>
+            
+            <p class="text-xs lg:text-sm text-white/60 leading-relaxed">
+              {{ getCardDescription(item.key) }}
+            </p>
             
             <div class="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-white/5 to-transparent rounded-full transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"></div>
           </div>

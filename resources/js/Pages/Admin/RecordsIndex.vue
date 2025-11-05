@@ -4,6 +4,7 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import { ref, reactive } from 'vue'
 import axios from 'axios'
 import RecordDetailsModal from '@/Components/Admin/RecordDetailsModal.vue'
+import Swal from 'sweetalert2'
 import { FileText, Filter, Eye, Download, CheckCircle, Clock, RefreshCw } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -59,9 +60,56 @@ async function toggleReviewed(type, id, index, isSF5) {
     } else {
       props.honorLists.data[index].status = updatedStatus
     }
+
+    // Show success message
+    Swal.fire({
+      title: 'Status Updated!',
+      text: `Record has been ${updatedStatus === 'reviewed' ? 'marked as reviewed' : 'marked as pending'}.`,
+      icon: 'success',
+      background: '#1f2937',
+      color: '#f9fafb',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK',
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    })
   } catch (err) {
     console.error(err)
-    alert('Unable to update status')
+    Swal.fire({
+      title: 'Update Failed!',
+      text: 'Unable to update record status. Please try again.',
+      icon: 'error',
+      background: '#1f2937',
+      color: '#f9fafb',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'Try Again'
+    })
   }
 }
 

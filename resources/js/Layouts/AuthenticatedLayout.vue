@@ -23,7 +23,8 @@ import {
   Award,
   FileText
 } from 'lucide-vue-next';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import Swal from 'sweetalert2';
 
 const showingNavigationDropdown = ref(false);
 const sidebarCollapsed = ref(false);
@@ -220,7 +221,7 @@ const roleBasedNavigation = computed(() => {
       {
         name: 'Reports Management',
         href: routeUrl('admin.records.index'),
-        icon: FileText, // you can import FileText from lucide-react or similar
+        icon: FileText,
         description: 'All SF5 and Honor Roll submissions'
       },
       {
@@ -246,6 +247,41 @@ const roleBasedNavigation = computed(() => {
 
   return sections;
 });
+
+// Handle logout with SweetAlert2 confirmation
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Sign Out?',
+    text: 'Are you sure you want to sign out?',
+    icon: 'question',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-blue-400'
+    },
+    buttonsStyling: false,
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Sign Out',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.post(route('logout'));
+    }
+  });
+};
 </script>
 
 <template>
@@ -335,13 +371,15 @@ const roleBasedNavigation = computed(() => {
                     Profile Settings
                   </DropdownLink>
                   <hr class="my-2 border-gray-200">
-                  <DropdownLink :href="route('logout')" method="post" as="button" 
-                                class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-300 group hover:text-red-700">
+                  <button 
+                    @click="handleLogout"
+                    class="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-all duration-300 group hover:text-red-700"
+                  >
                     <svg class="w-4 h-4 mr-3 transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
                     Sign Out
-                  </DropdownLink>
+                  </button>
                 </div>
               </template>
             </Dropdown>

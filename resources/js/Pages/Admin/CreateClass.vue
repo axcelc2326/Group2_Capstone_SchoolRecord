@@ -46,23 +46,28 @@ function deleteClass(classItem) {
     title: `Delete "${classItem.name}"?`,
     text: 'This action cannot be undone. All associated data will be permanently removed.',
     icon: 'warning',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
     showCancelButton: true,
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#6b7280',
     confirmButtonText: 'Yes, delete it',
     cancelButtonText: 'Cancel',
     reverseButtons: true,
-    background: '#1f2937', // slate-800
-    color: '#f9fafb',       // gray-50
-    iconColor: '#ef4444',   // red-500
-    backdrop: 'rgba(0,0,0,0.8)',
-    customClass: {
-      popup: 'rounded-xl border border-gray-700 shadow-lg',
-      title: 'text-lg font-semibold',
-      htmlContainer: 'text-gray-300',
-      confirmButton: 'px-4 py-2 rounded-md font-medium',
-      cancelButton: 'px-4 py-2 rounded-md font-medium',
-    }
   }).then((result) => {
     if (result.isConfirmed) {
       isLoading.value = true
@@ -70,30 +75,54 @@ function deleteClass(classItem) {
         onSuccess: () => {
           isLoading.value = false
           Swal.fire({
+            title: 'Class Deleted!',
+            text: `"${classItem.name}" has been permanently removed.`,
             icon: 'success',
-            title: 'Deleted!',
-            text: `"${classItem.name}" has been removed.`,
-            timer: 2000,
-            showConfirmButton: false,
-            toast: true,
-            position: 'top-end',
             background: '#1f2937',
             color: '#f9fafb',
-            iconColor: '#10b981'
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
           })
           reloadClasses()
         },
         onError: () => {
           isLoading.value = false
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
+            title: 'Deletion Failed!',
             text: 'Failed to delete the class. Please try again.',
-            toast: true,
-            position: 'top-end',
+            icon: 'error',
             background: '#1f2937',
             color: '#f9fafb',
-            iconColor: '#ef4444'
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: {
+              popup: 'animate__animated animate__shakeX animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent text-red-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Try Again'
           })
         }
       })

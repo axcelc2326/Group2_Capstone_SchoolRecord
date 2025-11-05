@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   show: Boolean,
@@ -19,9 +20,89 @@ const form = useForm({
 const submit = () => {
   form.post(route('announcements.store'), {
     onSuccess: () => {
-      form.reset()
-      emit('close')
+      Swal.fire({
+        title: 'Announcement Posted!',
+        text: 'Your announcement has been successfully published.',
+        icon: 'success',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        form.reset()
+        emit('close')
+      })
     },
+    onError: (errors) => {
+      // Show specific error for duplicate titles
+      if (form.errors.title && (
+        form.errors.title.toLowerCase().includes('already') ||
+        form.errors.title.toLowerCase().includes('taken') ||
+        form.errors.title.toLowerCase().includes('exists') ||
+        form.errors.title.toLowerCase().includes('duplicate')
+      )) {
+        Swal.fire({
+          title: 'Announcement Title Exists',
+          text: 'An announcement with this title already exists. Please choose a different title.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 focus:ring-4 focus:ring-yellow-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-yellow-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'OK'
+        })
+      } 
+      // Show general error for other validation issues
+      else if (Object.keys(errors).length > 0) {
+        Swal.fire({
+          title: 'Publication Failed',
+          text: 'Failed to publish announcement. Please check your input and try again.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-red-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'Try Again'
+        })
+      }
+    }
   })
 }
 

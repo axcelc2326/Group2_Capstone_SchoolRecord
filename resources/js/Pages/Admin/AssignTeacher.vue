@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Link, useForm } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import { Users, GraduationCap, UserCheck, Plus, Loader } from 'lucide-vue-next'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   teachers: Array,
@@ -21,7 +22,125 @@ const isSubmitting = ref(false)
 const submit = async () => {
   isSubmitting.value = true
   try {
-    await form.post(route('admin.assign-teacher.submit'))
+    // Convert empty string to null for unassigning
+    const formData = {
+      ...form,
+      teacher_id: form.teacher_id === '' ? null : form.teacher_id
+    }
+    
+    await form.post(route('admin.assign-teacher.submit'), {
+      data: formData,
+      onSuccess: () => {
+        const message = formData.teacher_id === null 
+          ? 'Teacher has been successfully unassigned from the class.'
+          : 'Teacher has been successfully assigned to the class.'
+        
+        const title = formData.teacher_id === null 
+          ? 'Teacher Unassigned!'
+          : 'Teacher Assigned!'
+        
+        Swal.fire({
+          title: title,
+          text: message,
+          icon: 'success',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__fadeInDown animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'OK',
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        })
+        // Optionally reset the form after successful submission
+        form.reset()
+      },
+      onError: (errors) => {
+        // Show specific error for assignment conflicts
+        if (form.errors.teacher_id && form.errors.teacher_id.toLowerCase().includes('already')) {
+          Swal.fire({
+            title: 'Assignment Conflict',
+            text: 'This teacher is already assigned to a class. Please choose a different teacher.',
+            icon: 'warning',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: {
+              popup: 'animate__animated animate__shakeX animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 focus:ring-4 focus:ring-yellow-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent text-yellow-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK'
+          })
+        } 
+        // Show general error for other validation issues
+        else if (Object.keys(errors).length > 0) {
+          Swal.fire({
+            title: 'Operation Failed',
+            text: formData.teacher_id === null 
+              ? 'Failed to unassign teacher. Please try again.'
+              : 'Failed to assign teacher. Please check your selection and try again.',
+            icon: 'error',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: {
+              popup: 'animate__animated animate__shakeX animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent text-red-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Try Again'
+          })
+        }
+      }
+    })
+  } catch (error) {
+    // Handle unexpected errors
+    Swal.fire({
+      title: 'Unexpected Error',
+      text: 'An unexpected error occurred. Please try again.',
+      icon: 'error',
+      background: '#1f2937',
+      color: '#f9fafb',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK'
+    })
   } finally {
     isSubmitting.value = false
   }

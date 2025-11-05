@@ -35,42 +35,107 @@ const toggleStatus = (id) => {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
+        title: 'Status Updated!',
+        text: 'The teacher account status has been successfully changed.',
         icon: 'success',
-        title: 'Status updated successfully',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-green-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
         timer: 2000,
+        timerProgressBar: true,
       })
-    }
+    },
+    onError: () => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to update status. Please try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again',
+      })
+    },
   })
 }
 
-const confirmDelete = (teacherId) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will permanently delete the teacher account!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#ef4444',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.delete(route('teachers.destroy', teacherId), {
-        preserveScroll: true,
-        onSuccess: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Teacher deleted successfully',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-          })
-        }
+// ✅ Automatically delete teacher (no confirmation prompt) - same as parents component
+const deleteTeacher = (teacherId) => {
+  router.delete(route('teachers.destroy', teacherId), {
+    preserveScroll: true,
+    onSuccess: () => {
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'The teacher account has been deleted successfully.',
+        icon: 'success',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-green-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 2500,
+        timerProgressBar: true,
       })
-    }
+    },
+    onError: () => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete teacher. Please try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again',
+      })
+    },
   })
 }
 
@@ -86,7 +151,7 @@ const handleModalAction = (action) => {
         toggleStatus(selectedTeacher.value.id)
         break
       case 'delete':
-        confirmDelete(selectedTeacher.value.id)
+        deleteTeacher(selectedTeacher.value.id) // Now uses the automatic delete function
         break
     }
   }

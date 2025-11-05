@@ -43,11 +43,30 @@ const handleToggleStatus = () => {
     title: `${isActive.value ? 'Deactivate' : 'Activate'} Teacher?`,
     text: `This will ${isActive.value ? 'deactivate' : 'activate'} ${props.teacher.name}'s account.`,
     icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: isActive.value ? '#ef4444' : '#10b981',
-    confirmButtonText: `Yes, ${isActive.value ? 'deactivate' : 'activate'}!`,
     background: '#1f2937',
     color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: isActive.value 
+        ? 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200'
+        : 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-blue-400'
+    },
+    buttonsStyling: false,
+    showCancelButton: true,
+    confirmButtonText: `Yes, ${isActive.value ? 'deactivate' : 'activate'}!`,
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
       emit('action', 'toggle-status')
@@ -58,12 +77,24 @@ const handleToggleStatus = () => {
 const handleEdit = () => {
   if (!form.name.trim() || !form.email.trim()) {
     Swal.fire({
-      icon: 'error',
       title: 'Validation Error',
       text: 'Name and email are required.',
+      icon: 'error',
       background: '#1f2937',
       color: '#f9fafb',
-      iconColor: '#ef4444',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK'
     })
     return
   }
@@ -71,12 +102,24 @@ const handleEdit = () => {
   // Check password confirmation if password is provided
   if (form.password && form.password !== form.password_confirmation) {
     Swal.fire({
-      icon: 'error',
       title: 'Validation Error',
       text: 'Password confirmation does not match.',
+      icon: 'error',
       background: '#1f2937',
       color: '#f9fafb',
-      iconColor: '#ef4444',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK'
     })
     return
   }
@@ -84,12 +127,24 @@ const handleEdit = () => {
   // Add minimum password length validation if password is provided
   if (form.password && form.password.length < 8) {
     Swal.fire({
-      icon: 'error',
       title: 'Validation Error',
       text: 'Password must be at least 8 characters long.',
+      icon: 'error',
       background: '#1f2937',
       color: '#f9fafb',
-      iconColor: '#ef4444',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK'
     })
     return
   }
@@ -98,19 +153,87 @@ const handleEdit = () => {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
-        toast: true,
-        position: 'top-end',
+        title: 'Teacher Updated!',
+        text: 'Teacher information has been updated successfully.',
         icon: 'success',
-        title: 'Teacher updated successfully!',
         background: '#1f2937',
         color: '#f9fafb',
-        iconColor: '#22c55e',
-        showConfirmButton: false,
-        timer: 2000,
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
         timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        form.reset('password', 'password_confirmation')
+        emit('close')
       })
-      form.reset('password', 'password_confirmation')
-      emit('close')
+    },
+    onError: (errors) => {
+      // Show specific error for duplicate email
+      if (form.errors.email && (
+        form.errors.email.toLowerCase().includes('already') ||
+        form.errors.email.toLowerCase().includes('taken') ||
+        form.errors.email.toLowerCase().includes('exists') ||
+        form.errors.email.toLowerCase().includes('duplicate')
+      )) {
+        Swal.fire({
+          title: 'Email Already Exists',
+          text: 'A teacher with this email already exists. Please use a different email.',
+          icon: 'warning',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 focus:ring-4 focus:ring-yellow-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-yellow-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'OK'
+        })
+      } 
+      // Show general error for other validation issues
+      else if (Object.keys(errors).length > 0) {
+        Swal.fire({
+          title: 'Update Failed',
+          text: 'Failed to update teacher information. Please check the form and try again.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#f9fafb',
+          backdrop: 'rgba(0, 0, 0, 0.7)',
+          showClass: {
+            popup: 'animate__animated animate__shakeX animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+            title: 'text-2xl font-bold text-white mb-2',
+            htmlContainer: 'text-gray-300',
+            confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+            icon: '!border-none !bg-transparent text-red-500'
+          },
+          buttonsStyling: false,
+          confirmButtonText: 'Try Again'
+        })
+      }
     }
   })
 }
@@ -120,12 +243,28 @@ const handleDelete = () => {
     title: 'Are you sure?',
     text: `This will permanently delete ${props.teacher.name} and all their associated data!`,
     icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#ef4444',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
     background: '#1f2937',
     color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
       emit('action', 'delete')
