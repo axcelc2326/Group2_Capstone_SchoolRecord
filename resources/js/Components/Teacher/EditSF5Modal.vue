@@ -267,6 +267,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import { watch, ref, onMounted, onUnmounted } from 'vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   show: Boolean,
@@ -304,7 +305,61 @@ watch(
 
 const submit = () => {
   form.put(route('sf5.update', props.record.id), {
-    onSuccess: () => handleClose(),
+    onSuccess: () => {
+      Swal.fire({
+        title: 'SF5 Updated!',
+        text: 'The SF5 record has been successfully updated.',
+        icon: 'success',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-gray-600/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        handleClose()
+      })
+    },
+    onError: (errors) => {
+      Swal.fire({
+        title: 'Update Failed!',
+        text: 'Failed to update SF5 record. Please check your input and try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again'
+      })
+    }
   })
 }
 

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 import EditStudentModal from '@/Components/AdminAndTeacher/EditStudentModal.vue'
 
 const props = defineProps({
@@ -58,28 +59,169 @@ const addStudent = () => {
   // Convert class_id to number
   form.class_id = Number(form.class_id)
 
-  form.post(route('parents.students.store', parentId.value), {
-    preserveScroll: true,
-    onSuccess: () => {
-      form.reset()
-      fetchStudents()
+  Swal.fire({
+    title: 'Add Student?',
+    text: 'Are you sure you want to add this student to the parent?',
+    icon: 'question',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Add Student',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+    hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton:
+        'py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+      cancelButton:
+        'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-blue-400'
     },
+    buttonsStyling: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      form.post(route('parents.students.store', parentId.value), {
+        preserveScroll: true,
+        onSuccess: () => {
+          form.reset()
+          fetchStudents()
+
+          Swal.fire({
+            title: 'Student Added!',
+            text: 'The student has been successfully added to the parent.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-green-400'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 2500,
+            timerProgressBar: true
+          })
+        },
+        onError: () => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to add the student. Please check the fields and try again.',
+            icon: 'error',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__shakeX animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-red-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Try Again'
+          })
+        },
+      })
+    }
   })
 }
 
-// Delete student
 const deleteStudent = (studentId) => {
-  if (!parentId.value) return;
+  if (!parentId.value) return
 
-  router.delete(route('parents.students.destroy', { 
-    parent: parentId.value, 
-    student: studentId 
-  }), {
-    preserveScroll: true,
-    onSuccess: () => {
-      fetchStudents();       // optional: refresh students before reload
+  Swal.fire({
+    title: 'Delete Student?',
+    text: "This will permanently remove the student's record and all related data.",
+    icon: 'warning',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+    hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton:
+        'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+      cancelButton:
+        'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-400'
     },
-  });
+    buttonsStyling: false,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(route('parents.students.destroy', {
+        parent: parentId.value,
+        student: studentId,
+      }), {
+        preserveScroll: true,
+        onSuccess: () => {
+          fetchStudents()
+
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The student record has been deleted successfully.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-green-400'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 2500,
+            timerProgressBar: true
+          })
+        },
+        onError: () => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to delete the student. Please try again later.',
+            icon: 'error',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__shakeX animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-red-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Try Again'
+          })
+        },
+      })
+    }
+  })
 }
 
 // Open edit modal

@@ -82,13 +82,24 @@ class StudentController extends Controller
 
     public function destroy($parentId, $studentId)
     {
-        // Find the student belonging to the given parent
+        // 1️⃣ Find the student that belongs to the given parent
         $student = Student::where('id', $studentId)
-                        ->where('parent_id', $parentId)
-                        ->firstOrFail();
+            ->where('parent_id', $parentId)
+            ->firstOrFail();
 
+        // 2️⃣ Delete all related grades (from `grades` table)
+        if ($student->grades()->exists()) {
+            $student->grades()->delete();
+        }
+
+        // 3️⃣ Delete all related grade remarks (from `grade_remarks` table)
+        if ($student->gradeRemarks()->exists()) {
+            $student->gradeRemarks()->delete();
+        }
+
+        // 4️⃣ Finally, delete the student record
         $student->delete();
 
-        return back()->with('message', 'Student deleted successfully.');
+        return back()->with('message', 'Student and all related records deleted successfully.');
     }
 }

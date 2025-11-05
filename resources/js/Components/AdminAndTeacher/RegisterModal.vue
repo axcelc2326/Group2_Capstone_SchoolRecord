@@ -147,25 +147,64 @@ const form = useForm({
   name: '',
 })
 
-function register() {
+const register = () => {
   form.post(route('parents.store'), {
-    preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
-        toast: true,
-        position: 'top-end',
+        title: 'Parent Registered!',
+        text: 'The parent has been successfully added to the system.',
         icon: 'success',
-        title: 'Parent registered successfully!',
         background: '#1f2937',
         color: '#f9fafb',
-        iconColor: '#22c55e',
-        showConfirmButton: false,
-        timer: 2000,
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-gray-600/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
         timerProgressBar: true,
+        didOpen: (popup) => {
+          popup.addEventListener('mouseenter', Swal.stopTimer)
+          popup.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        form.reset()
+        closeModal()
       })
-      form.reset()
-      closeModal()
     },
+    onError: () => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to register parent. Please check the input fields and try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again'
+      })
+    }
   })
 }
 
@@ -179,7 +218,6 @@ function handleBackdropClick(event) {
   }
 }
 
-// Handle ESC key to close modal
 function handleEscape(event) {
   if (event.key === 'Escape') {
     closeModal()

@@ -157,6 +157,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   show: Boolean,
@@ -172,13 +173,64 @@ const form = useForm({
 })
 
 const submit = () => {
-  // use the teacher route
   form.post(route('teacher.announcements.store'), {
     onSuccess: () => {
-      form.reset()
-      emit('saved')
-      closeModal()
+      Swal.fire({
+        title: 'Announcement Posted!',
+        text: 'Your announcement has been successfully shared with the class.',
+        icon: 'success',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-gray-600/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      }).then(() => {
+        form.reset()
+        emit('saved')
+        closeModal()
+      })
     },
+    onError: (errors) => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to post announcement. Please check your input and try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500'
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again'
+      })
+    }
   })
 }
 

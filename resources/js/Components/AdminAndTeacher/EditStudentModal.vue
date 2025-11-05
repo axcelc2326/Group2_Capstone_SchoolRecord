@@ -283,10 +283,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
-import { watch, defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
   show: Boolean,
@@ -296,22 +295,20 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated'])
 
-const modalContent = ref(null)
-
 const form = useForm({
   first_name: '',
-  middle_name: '', // ✅ Added middle name field
+  middle_name: '',
   last_name: '',
   lrn: '',
   gender: '',
   class_id: ''
 })
 
-// Update form whenever student prop changes
+// ✅ Watch for prop changes to fill the form
 watch(() => props.student, (newStudent) => {
   if (newStudent) {
     form.first_name = newStudent.first_name
-    form.middle_name = newStudent.middle_name || '' // ✅ Handle middle name
+    form.middle_name = newStudent.middle_name || ''
     form.last_name = newStudent.last_name
     form.lrn = newStudent.lrn || ''
     form.gender = newStudent.gender || ''
@@ -319,30 +316,90 @@ watch(() => props.student, (newStudent) => {
   }
 }, { immediate: true })
 
+// ✅ Updated submit with SweetAlert confirmation + consistent styling
 const submit = () => {
-  if (!props.student || !props.student.parent_id) return;
+  if (!props.student || !props.student.parent_id) return
 
-  form.put(route('parents.students.update', { 
-    parent: props.student.parent_id, 
-    student: props.student.id 
-  }), {
-    preserveScroll: true,
-    onSuccess: () => {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Student updated successfully',
-        background: '#1f2937',
-        color: '#f9fafb',
-        iconColor: '#22c55e',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-      });
-      emit('close');   // close modal
+  Swal.fire({
+    title: 'Save Changes?',
+    text: 'Are you sure you want to update this student’s information?',
+    icon: 'question',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Update',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+    hideClass: { popup: 'animate__animated animate__fadeOutUp animate__faster' },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton:
+        'py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+      cancelButton:
+        'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-blue-400'
+    },
+    buttonsStyling: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      form.put(route('parents.students.update', {
+        parent: props.student.parent_id,
+        student: props.student.id
+      }), {
+        preserveScroll: true,
+        onSuccess: () => {
+          Swal.fire({
+            title: 'Updated!',
+            text: 'The student information has been updated successfully.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__fadeInDown animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-green-400'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 2500,
+            timerProgressBar: true
+          })
+          emit('updated')
+          emit('close')
+        },
+        onError: () => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update the student. Please try again.',
+            icon: 'error',
+            background: '#1f2937',
+            color: '#f9fafb',
+            backdrop: 'rgba(0, 0, 0, 0.7)',
+            showClass: { popup: 'animate__animated animate__shakeX animate__faster' },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton:
+                'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200',
+              icon: '!border-none !bg-transparent text-red-500'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'Try Again'
+          })
+        }
+      })
     }
-  });
+  })
 }
 
 function closeModal() {
@@ -350,23 +407,14 @@ function closeModal() {
 }
 
 function handleBackdropClick(event) {
-  if (event.target === event.currentTarget) {
-    closeModal()
-  }
+  if (event.target === event.currentTarget) closeModal()
 }
 
-// Handle ESC key to close modal
+// ✅ ESC key closes modal
 function handleEscape(event) {
-  if (event.key === 'Escape') {
-    closeModal()
-  }
+  if (event.key === 'Escape') closeModal()
 }
 
-onMounted(() => {
-  document.addEventListener('keydown', handleEscape)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscape)
-})
+onMounted(() => document.addEventListener('keydown', handleEscape))
+onUnmounted(() => document.removeEventListener('keydown', handleEscape))
 </script>

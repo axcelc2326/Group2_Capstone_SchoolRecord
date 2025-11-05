@@ -27,8 +27,9 @@ const totalParents = computed(() => props.parents?.data?.length || 0)
 
 // Filter & search
 const applyFilters = () => {
-  router.get(route('parents.index'), 
-    { search: search.value, class_id: selectedClass.value }, 
+  router.get(
+    route('parents.index'),
+    { search: search.value, class_id: selectedClass.value },
     { preserveState: true, replace: true }
   )
 }
@@ -54,58 +55,124 @@ const handleParentAction = (action) => {
       toggleStatus(selectedParent.value.id)
       break
     case 'delete':
-      confirmDeleteParent(selectedParent.value.id)
+      deleteParent(selectedParent.value.id)
       break
   }
   showActionsModal.value = false
 }
 
+// ✅ Toggle active/inactive status with modern SweetAlert design
 const toggleStatus = (id) => {
   router.put(route('parents.toggle-status', id), {}, {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
+        title: 'Status Updated!',
+        text: 'The parent account status has been successfully changed.',
         icon: 'success',
-        title: 'Status updated successfully',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-green-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
         timer: 2000,
+        timerProgressBar: true,
       })
-    }
+    },
+    onError: () => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to update status. Please try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again',
+      })
+    },
   })
 }
 
-const confirmDeleteParent = (parentId) => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will permanently delete the parent account!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#ef4444',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    background: '#1f2937',
-    color: '#f9fafb',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.delete(route('parents.destroy', parentId), {
-        preserveScroll: true,
-        onSuccess: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Parent deleted successfully',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-          })
-        }
+
+// ✅ Automatically delete parent (no confirmation prompt)
+const deleteParent = (parentId) => {
+  router.delete(route('parents.destroy', parentId), {
+    preserveScroll: true,
+    onSuccess: () => {
+      Swal.fire({
+        title: 'Deleted!',
+        text: 'The parent account has been deleted successfully.',
+        icon: 'success',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-green-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        timer: 2500,
+        timerProgressBar: true,
       })
-    }
+    },
+    onError: () => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to delete parent. Please try again.',
+        icon: 'error',
+        background: '#1f2937',
+        color: '#f9fafb',
+        backdrop: 'rgba(0, 0, 0, 0.7)',
+        showClass: {
+          popup: 'animate__animated animate__shakeX animate__faster',
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+          title: 'text-2xl font-bold text-white mb-2',
+          htmlContainer: 'text-gray-300',
+          confirmButton:
+            'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+          icon: '!border-none !bg-transparent text-red-500',
+        },
+        buttonsStyling: false,
+        confirmButtonText: 'Try Again',
+      })
+    },
   })
 }
 </script>
+
 
 <template>
   <Head title="Parents Management" />

@@ -81,28 +81,48 @@ const handlePromoteStudents = async (targetClassId) => {
     
     // Show success message
     Swal.fire({
-      title: 'Success!',
+      title: 'Students Promoted!',
       text: 'Students have been promoted successfully.',
       icon: 'success',
-      confirmButtonColor: '#10b981',
       background: '#1f2937',
       color: '#f9fafb',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown animate__faster'
+      },
       customClass: {
-        popup: 'rounded-xl border border-gray-700 shadow-lg',
-      }
+        popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'OK',
+      timer: 3000,
+      timerProgressBar: true,
     })
   } catch (error) {
     console.error('Promotion failed:', error)
     Swal.fire({
-      title: 'Error!',
-      text: 'Failed to promote students.',
+      title: 'Promotion Failed!',
+      text: 'Failed to promote students. Please try again.',
       icon: 'error',
-      confirmButtonColor: '#ef4444',
       background: '#1f2937',
       color: '#f9fafb',
+      backdrop: 'rgba(0, 0, 0, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__shakeX animate__faster'
+      },
       customClass: {
-        popup: 'rounded-xl border border-gray-700 shadow-lg',
-      }
+        popup: 'rounded-2xl shadow-2xl border border-red-500/50 backdrop-blur-lg',
+        title: 'text-2xl font-bold text-white mb-2',
+        htmlContainer: 'text-gray-300',
+        confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+        icon: '!border-none !bg-transparent text-red-500'
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'Try Again'
     })
   }
 }
@@ -118,25 +138,55 @@ function removeStudent() {
     title: 'Are you sure?',
     text: 'This will unapprove the student.',
     icon: 'warning',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
     showCancelButton: true,
     confirmButtonText: 'Yes, unapprove',
     cancelButtonText: 'Cancel',
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#6b7280',
-    background: '#1f2937',
-    color: '#f9fafb',
-    iconColor: '#ef4444',
-    backdrop: 'rgba(0,0,0,0.8)',
-    customClass: {
-      popup: 'rounded-xl border border-gray-700 shadow-lg',
-      title: 'text-lg font-semibold',
-      htmlContainer: 'text-gray-300',
-      confirmButton: 'px-4 py-2 rounded-md font-medium',
-      cancelButton: 'px-4 py-2 rounded-md font-medium',
-    }
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
-      router.put(route('teacher.students.unapprove', { student: studentId }))
+      router.put(route('teacher.students.unapprove', { student: studentId }), {
+        onSuccess: () => {
+          Swal.fire({
+            title: 'Student Unapproved!',
+            text: 'The student has been successfully unapproved.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+          })
+        }
+      })
     }
   })
 }
@@ -148,28 +198,58 @@ function clearGrades() {
   closeIndividualModal()
   
   Swal.fire({
-    title: 'Clear student grades?',
+    title: 'Clear Student Grades?',
     text: 'This will delete all grades for this student.',
     icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, clear',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#6b7280',
     background: '#1f2937',
     color: '#f9fafb',
-    iconColor: '#ef4444',
-    backdrop: 'rgba(0,0,0,0.8)',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
     customClass: {
-      popup: 'rounded-xl border border-gray-700 shadow-lg',
-      title: 'text-lg font-semibold',
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
       htmlContainer: 'text-gray-300',
-      confirmButton: 'px-4 py-2 rounded-md font-medium',
-      cancelButton: 'px-4 py-2 rounded-md font-medium',
-    }
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
+    showCancelButton: true,
+    confirmButtonText: 'Yes, clear grades',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
-      router.delete(route('teacher.students.clearGrades', { student: studentId }))
+      router.delete(route('teacher.students.clearGrades', { student: studentId }), {
+        onSuccess: () => {
+          Swal.fire({
+            title: 'Grades Cleared!',
+            text: 'All grades for this student have been cleared.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+          })
+        }
+      })
     }
   })
 }
@@ -180,30 +260,59 @@ function unapproveAll() {
   
   showSettingsModal.value = false
   Swal.fire({
-    title: 'Unapprove ALL students?',
+    title: 'Unapprove ALL Students?',
     text: 'This will unapprove all students in your class.',
     icon: 'warning',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
     showCancelButton: true,
     confirmButtonText: 'Yes, unapprove all',
     cancelButtonText: 'Cancel',
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#6b7280',
-    background: '#1f2937',
-    color: '#f9fafb',
-    iconColor: '#ef4444',
-    backdrop: 'rgba(0,0,0,0.8)',
-    customClass: {
-      popup: 'rounded-xl border border-gray-700 shadow-lg',
-      title: 'text-lg font-semibold',
-      htmlContainer: 'text-gray-300',
-      confirmButton: 'px-4 py-2 rounded-md font-medium',
-      cancelButton: 'px-4 py-2 rounded-md font-medium',
-    }
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
       const studentIds = props.students.data.map((s) => s.id)
       router.put(route('teacher.students.unapproveAll'), {
         student_ids: studentIds,
+        onSuccess: () => {
+          Swal.fire({
+            title: 'All Students Unapproved!',
+            text: 'All students have been successfully unapproved.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+          })
+        }
       })
     }
   })
@@ -214,31 +323,60 @@ function clearAllGrades() {
   
   showSettingsModal.value = false
   Swal.fire({
-    title: 'Clear ALL grades?',
+    title: 'Clear ALL Grades?',
     text: 'This will remove all grades for all students shown.',
     icon: 'warning',
+    background: '#1f2937',
+    color: '#f9fafb',
+    backdrop: 'rgba(0, 0, 0, 0.7)',
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown animate__faster'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp animate__faster'
+    },
+    customClass: {
+      popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
+      title: 'text-2xl font-bold text-white mb-2',
+      htmlContainer: 'text-gray-300',
+      confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      icon: '!border-none !bg-transparent text-yellow-500'
+    },
+    buttonsStyling: false,
     showCancelButton: true,
     confirmButtonText: 'Yes, clear all grades',
     cancelButtonText: 'Cancel',
-    confirmButtonColor: '#ef4444',
-    cancelButtonColor: '#6b7280',
-    background: '#1f2937',
-    color: '#f9fafb',
-    iconColor: '#ef4444',
-    backdrop: 'rgba(0,0,0,0.8)',
-    customClass: {
-      popup: 'rounded-xl border border-gray-700 shadow-lg',
-      title: 'text-lg font-semibold',
-      htmlContainer: 'text-gray-300',
-      confirmButton: 'px-4 py-2 rounded-md font-medium',
-      cancelButton: 'px-4 py-2 rounded-md font-medium',
-    }
+    reverseButtons: true,
   }).then((result) => {
     if (result.isConfirmed) {
       const studentIds = props.students.data.map((s) => s.id)
       router.delete(route('teacher.students.clearAllGrades'), {
         data: { student_ids: studentIds },
         preserveScroll: true,
+        onSuccess: () => {
+          Swal.fire({
+            title: 'All Grades Cleared!',
+            text: 'All grades for all students have been cleared.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#f9fafb',
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border border-green-500/50 backdrop-blur-lg',
+              title: 'text-2xl font-bold text-white mb-2',
+              htmlContainer: 'text-gray-300',
+              confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
+              icon: '!border-none !bg-transparent'
+            },
+            buttonsStyling: false,
+            confirmButtonText: 'OK',
+            timer: 3000,
+            timerProgressBar: true,
+          })
+        }
       })
     }
   })
