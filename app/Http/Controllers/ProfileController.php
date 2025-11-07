@@ -46,34 +46,30 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+        
+        // Prevent deletion if user is admin
+        if ($user->hasRole('admin')) {
+            return redirect()->back()->withErrors(['error' => 'Admin users cannot be deleted.']);
+        }
+
         $request->validate([
             'password' => ['required', 'current_password'],
         ]);
 
-        $user = $request->user();
-
         DB::transaction(function () use ($user) {
             if ($user->hasRole('parent')) {
                 foreach ($user->students as $student) {
-                    // Delete related grade remarks
                     $student->gradeRemarks()->delete();
-
-                    // Delete related grades
                     $student->grades()->delete();
-
-                    // Delete the student itself
                     $student->delete();
                 }
             }
 
-            // Log out before deleting the user
             Auth::logout();
-
-            // Delete the parent user itself
             $user->delete();
         });
 
-        // Invalidate session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

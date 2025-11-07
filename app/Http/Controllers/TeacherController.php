@@ -148,7 +148,7 @@ class TeacherController extends Controller
 
         $students = $query->orderBy('last_name')
             ->with('grades', 'parent') // load parent relationship
-            ->paginate(40)
+            ->paginate(25)
             ->withQueryString();
 
         $students->getCollection()->transform(function ($student) {

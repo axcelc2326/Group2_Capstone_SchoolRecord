@@ -12,26 +12,45 @@ class ParentController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $classId = $request->input('class_id'); // selected class filter
+        $classId = $request->input('class_id');
+        $hasStudents = $request->input('has_students'); // New filter: 'with_students', 'without_students', or null for all
 
-        // Filtered parents query
-        $parentQuery = User::role('parent')
+        // Filtered parents query - explicitly exclude teacher and admin roles
+        $parentQuery = User::whereHas('roles', function ($query) {
+                $query->where('name', 'parent');
+            })
             ->with(['students.class'])
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
-            ->when($classId, function ($query, $classId) {
-                $query->whereHas('students', function ($q) use ($classId) {
-                    $q->where('class_id', $classId);
-                });
+            ->when($classId !== null, function ($query) use ($classId) {
+                if ($classId === 'null') {
+                    $query->whereHas('students', function ($q) {
+                        $q->whereNull('class_id');
+                    });
+                } else {
+                    $query->whereHas('students', function ($q) use ($classId) {
+                        $q->where('class_id', $classId);
+                    });
+                }
+            })
+            ->when($hasStudents !== null, function ($query) use ($hasStudents) {
+                if ($hasStudents === 'without_students') {
+                    $query->whereDoesntHave('students');
+                } elseif ($hasStudents === 'with_students') {
+                    $query->whereHas('students');
+                }
+                // If 'all' or any other value, don't apply any student existence filter
             });
 
         // Paginated parents (with filters)
         $parents = $parentQuery->paginate(50)->withQueryString();
 
-        // ✅ Total parents ever created (all with parent role, ignoring filters)
-        $totalMadeParents = User::role('parent')->count();
+        // ✅ Total parents ever created - also use the same explicit filter
+        $totalMadeParents = User::whereHas('roles', function ($query) {
+            $query->where('name', 'parent');
+        })->count();
 
         // All classes for dropdown
         $classes = ClassModel::select('id', 'name', 'grade_level')->get();
@@ -39,10 +58,11 @@ class ParentController extends Controller
         return Inertia::render('Register/Index', [
             'parents' => $parents,
             'classes' => $classes,
-            'totalMadeParents' => $totalMadeParents, // 👈 pass to frontend
+            'totalMadeParents' => $totalMadeParents,
             'filters' => [
                 'search' => $search,
                 'class_id' => $classId,
+                'has_students' => $hasStudents, // Add the new filter to filters array
             ],
         ]);
     }

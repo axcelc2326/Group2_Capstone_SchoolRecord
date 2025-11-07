@@ -20,7 +20,6 @@ defineProps({
 const form = useForm({
     email: '',
     password: '',
-    remember: false,
 });
 
 const submit = () => {
@@ -100,18 +99,6 @@ const submit = () => {
                     />
                 </div>
                 <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.password" />
-            </div>
-
-            <!-- Remember Me & Forgot Password -->
-            <div class="flex items-center bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2 hover:bg-white/10 transition-all duration-300">
-                <Checkbox 
-                    name="remember" 
-                    v-model:checked="form.remember"
-                    class="h-4 w-4 text-blue-500 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-transparent border-white/30 rounded bg-white/10 backdrop-blur-xl transition-all duration-300"
-                />
-                <label class="ml-2 text-xs text-white/70 cursor-pointer select-none hover:text-white/90 transition-colors duration-300 font-medium">
-                    Keep me signed in
-                </label>
             </div>
 
             <InputError class="mt-1 text-xs text-red-300 bg-red-500/10 backdrop-blur-xl border border-red-400/20 rounded-lg px-2 py-1" :message="form.errors.email" />

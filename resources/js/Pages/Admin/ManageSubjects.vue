@@ -1,25 +1,23 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, Link } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import EditSubjectModal from '@/Components/Admin/EditSubjectModal.vue'
 import CreateSubjectModal from '@/Components/Admin/CreateSubjectModal.vue'
 import Swal from 'sweetalert2'
-import { BookOpen, Plus, Edit, Trash2 } from 'lucide-vue-next'
+import { BookOpen, Search, Filter, Plus, Edit, Trash2, MoreVertical } from 'lucide-vue-next'
 
 const props = defineProps({
-  subjects: Object, // Laravel paginator
-  filters: Object,  // passed from backend (grade_level)
+  subjects: Object,
+  filters: Object,
 })
 
 const showEditModal = ref(false)
 const showCreateModal = ref(false)
 const selectedSubject = ref(null)
 
-// Filters - removed search
-const filters = ref({
-  grade_level: props.filters.grade_level || '',
-})
+// Filters
+const grade_level = ref(props.filters.grade_level || '')
 
 // Statistics
 const totalSubjects = computed(() => props.subjects?.total || 0)
@@ -40,15 +38,12 @@ function destroySubject(subject) {
     showClass: {
       popup: 'animate__animated animate__fadeInDown animate__faster'
     },
-    hideClass: {
-      popup: 'animate__animated animate__fadeOutUp animate__faster'
-    },
     customClass: {
       popup: 'rounded-2xl shadow-2xl border border-yellow-500/50 backdrop-blur-lg',
       title: 'text-2xl font-bold text-white mb-2',
       htmlContainer: 'text-gray-300',
       confirmButton: 'py-3 px-6 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 focus:ring-4 focus:ring-red-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
-      cancelButton: 'py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
+      cancelButton: 'py-3 px-6 border border-gray-300 text-gray-300 font-semibold rounded-xl shadow-sm hover:bg-gray-800 hover:shadow-md transform transition-all duration-200 mr-3',
       icon: '!border-none !bg-transparent text-yellow-500'
     },
     buttonsStyling: false,
@@ -59,6 +54,7 @@ function destroySubject(subject) {
   }).then((result) => {
     if (result.isConfirmed) {
       router.delete(route('subjects.destroy', subject.id), {
+        preserveScroll: true,
         onSuccess: () => {
           Swal.fire({
             title: 'Subject Deleted!',
@@ -75,18 +71,13 @@ function destroySubject(subject) {
               title: 'text-2xl font-bold text-white mb-2',
               htmlContainer: 'text-gray-300',
               confirmButton: 'py-3 px-6 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 focus:ring-4 focus:ring-green-500/50 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200',
-              icon: '!border-none !bg-transparent'
+              icon: '!border-none !bg-transparent text-green-500'
             },
             buttonsStyling: false,
             confirmButtonText: 'OK',
             timer: 3000,
             timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
           })
-          reloadSubjects()
         },
         onError: () => {
           Swal.fire({
@@ -115,12 +106,8 @@ function destroySubject(subject) {
   })
 }
 
-function reloadSubjects() {
-  router.reload({ only: ['subjects'] })
-}
-
 function applyFilters() {
-  router.get(route('subjects.index'), filters.value, {
+  router.get(route('subjects.index'), { grade_level: grade_level.value }, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -128,6 +115,7 @@ function applyFilters() {
 
 // Grade level options
 const gradeOptions = [
+  { value: '', label: 'All Grade Levels' },
   { value: 'K1', label: 'Kinder 1' },
   { value: 'K2', label: 'Kinder 2' },
   ...Array.from({ length: 6 }, (_, i) => ({ value: (i + 1).toString(), label: `Grade ${i + 1}` }))
@@ -135,119 +123,134 @@ const gradeOptions = [
 </script>
 
 <template>
-  <Head title="Subjects" />
-  
+  <Head title="Subjects Management" />
+
   <AuthenticatedLayout>
     <template #header>
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
-        <h2 class="text-2xl font-bold text-white bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-          📚 Subject Management
-        </h2>
-        <div class="flex items-center space-x-4">
-          <!-- Quick Stats -->
-          <div class="hidden md:flex items-center space-x-3 text-sm">
-            <div class="backdrop-blur-sm bg-blue-500/20 border border-blue-300/30 px-3 py-1 rounded-full">
-              <span class="text-blue-100">{{ totalSubjects }} Subjects</span>
-            </div>
+      <div class="space-y-1">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-3xl font-bold text-white">
+              Subjects Management
+            </h2>
+            <p class="text-white/70 mt-1">
+              Manage and oversee subject curriculum
+            </p>
           </div>
+          <BookOpen class="w-8 h-8 text-white/60" />
         </div>
       </div>
     </template>
 
-    <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       
-      <!-- Top Action Bar -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6 shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          
-          <!-- Filter Section -->
-          <div class="flex items-center space-x-3">
-            <!-- Grade Level Filter -->
-            <div class="relative">
-              <select
-                v-model="filters.grade_level"
-                @change="applyFilters"
-                class="appearance-none w-64 px-4 py-2.5 pr-10 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20 text-white focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+      <!-- Header Stats -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3">
+          <div class="text-2xl font-bold text-white">{{ totalSubjects }}</div>
+          <div class="text-sm text-white/70">Total Subjects</div>
+        </div>
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3">
+          <div class="text-2xl font-bold text-white">{{ subjects?.data?.length || 0 }}</div>
+          <div class="text-sm text-white/70">Currently Showing</div>
+        </div>
+      </div>
+
+      <!-- Search and Filters Card -->
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6">
+        <div class="flex items-center space-x-3 mb-6">
+          <Search class="w-5 h-5 text-blue-300" />
+          <div>
+            <h3 class="text-lg font-semibold text-white">Filter Subjects</h3>
+            <p class="text-sm text-white/70 mt-1">Filter subjects by grade level</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4">
+          <!-- Grade Level Filter -->
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-semibold text-white">
+              Grade Level
+            </label>
+            <select
+              v-model="grade_level"
+              @change="applyFilters"
+              class="w-full appearance-none backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
+            >
+              <option 
+                v-for="opt in gradeOptions" 
+                :key="opt.value" 
+                :value="opt.value"
+                class="bg-gray-800 text-white"
               >
-                <option value="" class="bg-gray-800 text-white">All Levels</option>
-                <option v-for="opt in gradeOptions" :key="opt.value" :value="opt.value" class="bg-gray-800 text-white">
-                  {{ opt.label }}
-                </option>
-              </select>
-              <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="md:col-span-1 space-y-2">
+            <label class="block text-sm font-semibold text-white">
+              Actions
+            </label>
+            <div class="flex gap-2">
+              <button 
+                @click="applyFilters"
+                class="flex-1 backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center justify-center gap-2"
+              >
+                <Filter class="w-4 h-4" />
+                Apply
+              </button>
+              <button
+                @click="showCreateModal = true"
+                class="flex-1 backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center justify-center gap-2"
+              >
+                <Plus class="w-4 h-4" />
+                Add Subject
+              </button>
             </div>
           </div>
-
-          <!-- Add Subject Button -->
-          <div class="relative">
-            <button
-              @click="showCreateModal = true"
-              class="group relative inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/20"
-            >
-              <Plus class="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-200" />
-              Add Subject
-            </button>
-          </div>
         </div>
       </div>
 
-      <!-- Mobile Stats (visible on small screens) -->
-      <div class="md:hidden">
-        <div class="backdrop-blur-md bg-blue-500/10 border border-blue-300/30 rounded-xl p-4 text-center">
-          <div class="text-2xl font-bold text-blue-100">{{ totalSubjects }}</div>
-          <div class="text-sm text-blue-200">Total Subjects</div>
-        </div>
-      </div>
-
-      <!-- Subjects List -->
-      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+      <!-- Subjects Table Card -->
+      <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl overflow-hidden">
         <div class="px-6 py-4 border-b border-white/10">
           <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-              <BookOpen class="w-4 h-4 text-white" />
-            </div>
+            <BookOpen class="w-5 h-5 text-purple-300" />
             <div>
-              <h3 class="text-lg font-semibold text-white">Total Subjects</h3>
-              <p class="text-sm text-white/70 mt-1">{{ subjects.data.length }} subjects shown</p>
+              <h3 class="text-lg font-semibold text-white">Subjects Directory</h3>
+              <p class="text-sm text-white/70 mt-1">{{ subjects?.data?.length || 0 }} subjects available</p>
             </div>
           </div>
         </div>
 
-        <div v-if="subjects.data.length > 0">
-          <!-- Desktop View -->
+        <div v-if="subjects?.data?.length">
+          <!-- Desktop Table -->
           <div class="hidden md:block overflow-x-auto">
             <table class="min-w-full divide-y divide-white/10">
               <thead class="bg-white/5">
                 <tr>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">#</th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Subject</th>
-                  <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Grade Level</th>
-                  <th class="px-6 py-4 text-right text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Subject</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Grade Level</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/10">
-                <tr 
-                  v-for="(subject, index) in subjects.data" 
-                  :key="subject.id" 
+                <tr
+                  v-for="subject in subjects.data"
+                  :key="subject.id"
                   class="hover:bg-white/5 transition-colors duration-150"
                 >
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-white">{{ index + 1 + (subjects.current_page - 1) * subjects.per_page }}</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                      <div class="flex-shrink-0 h-12 w-12">
-                        <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg">
-                          {{ subject.name.charAt(0).toUpperCase() }}
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-medium text-sm">
+                          {{ subject.name.charAt(0) }}
                         </div>
                       </div>
                       <div class="ml-4">
                         <div class="text-sm font-medium text-white">{{ subject.name }}</div>
-                        <div class="text-xs text-white/60">Subject</div>
                       </div>
                     </div>
                   </td>
@@ -258,21 +261,25 @@ const gradeOptions = [
                       <span v-else>Grade {{ subject.grade_level }}</span>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                    <button
-                      @click="openEdit(subject)"
-                      class="inline-flex items-center px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-400/30 hover:border-amber-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
-                    >
-                      <Edit class="w-4 h-4 mr-1" />
-                      Edit
-                    </button>
-                    <button
-                      @click="destroySubject(subject)"
-                      class="inline-flex items-center px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
-                    >
-                      <Trash2 class="w-4 h-4 mr-1" />
-                      Delete
-                    </button>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center space-x-2">
+                      <button
+                        @click="openEdit(subject)"
+                        class="flex items-center gap-1.5 p-2 rounded-lg backdrop-blur-sm bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 hover:bg-indigo-500/30 transition-all duration-150"
+                        title="Edit"
+                      >
+                        <Edit class="w-4 h-4" />
+                        <span class="text-xs">Edit</span>
+                      </button>
+                      <button
+                        @click="destroySubject(subject)"
+                        class="flex items-center gap-1.5 p-2 rounded-lg backdrop-blur-sm bg-red-500/20 border border-red-400/30 text-red-100 hover:bg-red-500/30 transition-all duration-150"
+                        title="Delete"
+                      >
+                        <Trash2 class="w-4 h-4" />
+                        <span class="text-xs">Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -282,18 +289,18 @@ const gradeOptions = [
           <!-- Mobile Cards -->
           <div class="md:hidden divide-y divide-white/10">
             <div 
-              v-for="(subject, index) in subjects.data" 
+              v-for="subject in subjects.data" 
               :key="subject.id"
-              class="p-6 hover:bg-white/5 transition-colors duration-150"
+              class="p-4 hover:bg-white/5 transition-colors duration-150"
             >
-              <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center space-x-3">
-                  <div class="flex-shrink-0 h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg">
-                    {{ subject.name.charAt(0).toUpperCase() }}
+                  <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-medium text-sm">
+                    {{ subject.name.charAt(0) }}
                   </div>
                   <div>
-                    <h4 class="text-white font-medium">{{ subject.name }}</h4>
-                    <p class="text-sm text-white/70">
+                    <h4 class="text-white font-medium text-sm">{{ subject.name }}</h4>
+                    <p class="text-xs text-white/70">
                       <span v-if="subject.grade_level === 'K1'">Kinder 1</span>
                       <span v-else-if="subject.grade_level === 'K2'">Kinder 2</span>
                       <span v-else>Grade {{ subject.grade_level }}</span>
@@ -301,73 +308,120 @@ const gradeOptions = [
                   </div>
                 </div>
               </div>
-              <div class="flex space-x-2">
+              
+              <div class="flex space-x-2 pt-3 border-t border-white/10">
                 <button
                   @click="openEdit(subject)"
-                  class="flex-1 inline-flex justify-center items-center px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-400/30 hover:border-amber-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                  class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 hover:bg-indigo-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
                 >
-                  <Edit class="w-4 h-4 mr-2" />
+                  <Edit class="w-4 h-4" />
                   Edit
                 </button>
                 <button
                   @click="destroySubject(subject)"
-                  class="flex-1 inline-flex justify-center items-center px-3 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-400/30 hover:border-red-400/50 rounded-lg transition-all duration-150 backdrop-blur-sm"
+                  class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-red-500/20 border border-red-400/30 text-red-100 hover:bg-red-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
                 >
-                  <Trash2 class="w-4 h-4 mr-2" />
+                  <Trash2 class="w-4 h-4" />
                   Delete
                 </button>
               </div>
             </div>
           </div>
-
-          <!-- Pagination -->
-          <div v-if="subjects.links && subjects.links.length > 3" class="px-6 py-4 border-t border-white/10 flex justify-between items-center">
-            <div class="text-sm text-white/70">
-              Showing {{ subjects.from || 0 }} to {{ subjects.to || 0 }} of {{ subjects.total || 0 }} subjects
-            </div>
-            <div class="flex space-x-1">
-              <template v-for="(link, index) in subjects.links" :key="index">
-                <span v-if="!link.url" class="px-3 py-2 text-white/40 cursor-not-allowed text-sm" v-html="link.label"></span>
-                <button v-else @click="router.get(link.url, {}, { preserveState: true })" class="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150"
-                  :class="link.active ? 'bg-blue-500/30 text-white border border-blue-400/50' : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'" v-html="link.label" />
-              </template>
-            </div>
-          </div>
         </div>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <BookOpen class="mx-auto h-12 w-12 text-white/40 mb-4" />
-          <h3 class="mt-2 text-sm font-medium text-white/80">
-            {{ filters.grade_level ? 'No subjects found' : 'No subjects created yet' }}
+        <div v-else class="text-center py-8">
+          <BookOpen class="mx-auto h-10 w-10 text-white/40 mb-3" />
+          <h3 class="text-sm font-medium text-white/80">
+            {{ grade_level ? 'No subjects found' : 'No subjects created yet' }}
           </h3>
           <p class="mt-1 text-sm text-white/60">
-            {{ filters.grade_level ? 'Try adjusting your grade level filter.' : 'Create your first subject to get started.' }}
+            {{ grade_level ? 'Try adjusting your grade level filter.' : 'Start by creating your first subject.' }}
           </p>
           <button
-            v-if="!filters.grade_level"
+            v-if="!grade_level"
             @click="showCreateModal = true"
-            class="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            class="mt-4 inline-flex items-center px-4 py-2 backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30"
           >
             <Plus class="w-4 h-4 mr-2" />
             Create Subject
           </button>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div v-if="subjects?.links?.length > 3" class="flex justify-center">
+        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl p-2">
+          <div class="flex space-x-2">
+            <Link
+              v-for="link in subjects.links"
+              :key="link.url"
+              :href="link.url || ''"
+              v-html="link.label"
+              class="px-4 py-2 rounded-lg transition-all duration-150 text-sm"
+              :class="{
+                'backdrop-blur-sm bg-blue-500/30 text-blue-100 border border-blue-400/50': link.active,
+                'text-white/70 hover:bg-white/10 hover:text-white border border-transparent': !link.active && link.url,
+                'text-white/40 cursor-not-allowed': !link.url
+              }"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </AuthenticatedLayout>
 
   <!-- Modals -->
-  <CreateSubjectModal
-    :show="showCreateModal"
+  <CreateSubjectModal 
+    :show="showCreateModal" 
     @close="showCreateModal = false"
-    @created="reloadSubjects"
+    @created="router.reload({ only: ['subjects'] })"
   />
-
   <EditSubjectModal
+    v-if="selectedSubject"
     :show="showEditModal"
     :subject="selectedSubject"
     @close="showEditModal = false"
-    @updated="reloadSubjects"
+    @updated="router.reload({ only: ['subjects'] })"
   />
 </template>
+
+<style scoped>
+/* Glassmorphism base effects */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+  border-radius: 0.375rem;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+</style>

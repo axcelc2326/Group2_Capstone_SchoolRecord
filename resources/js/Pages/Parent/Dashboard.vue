@@ -70,7 +70,7 @@ const formatCardTitle = (key) => {
 const getCardDescription = (key) => {
   const descriptions = {
     total_registered: 'Children registered in your account',
-    total_enrolled: 'Currently enrolled this semester',
+    total_enrolled: 'Currently enrolled this academic year',
     average_grade: 'Overall performance across all children',
     promoted: 'Children advanced to next grade',
     failed: 'Children requiring additional support'
@@ -115,6 +115,15 @@ const getStatusInfo = (child) => {
       icon: CheckCircle,
       label: 'Promoted',
       glow: 'shadow-emerald-500/25'
+    };
+  } else if (child.status === 'In Progress') {
+    return {
+      bgColor: 'bg-blue-500/20',
+      textColor: 'text-blue-100',
+      borderColor: 'border-blue-400/30',
+      icon: Clock, // Assuming you have a Clock icon
+      label: 'In Progress',
+      glow: 'shadow-blue-500/25'
     };
   } else {
     return {

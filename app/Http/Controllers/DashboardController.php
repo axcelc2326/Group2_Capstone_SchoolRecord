@@ -165,7 +165,7 @@ class DashboardController extends Controller
                 $average = round($student->grades->avg('grade') ?? 0, 2);
                 return [
                     'id' => $student->id,
-                    'name' => "{$student->first_name} {$student->last_name}",
+                    'name' => "{$student->first_name} {$student->middle_name} {$student->last_name}",
                     'average' => $average,
                 ];
             })->sortByDesc('average')->take(3)->values();
@@ -234,8 +234,26 @@ class DashboardController extends Controller
 
                     // Get latest grade remark
                     $latestRemark = $student->gradeRemarks->first();
-                    $finalAverage = $latestRemark->final_average ?? $avg;
-                    $remarkText = $latestRemark->remarks ?? ($avg >= 75 ? 'Passed' : 'Failed');
+                    
+                    // Check if there are any grades or remarks
+                    $hasGrades = $student->grades->isNotEmpty();
+                    $hasRemark = !is_null($latestRemark);
+                    
+                    // Determine final average and remarks
+                    if (!$hasGrades && !$hasRemark) {
+                        // No grades and no remarks yet - show "In Progress"
+                        $finalAverage = 0;
+                        $remarkText = 'In Progress';
+                    } else {
+                        $finalAverage = $latestRemark->final_average ?? $avg;
+                        
+                        // Use remark from GradeRemarks if available, otherwise calculate based on average
+                        if ($hasRemark) {
+                            $remarkText = $latestRemark->remarks ?? ($avg >= 75 ? 'Promoted' : 'Failed');
+                        } else {
+                            $remarkText = $avg >= 75 ? 'Promoted' : 'Failed';
+                        }
+                    }
 
                     return [
                         'name' => "{$student->first_name} {$student->middle_name} {$student->last_name}",
@@ -244,13 +262,22 @@ class DashboardController extends Controller
                         'average' => $avg,
                         'final_average' => $finalAverage,
                         'remarks' => $remarkText,
-                        'status' => $finalAverage >= 75 ? 'Promoted' : 'Failed',
+                        'status' => $remarkText,
                     ];
                 });
 
-                // 🧾 Count promoted and failed students
-                $promotedCount = $childrenPerformance->where('status', 'Promoted')->count();
-                $failedCount = $childrenPerformance->where('status', 'Failed')->count();
+                // 🧾 Count promoted and failed students FROM GRADE REMARKS
+                $studentIds = $students->pluck('id');
+                
+                // Get promoted count from GradeRemarks
+                $promotedCount = GradeRemark::whereIn('student_id', $studentIds)
+                    ->where('remarks', 'Promoted')
+                    ->count();
+
+                // Get retained count from GradeRemarks (equivalent to failed)
+                $failedCount = GradeRemark::whereIn('student_id', $studentIds)
+                    ->where('remarks', 'Retained')
+                    ->count();
 
                 // 📢 Latest announcements (class-specific + global)
                 $classIds = $students->pluck('class_id')->unique();
@@ -278,8 +305,8 @@ class DashboardController extends Controller
                         'total_registered' => $totalRegistered,
                         'total_enrolled' => $totalEnrolled,
                         'average_grade' => $averageGrade,
-                        'promoted' => $promotedCount,   // ✅ New
-                        'failed' => $failedCount,       // ✅ New
+                        'promoted' => $promotedCount,   // ✅ From GradeRemarks
+                        'failed' => $failedCount,       // ✅ From GradeRemarks (as Retained)
                     ],
                     'childrenPerformance' => $childrenPerformance,
                     'announcements' => $announcements,
