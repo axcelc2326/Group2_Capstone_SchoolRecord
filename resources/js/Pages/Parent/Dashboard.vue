@@ -4,7 +4,6 @@ import { Head } from '@inertiajs/vue3';
 import { 
   Users, 
   UserCheck, 
-  Star,
   TrendingUp,
   TrendingDown,
   BookOpen,
@@ -35,7 +34,6 @@ const getSummaryIcon = (key) => {
   const icons = {
     total_registered: Users,
     total_enrolled: UserCheck,
-    average_grade: Star,
     promoted: TrendingUp,
     failed: TrendingDown
   };
@@ -47,7 +45,6 @@ const getCardGradient = (key) => {
   const gradients = {
     total_registered: 'from-violet-500 to-purple-600',
     total_enrolled: 'from-emerald-500 to-teal-600',
-    average_grade: 'from-amber-500 to-orange-600',
     promoted: 'from-green-500 to-emerald-600',
     failed: 'from-rose-500 to-red-600',
   };
@@ -59,7 +56,6 @@ const formatCardTitle = (key) => {
   const titles = {
     total_registered: 'Total Registered',
     total_enrolled: 'Enrolled',
-    average_grade: 'Avg Grade',
     promoted: 'Promoted',
     failed: 'Needs Help'
   };
@@ -71,7 +67,6 @@ const getCardDescription = (key) => {
   const descriptions = {
     total_registered: 'Children registered in your account',
     total_enrolled: 'Currently enrolled this academic year',
-    average_grade: 'Overall performance across all children',
     promoted: 'Children advanced to next grade',
     failed: 'Children requiring additional support'
   };
@@ -220,30 +215,6 @@ const getStatusInfo = (child) => {
                 </div>
               </div>
 
-              <!-- Card 3: Average Grade -->
-              <div class="group relative overflow-hidden rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl hover:shadow-2xl active:bg-white/15 transition-all duration-300">
-                <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-active:opacity-10 transition-opacity duration-300', getCardGradient('average_grade')]"></div>
-                
-                <div class="relative p-4">
-                  <div class="flex items-center space-x-3 mb-2">
-                    <div :class="['w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center shadow-md', getCardGradient('average_grade')]">
-                      <component :is="getSummaryIcon('average_grade')" class="w-5 h-5 text-white" />
-                    </div>
-                    <div class="flex-1">
-                      <div class="text-2xl font-bold text-white">
-                        {{ summary.average_grade || 'N/A' }}
-                      </div>
-                      <div class="text-xs text-white/70 font-medium">
-                        {{ formatCardTitle('average_grade') }}
-                      </div>
-                    </div>
-                  </div>
-                  <p class="text-xs text-white/60 leading-relaxed">
-                    {{ getCardDescription('average_grade') }}
-                  </p>
-                </div>
-              </div>
-
               <!-- Card 4: Promoted -->
               <div class="group relative overflow-hidden rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl hover:shadow-2xl active:bg-white/15 transition-all duration-300">
                 <div :class="['absolute inset-0 bg-gradient-to-br opacity-0 group-active:opacity-10 transition-opacity duration-300', getCardGradient('promoted')]"></div>
@@ -296,12 +267,11 @@ const getStatusInfo = (child) => {
             <!-- Tablet & Desktop: Grid layout -->
             <div class="hidden sm:block space-y-4 lg:space-y-6">
               <!-- First Row -->
-              <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              <div class="grid grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6">
                 <div
                   v-for="(item, index) in [
                     { key: 'total_registered', value: summary.total_registered || 0 },
                     { key: 'total_enrolled', value: summary.total_enrolled || 0 },
-                    { key: 'average_grade', value: summary.average_grade || 'N/A' }
                   ]"
                   :key="item.key"
                   class="group relative overflow-hidden rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl hover:shadow-3xl hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 cursor-pointer"

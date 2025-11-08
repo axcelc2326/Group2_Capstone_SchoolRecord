@@ -41,7 +41,7 @@ const getGradeDisplay = (grade) => {
   if (!grade || grade === '—') return '—';
   const numGrade = parseFloat(grade);
   if (numGrade <= 74) return 'F';
-  return grade;
+  return Math.round(numGrade); // Removed decimal
 };
 
 const calculateSubjectAverage = (grades, subject) => {
@@ -49,7 +49,7 @@ const calculateSubjectAverage = (grades, subject) => {
   if (subjectGrades.length === 0) return '—';
   
   const sum = subjectGrades.reduce((acc, g) => acc + parseFloat(g.grade), 0);
-  return (sum / subjectGrades.length).toFixed(1);
+  return Math.round(sum / subjectGrades.length); // Removed decimal
 };
 
 const getGradeStats = (grades) => {
@@ -110,7 +110,7 @@ const summary = computed(() => {
   let averageGPA = '—';
   if (validGrades.length > 0) {
     const sum = validGrades.reduce((acc, g) => acc + parseFloat(g.grade), 0);
-    averageGPA = (sum / validGrades.length).toFixed(1);
+    averageGPA = Math.round(sum / validGrades.length); // Removed decimal
   }
 
   return {
@@ -120,6 +120,11 @@ const summary = computed(() => {
     average_gpa: averageGPA
   };
 });
+
+// Get unique subjects for table
+const getUniqueSubjects = (grades) => {
+  return [...new Set(grades.map(g => g.subject))].filter(subject => subject);
+};
 </script>
 
 <template>
@@ -237,7 +242,7 @@ const summary = computed(() => {
                       </button>
                   </div>
                   
-                  <!-- Detailed Grades Section -->
+                  <!-- Detailed Grades Section - Table Format -->
                   <div v-if="expandedStudents.has(student.id) && student.grades && student.grades.length > 0" 
                        class="border-t border-white/10 p-4 space-y-4 bg-white/5">
                       
@@ -275,15 +280,67 @@ const summary = computed(() => {
                           </div>
                       </div>
 
-                      <!-- Subjects Performance -->
+                      <!-- Subjects Performance Table -->
                       <div>
                           <h4 class="text-white font-semibold mb-3 flex items-center space-x-2 text-sm">
                               <BookOpen class="w-4 h-4" />
                               <span>Subject Performance</span>
                           </h4>
-                          <div class="space-y-3">
+                          
+                          <!-- Desktop Table -->
+                          <div class="hidden md:block overflow-x-auto">
+                              <table class="w-full border-collapse">
+                                  <thead>
+                                      <tr class="border-b border-white/20">
+                                          <th class="text-left py-3 px-4 text-white font-semibold text-sm bg-white/5">
+                                              Subject
+                                          </th>
+                                          <th v-for="q in quarters" :key="q" class="text-center py-3 px-4 text-white font-semibold text-sm bg-white/5">
+                                              {{ q }}
+                                          </th>
+                                          <th class="text-center py-3 px-4 text-white font-semibold text-sm bg-white/5">
+                                              Average
+                                          </th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr 
+                                          v-for="subject in getUniqueSubjects(student.grades)" 
+                                          :key="subject"
+                                          class="border-b border-white/10 hover:bg-white/5 transition-colors"
+                                      >
+                                          <td class="py-3 px-4 text-white font-medium text-sm">
+                                              {{ subject }}
+                                          </td>
+                                          <td 
+                                              v-for="q in quarters" 
+                                              :key="q"
+                                              class="text-center py-3 px-4"
+                                          >
+                                              <div 
+                                                  :class="getGradeColor(student.grades.find(g => g.subject === subject && g.quarter === q)?.grade)"
+                                                  class="inline-block px-3 py-2 rounded text-sm font-bold border min-w-[60px]"
+                                              >
+                                                  {{ getGradeDisplay(student.grades.find(g => g.subject === subject && g.quarter === q)?.grade) }}
+                                              </div>
+                                          </td>
+                                          <td class="text-center py-3 px-4">
+                                              <div 
+                                                  :class="getGradeColor(calculateSubjectAverage(student.grades, subject))"
+                                                  class="inline-block px-3 py-2 rounded text-sm font-bold border min-w-[60px]"
+                                              >
+                                                  {{ calculateSubjectAverage(student.grades, subject) }}
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                              </table>
+                          </div>
+
+                          <!-- Mobile Cards -->
+                          <div class="md:hidden space-y-3">
                               <div 
-                                  v-for="subject in [...new Set(student.grades.map(g => g.subject))]" 
+                                  v-for="subject in getUniqueSubjects(student.grades)" 
                                   :key="subject"
                                   class="backdrop-blur-sm bg-black/10 rounded-lg border border-white/20 overflow-hidden"
                               >
@@ -424,5 +481,19 @@ button {
   .transition-transform {
     transition: none;
   }
+}
+
+/* Table styling */
+table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+th, td {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th:last-child, td:last-child {
+  border-right: none;
 }
 </style>

@@ -408,7 +408,7 @@ const hasValidChartData = (classData) => {
                               <!-- Overall Average -->
                               <div class="text-right">
                                   <div class="text-3xl font-bold text-white mb-1">
-                                      {{ getOverallAverage(classData).toFixed(1) }}%
+                                      {{ getOverallAverage(classData) }}%
                                   </div>
                                   <div class="text-white/70 text-sm">Overall Average</div>
                               </div>
@@ -443,7 +443,7 @@ const hasValidChartData = (classData) => {
                                       <div class="text-white/70 text-xs mb-1">Top Subject</div>
                                       <div class="font-medium text-white text-sm mb-1">{{ classData.top_subject || 'N/A' }}</div>
                                       <div class="text-blue-300 text-xs">
-                                          {{ classData.subject_averages && classData.top_subject ? classData.subject_averages[classData.top_subject]?.toFixed(1) : '0' }}% Average
+                                          {{ classData.subject_averages && classData.top_subject ? classData.subject_averages[classData.top_subject] : '0' }}% Average
                                       </div>
                                   </div>
                               </div>
@@ -457,7 +457,7 @@ const hasValidChartData = (classData) => {
                                       <div class="text-white/70 text-xs mb-1">Focus Area</div>
                                       <div class="font-medium text-white text-sm mb-1">{{ classData.low_subject || 'N/A' }}</div>
                                       <div class="text-amber-300 text-xs">
-                                          {{ classData.subject_averages && classData.low_subject ? classData.subject_averages[classData.low_subject]?.toFixed(1) : '0' }}% Average
+                                          {{ classData.subject_averages && classData.low_subject ? classData.subject_averages[classData.low_subject] : '0' }}% Average
                                       </div>
                                   </div>
                               </div>
@@ -550,7 +550,7 @@ const hasValidChartData = (classData) => {
                                   
                                   <div class="flex items-center justify-between">
                                       <div class="text-2xl font-bold text-white">
-                                          {{ (average || 0).toFixed(1) }}%
+                                          {{ (average || 0)}}%
                                       </div>
                                       <div :class="['px-2 py-1 rounded text-xs font-medium border', getPerformanceLevel(average || 0).color]">
                                           {{ getPerformanceLevel(average || 0).label }}

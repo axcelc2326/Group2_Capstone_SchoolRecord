@@ -19,97 +19,97 @@ class DashboardController extends Controller
         $role = $user->getRoleNames()->first();
 
         switch ($role) {
-            //Admin Dashboard
-            case 'admin':
-                // 🏆 Get top 3 performing classes
-                $topClasses = ClassModel::with('students.grades')
-                    ->get()
-                    ->map(function ($class) {
-                        $allGrades = $class->students->flatMap->grades;
-                        $average = $allGrades->avg('grade') ?? 0;
-                        return [
-                            'id'          => $class->id,
-                            'name'        => $class->name,
-                            'grade_level' => $class->grade_level,
-                            'average'     => round($average, 2),
-                        ];
-                    })
-                    ->sortByDesc('average')
-                    ->take(5)
-                    ->values();
+        //Admin Dashboard
+        case 'admin':
+            // 🏆 Get top 3 performing classes
+            $topClasses = ClassModel::with('students.grades')
+                ->get()
+                ->map(function ($class) {
+                    $allGrades = $class->students->flatMap->grades;
+                    $average = $allGrades->avg('grade') ?? 0;
+                    return [
+                        'id'          => $class->id,
+                        'name'        => $class->name,
+                        'grade_level' => $class->grade_level,
+                        'average'     => round($average), // Removed decimal places
+                    ];
+                })
+                ->sortByDesc('average')
+                ->take(5)
+                ->values();
 
-                // 📊 Summary info
-                $summary = [
-                    'total_classes'   => ClassModel::count(),
-                    'total_students'  => Student::count(),
-                    'total_teachers'  => User::role('teacher')->count(),
-                    'total_parents'   => User::role('parent')->count(),
-                    'overall_average' => round(Grade::avg('grade') ?? 0, 2),
-                ];
+            // 📊 Summary info
+            $summary = [
+                'total_classes'   => ClassModel::count(),
+                'total_students'  => Student::count(),
+                'total_teachers'  => User::role('teacher')->count(),
+                'total_parents'   => User::role('parent')->count(),
+                'overall_average' => round(Grade::avg('grade') ?? 0), // Removed decimal places
+            ];
 
-                // ✅ Promotion & Retention
-                $promoted = GradeRemark::where('remarks', 'Promoted')->count();
-                $retained = GradeRemark::where('remarks', 'Retained')->count();
+            // ✅ Promotion & Retention
+            $promoted = GradeRemark::where('remarks', 'Promoted')->count();
+            $retained = GradeRemark::where('remarks', 'Retained')->count();
 
-                // ✅ Honor percentages
-                $studentsWithRemarks = GradeRemark::with('student')->get();
-                $total = max($studentsWithRemarks->count(), 1); // avoid division by zero
+            // ✅ Honor percentages
+            $studentsWithRemarks = GradeRemark::with('student')->get();
+            $total = max($studentsWithRemarks->count(), 1); // avoid division by zero
 
-                $withHonors        = $studentsWithRemarks->whereBetween('final_average', [90, 94.99])->count();
-                $withHighHonors    = $studentsWithRemarks->whereBetween('final_average', [95, 97.99])->count();
-                $withHighestHonors = $studentsWithRemarks->whereBetween('final_average', [98, 100])->count();
-                $nonHonors         = $total - ($withHonors + $withHighHonors + $withHighestHonors);
+            $withHonors        = $studentsWithRemarks->whereBetween('final_average', [90, 94.99])->count();
+            $withHighHonors    = $studentsWithRemarks->whereBetween('final_average', [95, 97.99])->count();
+            $withHighestHonors = $studentsWithRemarks->whereBetween('final_average', [98, 100])->count();
+            $nonHonors         = $total - ($withHonors + $withHighHonors + $withHighestHonors);
 
-                $honorPercentages = [
-                    'with_honors'         => round(($withHonors / $total) * 100, 2),
-                    'with_high_honors'    => round(($withHighHonors / $total) * 100, 2),
-                    'with_highest_honors' => round(($withHighestHonors / $total) * 100, 2),
-                    'non_honor'           => round(($nonHonors / $total) * 100, 2),
-                ];
+            $honorPercentages = [
+                'with_honors'         => round(($withHonors / $total) * 100, 2),
+                'with_high_honors'    => round(($withHighHonors / $total) * 100, 2),
+                'with_highest_honors' => round(($withHighestHonors / $total) * 100, 2),
+                'non_honor'           => round(($nonHonors / $total) * 100, 2),
+            ];
 
-                // 🌟 Top 5 performing students
-                $topStudents = Student::with('class', 'grades')
-                    ->get()
-                    ->map(function ($student) {
-                        $average = $student->grades->avg('grade') ?? 0;
+            // 🌟 Top 5 performing students
+            $topStudents = Student::with('class', 'grades')
+                ->get()
+                ->map(function ($student) {
+                    $average = $student->grades->avg('grade') ?? 0;
 
-                        return [
-                            'id'          => $student->id,
-                            'name'        => $student->first_name . ' ' . $student->last_name,
-                            'class'       => $student->class->name ?? '',
-                            'grade_level' => $student->class->grade_level ?? '',
-                            'average'     => round($average, 2),
-                        ];
-                    })
-                    ->sortByDesc('average')
-                    ->take(5)
-                    ->values();
+                    return [
+                        'id'          => $student->id,
+                        'name'        => $student->first_name . ' ' . $student->last_name,
+                        'class'       => $student->class->name ?? '',
+                        'grade_level' => $student->class->grade_level ?? '',
+                        'average'     => round($average), // Removed decimal places
+                    ];
+                })
+                ->sortByDesc('average')
+                ->take(5)
+                ->values();
 
-                // 📢 Latest announcements
-                $announcements = Announcement::with('creator:id,name')
-                    ->latest()
-                    ->take(5)
-                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
-                    ->map(function ($announcement) {
-                        return [
-                            'id'         => $announcement->id,
-                            'title'      => $announcement->title,
-                            'body'       => $announcement->body,
-                            'created_at' => $announcement->created_at->toDateString(),
-                            'created_by' => $announcement->creator->name ?? 'Unknown',
-                        ];
-                    });
+            // 📢 Latest announcements
+            $announcements = Announcement::with('creator:id,name')
+                ->latest()
+                ->take(5)
+                ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                ->map(function ($announcement) {
+                    return [
+                        'id'         => $announcement->id,
+                        'title'      => $announcement->title,
+                        'body'       => $announcement->body,
+                        'created_at' => $announcement->created_at->toDateString(),
+                        'created_by' => $announcement->creator->name ?? 'Unknown',
+                    ];
+                });
 
-                // 🎯 Send to Inertia Vue page
-                return Inertia::render('Admin/Dashboard', [
-                    'topClasses'       => $topClasses,
-                    'summary'          => $summary,
-                    'announcements'    => $announcements,
-                    'promoted'         => $promoted,
-                    'retained'         => $retained,
-                    'honorPercentages' => $honorPercentages,
-                    'topStudents'      => $topStudents,
-                ]);
+            // 🎯 Send to Inertia Vue page
+            return Inertia::render('Admin/Dashboard', [
+                'topClasses'       => $topClasses,
+                'summary'          => $summary,
+                'announcements'    => $announcements,
+                'promoted'         => $promoted,
+                'retained'         => $retained,
+                'honorPercentages' => $honorPercentages,
+                'topStudents'      => $topStudents,
+            ]);
 
 
             //Teacher Dashboard
@@ -146,7 +146,7 @@ class DashboardController extends Controller
             $totalSubjects = $subjects->count();
 
             // ✅ Class average
-            $classAverage = round($class->students->flatMap->grades->avg('grade') ?? 0, 2);
+            $classAverage = round($class->students->flatMap->grades->avg('grade'));
 
             // ✅ Subject performance (avg per subject)
             $subjectAverages = [];
@@ -162,7 +162,7 @@ class DashboardController extends Controller
 
             // ✅ Top 3 students (by average)
             $topStudents = $class->students->map(function ($student) {
-                $average = round($student->grades->avg('grade') ?? 0, 2);
+                $average = round($student->grades->avg('grade'));
                 return [
                     'id' => $student->id,
                     'name' => "{$student->first_name} {$student->middle_name} {$student->last_name}",
@@ -222,15 +222,11 @@ class DashboardController extends Controller
                 $totalRegistered = $students->count(); 
                 $totalEnrolled = $totalRegistered; 
 
-                // 📊 Overall average grade
-                $enrolledGrades = $students->flatMap->grades;
-                $averageGrade = round($enrolledGrades->avg('grade') ?? 0, 2);
-
                 // 👦 Individual child performance with class name, grade level, and remarks
                 $childrenPerformance = $students->map(function ($student) {
                     $className = $student->class->name ?? 'No Class Assigned';
                     $gradeLevel = $student->class->grade_level ?? 'No Grade Level';
-                    $avg = round($student->grades->avg('grade') ?? 0, 2);
+                    $avg = round($student->grades->avg('grade') ?? 0); // Removed decimal
 
                     // Get latest grade remark
                     $latestRemark = $student->gradeRemarks->first();
@@ -260,7 +256,7 @@ class DashboardController extends Controller
                         'class_name' => $className,
                         'grade_level' => $gradeLevel,
                         'average' => $avg,
-                        'final_average' => $finalAverage,
+                        'final_average' => round($finalAverage), // Removed decimal
                         'remarks' => $remarkText,
                         'status' => $remarkText,
                     ];
@@ -304,7 +300,6 @@ class DashboardController extends Controller
                     'summary' => [
                         'total_registered' => $totalRegistered,
                         'total_enrolled' => $totalEnrolled,
-                        'average_grade' => $averageGrade,
                         'promoted' => $promotedCount,   // ✅ From GradeRemarks
                         'failed' => $failedCount,       // ✅ From GradeRemarks (as Retained)
                     ],

@@ -133,10 +133,10 @@ class GradeController extends Controller
                     return [
                         'subject' => $grade->subject?->name,
                         'quarter' => $grade->quarter,
-                        'grade'   => $grade->grade,
+                        'grade'   => round($grade->grade), // Removed decimal
                     ];
                 }),
-                'final_average'  => $latestRemark->final_average ?? round($student->grades->avg('grade') ?? 0, 2),
+                'final_average'  => $latestRemark->final_average ?? round($student->grades->avg('grade') ?? 0), // Removed decimal
                 'remarks'        => $latestRemark->remarks ?? 'In Progress',
             ];
         });

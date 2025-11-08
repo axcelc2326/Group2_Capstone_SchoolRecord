@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, router } from '@inertiajs/vue3'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import EditHonorRollModal from '@/Components/Teacher/EditHonorRollModal.vue'
 import { Award, Download, Edit, Trash2, Plus, Loader } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
@@ -26,6 +26,21 @@ const form = ref({
 const showEdit = ref(false)
 const selectedRecord = ref(null)
 const isSubmitting = ref(false)
+
+// ✅ School year recommendations
+const currentYear = new Date().getFullYear()
+const schoolYearOptions = computed(() => {
+  const options = []
+  for (let i = -2; i <= 2; i++) {
+    const year = currentYear + i
+    options.push(`${year} - ${year + 1}`)
+  }
+  return options
+})
+
+const setSchoolYear = (schoolYear) => {
+  form.value.school_year = schoolYear
+}
 
 // ✅ Auto-select teacher's class if only one
 onMounted(() => {
@@ -258,6 +273,22 @@ function refreshRecords() {
                 class="w-full backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-200"
                 required
               />
+              
+              <!-- School Year Recommendations -->
+              <div class="mt-2">
+                <p class="text-xs text-white/60 mb-2">Quick select:</p>
+                <div class="flex gap-2">
+                  <button
+                    v-for="option in schoolYearOptions"
+                    :key="option"
+                    type="button"
+                    @click="setSchoolYear(option)"
+                    class="flex-1 text-xs backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/20 text-white px-2 py-2 rounded-lg transition-all duration-150 hover:scale-105 min-w-0"
+                  >
+                    {{ option }}
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Principal Name -->

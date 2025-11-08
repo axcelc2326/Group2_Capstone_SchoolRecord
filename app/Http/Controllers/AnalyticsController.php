@@ -48,13 +48,13 @@ class AnalyticsController extends Controller
                     ->filter(fn($grade) => is_numeric($grade) && $grade >= 0 && $grade <= 100);
 
                 if ($grades->isNotEmpty()) {
-                    $average = round($grades->avg(), 2);
+                    $average = round($grades->avg()); // Removed decimal places
                     $subjectAverages[$subject->name] = $average;
                     $subjectStats[$subject->name] = [
-                        'average' => $average,
+                        'average' => $average, // Removed decimal places
                         'count' => $grades->count(),
-                        'min' => $grades->min(),
-                        'max' => $grades->max()
+                        'min' => round($grades->min()), // Removed decimal places
+                        'max' => round($grades->max()) // Removed decimal places
                     ];
                 }
             }
@@ -64,7 +64,7 @@ class AnalyticsController extends Controller
             $retained = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'retained')->count();
 
             $totalStudents = $classes->sum(fn($c) => $c->students->count());
-            $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg(), 2) : 0;
+            $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg()) : 0; // Removed decimal places
 
             $sortedSubjects = collect($subjectAverages)->sort();
             $topSubject = $sortedSubjects->sortDesc()->keys()->first();
@@ -80,7 +80,7 @@ class AnalyticsController extends Controller
                 'total_students' => $totalStudents,
                 'promoted' => $promoted,
                 'retained' => $retained,
-                'overall_average' => $overallAverage,
+                'overall_average' => $overallAverage, // Already rounded above
                 'subjects_count' => count($subjectAverages),
                 'classes_count' => $classes->count(),
                 'has_data' => !empty($subjectAverages),
@@ -116,7 +116,7 @@ class AnalyticsController extends Controller
                 'total_students' => $analytics->sum('total_students'),
                 'total_promoted' => $analytics->sum('promoted'),
                 'total_retained' => $analytics->sum('retained'),
-                'overall_school_average' => $analytics->avg('overall_average'),
+                'overall_school_average' => round($analytics->avg('overall_average')), // Removed decimal places
             ]
         ]);
     }
@@ -138,8 +138,8 @@ class AnalyticsController extends Controller
             // ✅ Latest computed remark
             $latestRemark = $student->gradeRemarks->sortByDesc('created_at')->first();
 
-            // ✅ Fallback if final_average not yet stored
-            $computedAverage = round($student->grades->avg('grade') ?? 0, 2);
+            // ✅ Fallback if final_average not yet stored - removed decimal
+            $computedAverage = round($student->grades->avg('grade') ?? 0);
 
             return [
                 'id'            => $student->id,
@@ -189,13 +189,13 @@ class AnalyticsController extends Controller
                     ->filter(fn($grade) => is_numeric($grade) && $grade >= 0 && $grade <= 100);
 
                 if ($grades->isNotEmpty()) {
-                    $average = round($grades->avg(), 2);
+                    $average = round($grades->avg()); // Removed decimal places
                     $subjectAverages[$subject->name] = $average;
                     $subjectStats[$subject->name] = [
                         'average' => $average,
                         'count'   => $grades->count(),
-                        'min'     => $grades->min(),
-                        'max'     => $grades->max(),
+                        'min'     => round($grades->min()), // Removed decimal places
+                        'max'     => round($grades->max()), // Removed decimal places
                     ];
                 }
             }
@@ -206,7 +206,7 @@ class AnalyticsController extends Controller
             $retained = $remarks->filter(fn($r) => strtolower(trim($r->remarks ?? '')) === 'retained')->count();
 
             $totalStudents = $class->students->count();
-            $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg(), 2) : 0;
+            $overallAverage = !empty($subjectAverages) ? round(collect($subjectAverages)->avg()) : 0; // Removed decimal places
 
             $sortedSubjects = collect($subjectAverages)->sort();
             $topSubject = $sortedSubjects->sortDesc()->keys()->first();
@@ -236,7 +236,7 @@ class AnalyticsController extends Controller
             'total_students'    => $classes->sum(fn($c) => $c->students->count()),
             'total_promoted'    => $analytics->sum('promoted'),
             'total_retained'    => $analytics->sum('retained'),
-            'overall_average'   => round($analytics->avg('overall_average') ?? 0, 2),
+            'overall_average'   => round($analytics->avg('overall_average')), // Removed decimal places
         ];
 
         return Inertia::render('Analytics/TeacherIndex', [

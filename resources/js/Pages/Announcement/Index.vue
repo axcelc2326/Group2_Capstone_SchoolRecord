@@ -102,7 +102,6 @@ const getCreatorInitials = (name) => {
                 <option value="class" class="bg-gray-800 text-white">Class Only</option>
               </select>
               <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <ChevronDown class="h-5 w-5 text-white/60" />
               </div>
             </div>
           </div>

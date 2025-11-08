@@ -21,7 +21,7 @@ const getBadgeColorClass = (grade) => {
   return 'bg-red-500/20 border-red-300/30'
 }
 
-// Calculate quarterly averages
+// Calculate quarterly averages as whole numbers
 const calculateQuarterlyAverage = (quarter) => {
   const quarterGrades = props.grades[quarter]
   if (!quarterGrades) return null
@@ -29,15 +29,23 @@ const calculateQuarterlyAverage = (quarter) => {
   const validGrades = Object.values(quarterGrades).filter(grade => grade && grade !== '—').map(g => parseFloat(g))
   if (validGrades.length === 0) return null
   
-  return (validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length).toFixed(2)
+  const average = validGrades.reduce((sum, grade) => sum + grade, 0) / validGrades.length
+  return Math.round(average) // Round to whole number
 }
 
-// Calculate overall GPA
+// Calculate overall GPA as whole number
 const calculateOverallGPA = () => {
   const allAverages = quarters.map(q => calculateQuarterlyAverage(q)).filter(avg => avg !== null)
   if (allAverages.length === 0) return null
   
-  return (allAverages.reduce((sum, avg) => sum + parseFloat(avg), 0) / allAverages.length).toFixed(2)
+  const gpa = allAverages.reduce((sum, avg) => sum + parseFloat(avg), 0) / allAverages.length
+  return Math.round(gpa) // Round to whole number
+}
+
+// Format grade display to remove decimals
+const formatGrade = (grade) => {
+  if (!grade || grade === '—') return '—'
+  return Math.round(parseFloat(grade)).toString()
 }
 
 // Go back function
@@ -127,7 +135,7 @@ const goBack = () => {
         <div class="flex items-center space-x-3 mb-6">
           <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
           <div>
@@ -220,7 +228,7 @@ const goBack = () => {
                       v-if="props.grades[q]?.[subject.id] && props.grades[q][subject.id] !== '—'"
                       :class="[(props.grades[q][subject.id]), 'text-lg font-bold']"
                     >
-                      {{ props.grades[q][subject.id] }}
+                      {{ formatGrade(props.grades[q][subject.id]) }}
                     </span>
                     <span 
                       v-else
@@ -263,7 +271,7 @@ const goBack = () => {
                     v-if="props.grades[q]?.[subject.id] && props.grades[q][subject.id] !== '—'"
                     :class="[(props.grades[q][subject.id]), 'text-xl font-bold']"
                   >
-                    {{ props.grades[q][subject.id] }}
+                    {{ formatGrade(props.grades[q][subject.id]) }}
                   </div>
                   <div 
                     v-else
