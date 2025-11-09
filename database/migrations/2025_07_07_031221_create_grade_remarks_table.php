@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('class_id');
-            $table->decimal('final_average', 5, 2);
+            $table->unsignedInteger('final_average'); // Changed to unsigned integer for whole numbers
             $table->string('remarks'); // Promoted, Retained, etc.
             $table->timestamps();
 

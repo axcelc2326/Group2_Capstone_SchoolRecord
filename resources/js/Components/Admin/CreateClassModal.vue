@@ -216,10 +216,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
-  show: Boolean,
+  show: {
+    type: Boolean,
+    default: false
+  }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'created'])
 
 const modalContent = ref(null)
 
@@ -270,7 +273,7 @@ const handleClose = () => {
   }
 }
 
-function handleBackdropClick(event) {
+const handleBackdropClick = (event) => {
   if (event.target === event.currentTarget && !form.processing) {
     handleClose()
   }
@@ -319,6 +322,7 @@ const submit = () => {
         form.reset()
         form.clearErrors()
         emit('close')
+        emit('created') // Emit created event
       })
     },
     onError: (errors) => {
@@ -376,7 +380,7 @@ const submit = () => {
 }
 
 // Handle ESC key to close modal
-function handleEscape(event) {
+const handleEscape = (event) => {
   if (event.key === 'Escape' && !form.processing) {
     handleClose()
   }

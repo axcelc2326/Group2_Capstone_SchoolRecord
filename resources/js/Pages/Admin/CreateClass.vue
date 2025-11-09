@@ -3,9 +3,10 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import CreateClassModal from '@/Components/Admin/CreateClassModal.vue'
 import EditClassModal from '@/Components/Admin/EditClassModal.vue'
+import ViewSubjectsModal from '@/Components/Admin/ViewSubjectsModal.vue'
 import { ref, watch, computed } from 'vue'
 import Swal from 'sweetalert2'
-import { Search, GraduationCap, Filter, Plus, Edit, Trash2 } from 'lucide-vue-next'
+import { Search, GraduationCap, Filter, Plus, Edit, Trash2, BookOpen } from 'lucide-vue-next'
 
 const page = usePage()
 const props = defineProps({
@@ -18,6 +19,7 @@ const props = defineProps({
 const classes = ref(props.classes)
 const showModal = ref(false)
 const showEditModal = ref(false)
+const showSubjectsModal = ref(false)
 const selectedClass = ref(null)
 
 // Filters
@@ -34,6 +36,12 @@ watch(
     classes.value = newVal
   }
 )
+
+// View subjects function
+function viewSubjects(classItem) {
+  selectedClass.value = classItem
+  showSubjectsModal.value = true
+}
 
 // Delete class
 function deleteClass(classItem) {
@@ -309,6 +317,15 @@ const gradeOptions = [
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center space-x-2">
+                      <!-- View Subjects Button - Added before Edit -->
+                      <button
+                        @click="viewSubjects(classItem)"
+                        class="flex items-center gap-1.5 p-2 rounded-lg backdrop-blur-sm bg-green-500/20 border border-green-400/30 text-green-100 hover:bg-green-500/30 transition-all duration-150"
+                        title="View Subjects"
+                      >
+                        <BookOpen class="w-4 h-4" />
+                        <span class="text-xs">Subjects</span>
+                      </button>
                       <button
                         @click="openEdit(classItem)"
                         class="flex items-center gap-1.5 p-2 rounded-lg backdrop-blur-sm bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 hover:bg-indigo-500/30 transition-all duration-150"
@@ -362,6 +379,14 @@ const gradeOptions = [
               </div>
               
               <div class="flex space-x-2 pt-3 border-t border-white/10">
+                <!-- View Subjects Button - Added before Edit -->
+                <button
+                  @click="viewSubjects(classItem)"
+                  class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-green-500/20 border border-green-400/30 text-green-100 hover:bg-green-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
+                >
+                  <BookOpen class="w-4 h-4" />
+                  Subjects
+                </button>
                 <button
                   @click="openEdit(classItem)"
                   class="flex-1 py-2 px-3 rounded-lg backdrop-blur-sm bg-indigo-500/20 border border-indigo-400/30 text-indigo-100 hover:bg-indigo-500/30 transition-all duration-150 text-sm flex items-center justify-center gap-2"
@@ -435,6 +460,15 @@ const gradeOptions = [
     :classItem="selectedClass"
     @close="showEditModal = false"
     @updated="router.reload({ only: ['classes'] })"
+  />
+  
+  <!-- View Subjects Modal -->
+  <ViewSubjectsModal
+    v-if="selectedClass"
+    :show="showSubjectsModal"
+    :classData="selectedClass"
+    :key="selectedClass.id"
+    @close="showSubjectsModal = false"
   />
 </template>
 

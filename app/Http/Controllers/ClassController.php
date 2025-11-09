@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\ClassModel;
+use App\Models\Subject;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 
@@ -102,5 +103,25 @@ class ClassController extends Controller
         $class->delete();
 
         return back()->with('success', 'Class deleted, students unassigned, and related data cleared successfully!');
+    }
+
+    public function viewSubjects($id)
+    {
+        try {
+            $class = ClassModel::findOrFail($id);
+            
+            $subjects = Subject::where('grade_level', $class->grade_level)->get();
+
+            return response()->json([
+                'success' => true,
+                'class' => $class,
+                'subjects' => $subjects,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load class subjects',
+            ], 500);
+        }
     }
 }

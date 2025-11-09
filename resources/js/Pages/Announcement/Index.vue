@@ -160,16 +160,16 @@ const getExpiryStatus = (announcement) => {
                   :class="showExpired 
                     ? 'bg-blue-500 border-blue-400' 
                     : 'bg-white/10 border-white/20'"
-                  class="w-11 h-6 rounded-full border transition-colors duration-200"
+                  class="w-14 h-8 rounded-full border transition-colors duration-200"
                 ></div>
                 <div 
-                  :class="showExpired ? 'translate-x-5 bg-white' : 'translate-x-1 bg-white/60'"
-                  class="absolute top-0.5 left-0 w-4 h-4 rounded-full transition-transform duration-200"
+                  :class="showExpired ? 'translate-x-6 bg-white' : 'translate-x-1 bg-white/60'"
+                  class="absolute top-1 left-0 w-6 h-6 rounded-full transition-transform duration-200"
                 ></div>
               </div>
               <div class="flex items-center space-x-2">
-                <Clock class="w-4 h-4 text-white/60" />
-                <span class="text-sm font-medium text-white/80">Show expired</span>
+                <Clock class="w-5 h-5 text-white/60" />
+                <span class="text-md font-medium text-white/80">Show expired</span>
               </div>
             </label>
           </div>

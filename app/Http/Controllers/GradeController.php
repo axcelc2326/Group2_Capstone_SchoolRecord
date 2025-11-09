@@ -65,8 +65,8 @@ class GradeController extends Controller
         // ✅ Check if all 4 quarters are filled for this student
         $totalSubjects = Subject::where('grade_level', function($q) use ($request) {
             $q->select('grade_level')
-              ->from('classes')
-              ->where('id', $request->class_id);
+            ->from('classes')
+            ->where('id', $request->class_id);
         })->count();
 
         $quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
@@ -90,7 +90,10 @@ class GradeController extends Controller
                 ->where('class_id', $request->class_id)
                 ->avg('grade');
 
-            $remarks = $average >= 75 ? 'Promoted' : 'Retained';
+            // ✅ Round off the average (.5-.9 rounds up, .1-.4 rounds down)
+            $roundedAverage = round($average);
+            
+            $remarks = $roundedAverage >= 75 ? 'Promoted' : 'Retained';
 
             GradeRemark::updateOrCreate(
                 [
@@ -98,7 +101,7 @@ class GradeController extends Controller
                     'class_id'      => $request->class_id,
                 ],
                 [
-                    'final_average' => $average,
+                    'final_average' => $roundedAverage, // Use rounded value
                     'remarks'       => $remarks,
                 ]
             );

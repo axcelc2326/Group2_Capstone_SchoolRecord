@@ -82,7 +82,7 @@ const getRemarkColor = (remark) => {
 
 const formatAverage = (finalAverage) => {
   if (finalAverage === null || finalAverage === undefined) return 'N/A'
-  return typeof finalAverage === 'number' ? finalAverage.toFixed(2) : finalAverage
+  return typeof finalAverage === 'number' ? Math.round(finalAverage) : finalAverage
 }
 
 const getClassBadgeColor = (className) => {
@@ -161,7 +161,7 @@ const getClassBadgeColor = (className) => {
             <div>
               <p class="text-white/70 text-sm">Class Average</p>
               <p class="text-2xl font-bold text-white mt-1">
-                {{ formatAverage(students.reduce((sum, student) => sum + parseFloat(student.final_average || 0), 0) / students.length) }}
+                {{ formatAverage(students.reduce((sum, student) => sum + parseFloat(student.final_average || 0), 0) / students.length) }}%
               </p>
             </div>
             <LineChart class="w-8 h-8 text-blue-300" />
@@ -264,7 +264,7 @@ const getClassBadgeColor = (className) => {
                 <!-- Average Grade -->
                 <div class="backdrop-blur-sm bg-white/20 border border-white/30 rounded-lg p-3 mb-3">
                   <p class="text-xs text-blue-200 font-semibold uppercase tracking-wide">Final Average</p>
-                  <p class="text-2xl font-bold text-white mt-1">{{ formatAverage(student.final_average) }}</p>
+                  <p class="text-2xl font-bold text-white mt-1">{{ formatAverage(student.final_average) }}%</p>
                 </div>
 
                 <!-- Remarks -->
@@ -363,7 +363,7 @@ const getClassBadgeColor = (className) => {
                       class="px-3 py-1 inline-flex text-sm font-bold rounded backdrop-blur-sm"
                       :class="getGradeColor(student.final_average, index + 1)"
                     >
-                      {{ formatAverage(student.final_average) }}
+                      {{ formatAverage(student.final_average) }}%
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -415,7 +415,7 @@ const getClassBadgeColor = (className) => {
                     class="px-3 py-1 inline-flex text-sm font-bold rounded backdrop-blur-sm"
                     :class="getGradeColor(student.final_average, index + 1)"
                   >
-                    Final Average: {{ formatAverage(student.final_average) }}
+                    Final Average: {{ formatAverage(student.final_average) }}%
                   </span>
                 </div>
                 

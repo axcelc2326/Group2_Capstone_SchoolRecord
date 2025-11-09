@@ -120,7 +120,8 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     Route::post('/classes', [ClassController::class, 'store'])->name('classes.store'); 
     Route::put('/classes/{id}', [ClassController::class, 'update'])->name('classes.update');
     Route::delete('/classes/{class}', [ClassController::class, 'destroy'])->name('classes.destroy'); 
-
+    Route::get('/api/classes/{id}/subjects', [ClassController::class, 'viewSubjects']);
+    
     // Subject management
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
