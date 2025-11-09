@@ -17,24 +17,28 @@ class AnnouncementController extends Controller
             $classIds = $user->students->pluck('class_id')->toArray();
 
             $filter = request()->query('filter', 'all'); // default: all
+            $showExpired = request()->query('show_expired', false); // new: show expired toggle
 
-            // 🔍 Counts
-            $totalGlobal = Announcement::whereNull('class_id')->count();
-            $totalClass = Announcement::whereIn('class_id', $classIds)->count();
+            // 🔍 Counts - Count based on active/expired filter
+            $announcementsBaseQuery = $showExpired ? Announcement::query() : Announcement::active();
+            
+            $totalGlobal = $announcementsBaseQuery->whereNull('class_id')->count();
+            $totalClass = $announcementsBaseQuery->whereIn('class_id', $classIds)->count();
             $totalAll = $totalGlobal + $totalClass;
 
-            // 🔍 Announcements query
-            $announcementsQuery = Announcement::with('creator')
-                ->where(function ($query) use ($classIds, $filter) {
-                    if ($filter === 'global') {
-                        $query->whereNull('class_id');
-                    } elseif ($filter === 'class') {
-                        $query->whereIn('class_id', $classIds);
-                    } else { // all
-                        $query->whereNull('class_id')
-                            ->orWhereIn('class_id', $classIds);
-                    }
-                });
+            // 🔍 Announcements query - Apply active/expired filter
+            $announcementsQuery = $showExpired ? Announcement::with('creator') : Announcement::active()->with('creator');
+            
+            $announcementsQuery->where(function ($query) use ($classIds, $filter) {
+                if ($filter === 'global') {
+                    $query->whereNull('class_id');
+                } elseif ($filter === 'class') {
+                    $query->whereIn('class_id', $classIds);
+                } else { // all
+                    $query->whereNull('class_id')
+                        ->orWhereIn('class_id', $classIds);
+                }
+            });
 
             $announcements = $announcementsQuery
                 ->latest()
@@ -45,6 +49,7 @@ class AnnouncementController extends Controller
                 'announcements' => $announcements,
                 'classIds' => $classIds,
                 'filter' => $filter,
+                'show_expired' => $showExpired, // pass the toggle state
                 'counts' => [
                     'total_announcements' => $totalAll,
                     'total_global' => $totalGlobal,
@@ -56,8 +61,9 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        // ✅ Admins and teachers only see their own announcements
-        $announcements = Announcement::with('creator')
+        // ✅ Admins and teachers only see their own announcements (active only)
+        $announcements = Announcement::active()
+            ->with('creator')
             ->where('created_by', $user->id)
             ->latest()
             ->paginate(5)
@@ -91,6 +97,7 @@ class AnnouncementController extends Controller
             'body' => $request->body,
             'class_id' => null,
             'created_by' => auth()->id(),
+            'expires_at' => now()->addMonths(1), // Automatically set to 2 months from now
         ]);
 
         return redirect()->route('announcements.create')->with('success', 'Global announcement posted.');
@@ -129,6 +136,7 @@ class AnnouncementController extends Controller
             'body' => $request->body,
             'class_id' => $class->id,
             'created_by' => $teacher->id,
+            'expires_at' => now()->addMonths(1), // Add expiration date here too
         ]);
 
         return redirect()->route('teacher.announcements.create')->with('success', 'Class announcement posted.');

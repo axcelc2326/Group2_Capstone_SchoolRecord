@@ -12,7 +12,9 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
-  Plus
+  Plus,
+  Clock,
+  AlertTriangle
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -20,13 +22,30 @@ const props = defineProps({
   parentClassIds: Array,
   filter: String,
   auth: Object,
-  counts: Object
+  counts: Object,
+  show_expired: Boolean
 })
 
 const selectedFilter = ref(props.filter || 'all')
+const showExpired = ref(props.show_expired || false)
 
+// Watch for filter changes
 watch(selectedFilter, (value) => {
-  router.get(route('announcements.index'), { filter: value }, {
+  router.get(route('announcements.index'), { 
+    filter: value,
+    show_expired: showExpired.value 
+  }, {
+    preserveState: true,
+    preserveScroll: true
+  })
+})
+
+// Watch for expired toggle changes
+watch(showExpired, (value) => {
+  router.get(route('announcements.index'), { 
+    filter: selectedFilter.value,
+    show_expired: value 
+  }, {
     preserveState: true,
     preserveScroll: true
   })
@@ -42,8 +61,28 @@ const formatDate = (date) => {
   })
 }
 
-const getCreatorInitials = (name) => {
-  return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().substring(0, 2)
+const isExpired = (announcement) => {
+  if (!announcement.expires_at) return false
+  return new Date(announcement.expires_at) < new Date()
+}
+
+const getExpiryStatus = (announcement) => {
+  if (!announcement.expires_at) return null
+  
+  const now = new Date()
+  const expiresAt = new Date(announcement.expires_at)
+  
+  if (expiresAt < now) {
+    return 'expired'
+  }
+  
+  // Check if expires within 7 days
+  const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+  if (expiresAt < oneWeekFromNow) {
+    return 'expiring_soon'
+  }
+  
+  return 'active'
 }
 </script>
 
@@ -102,8 +141,37 @@ const getCreatorInitials = (name) => {
                 <option value="class" class="bg-gray-800 text-white">Class Only</option>
               </select>
               <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <ChevronDown class="w-4 h-4 text-white/60" />
               </div>
             </div>
+          </div>
+
+          <!-- Show Expired Toggle -->
+          <div class="flex items-center space-x-3">
+            <label for="show-expired" class="flex items-center space-x-2 cursor-pointer">
+              <div class="relative">
+                <input
+                  id="show-expired"
+                  v-model="showExpired"
+                  type="checkbox"
+                  class="sr-only"
+                >
+                <div 
+                  :class="showExpired 
+                    ? 'bg-blue-500 border-blue-400' 
+                    : 'bg-white/10 border-white/20'"
+                  class="w-11 h-6 rounded-full border transition-colors duration-200"
+                ></div>
+                <div 
+                  :class="showExpired ? 'translate-x-5 bg-white' : 'translate-x-1 bg-white/60'"
+                  class="absolute top-0.5 left-0 w-4 h-4 rounded-full transition-transform duration-200"
+                ></div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <Clock class="w-4 h-4 text-white/60" />
+                <span class="text-sm font-medium text-white/80">Show expired</span>
+              </div>
+            </label>
           </div>
         </div>
       </div>
@@ -138,7 +206,8 @@ const getCreatorInitials = (name) => {
             <article 
               v-for="announcement in announcements.data" 
               :key="announcement.id"
-              class="p-6 hover:bg-white/5 transition-colors duration-150 group"
+              :class="isExpired(announcement) ? 'opacity-70' : ''"
+              class="p-6 hover:bg-white/5 transition-all duration-150 group"
             >
               <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -152,8 +221,27 @@ const getCreatorInitials = (name) => {
                       <BookOpen v-if="announcement.class_id" class="w-5 h-5" />
                       <Star v-else class="w-5 h-5" />
                     </div>
-                    <div>
-                      <h4 class="text-lg font-semibold text-white">{{ announcement.title }}</h4>
+                    <div class="flex-1">
+                      <div class="flex items-start justify-between">
+                        <h4 class="text-lg font-semibold text-white">{{ announcement.title }}</h4>
+                        <!-- Expiry Badge -->
+                        <div v-if="announcement.expires_at" class="flex items-center space-x-2">
+                          <div 
+                            v-if="getExpiryStatus(announcement) === 'expired'"
+                            class="flex items-center space-x-1 bg-red-500/20 text-red-100 border border-red-400/30 px-2 py-1 rounded-full text-xs"
+                          >
+                            <AlertTriangle class="w-3 h-3" />
+                            <span>Expired</span>
+                          </div>
+                          <div 
+                            v-else-if="getExpiryStatus(announcement) === 'expiring_soon'"
+                            class="flex items-center space-x-1 bg-amber-500/20 text-amber-100 border border-amber-400/30 px-2 py-1 rounded-full text-xs"
+                          >
+                            <Clock class="w-3 h-3" />
+                            <span>Expires soon</span>
+                          </div>
+                        </div>
+                      </div>
                       <div class="flex items-center space-x-4 mt-1">
                         <span 
                           :class="announcement.class_id 
@@ -169,6 +257,9 @@ const getCreatorInitials = (name) => {
                         </span>
                         <p class="text-sm text-white/60">
                           Posted: {{ formatDate(announcement.created_at) }}
+                        </p>
+                        <p v-if="announcement.expires_at" class="text-sm text-white/60">
+                          Expires: {{ formatDate(announcement.expires_at) }}
                         </p>
                       </div>
                     </div>
@@ -195,7 +286,8 @@ const getCreatorInitials = (name) => {
           <article 
             v-for="announcement in announcements.data" 
             :key="announcement.id"
-            class="p-4 hover:bg-white/5 transition-colors duration-150"
+            :class="isExpired(announcement) ? 'opacity-70' : ''"
+            class="p-4 hover:bg-white/5 transition-all duration-150"
           >
             <div class="flex items-start space-x-3 mb-3">
               <div 
@@ -208,7 +300,16 @@ const getCreatorInitials = (name) => {
                 <Star v-else class="w-4 h-4" />
               </div>
               <div class="flex-1">
-                <h4 class="text-white font-medium mb-1">{{ announcement.title }}</h4>
+                <div class="flex items-start justify-between mb-1">
+                  <h4 class="text-white font-medium">{{ announcement.title }}</h4>
+                  <!-- Expiry Badge (Mobile) -->
+                  <div v-if="announcement.expires_at && isExpired(announcement)" class="flex-shrink-0">
+                    <div class="flex items-center space-x-1 bg-red-500/20 text-red-100 border border-red-400/30 px-1.5 py-0.5 rounded-full text-xs">
+                      <AlertTriangle class="w-2.5 h-2.5" />
+                      <span>Expired</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="flex items-center space-x-2 mb-2">
                   <span 
                     :class="announcement.class_id 
@@ -225,6 +326,9 @@ const getCreatorInitials = (name) => {
                 </div>
                 <p class="text-sm text-white/60 mb-2">
                   Posted: {{ formatDate(announcement.created_at) }}
+                </p>
+                <p v-if="announcement.expires_at" class="text-sm text-white/60 mb-2">
+                  Expires: {{ formatDate(announcement.expires_at) }}
                 </p>
                 <p class="text-white/80 text-sm leading-relaxed mb-3">{{ announcement.body }}</p>
                 
@@ -246,10 +350,10 @@ const getCreatorInitials = (name) => {
         <div v-if="announcements.data.length === 0" class="text-center py-8">
           <FileText class="mx-auto h-10 w-10 text-white/40 mb-3" />
           <h3 class="text-sm font-medium text-white/80">
-            No announcements posted yet
+            No announcements found
           </h3>
           <p class="mt-1 text-sm text-white/60">
-            Check back later for new updates and announcements.
+            {{ showExpired ? 'No expired announcements available.' : 'No active announcements available.' }}
           </p>
         </div>
       </div>

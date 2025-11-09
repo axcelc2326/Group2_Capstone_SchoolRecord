@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('class_id');
             $table->enum('quarter', ['Q1', 'Q2', 'Q3', 'Q4']);
-            $table->decimal('grade', 5, 2);
+            $table->unsignedTinyInteger('grade');
             $table->timestamps();
 
             $table->foreign('student_id')->references('id')->on('students');

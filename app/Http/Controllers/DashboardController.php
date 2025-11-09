@@ -86,10 +86,11 @@ class DashboardController extends Controller
                 ->values();
 
             // 📢 Latest announcements
-            $announcements = Announcement::with('creator:id,name')
+            $announcements = Announcement::active() // Add this to filter out expired announcements
+                ->with('creator:id,name')
                 ->latest()
-                ->take(5)
-                ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                ->take(3)
+                ->get(['id', 'title', 'body', 'created_at', 'created_by', 'expires_at']) // Add expires_at
                 ->map(function ($announcement) {
                     return [
                         'id'         => $announcement->id,
@@ -97,6 +98,7 @@ class DashboardController extends Controller
                         'body'       => $announcement->body,
                         'created_at' => $announcement->created_at->toDateString(),
                         'created_by' => $announcement->creator->name ?? 'Unknown',
+                        'expires_at' => $announcement->expires_at, // Include expires_at
                     ];
                 });
 
@@ -171,14 +173,15 @@ class DashboardController extends Controller
             })->sortByDesc('average')->take(3)->values();
 
             // ✅ Latest 3 announcements (specific class + global)
-            $announcements = \App\Models\Announcement::with('creator:id,name')
+            $announcements = \App\Models\Announcement::active() // Add this to filter out expired announcements
+                ->with('creator:id,name')
                 ->where(function ($query) use ($class) {
                     $query->where('class_id', $class->id)
                         ->orWhereNull('class_id');
                 })
                 ->latest()
-                ->take(5)
-                ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                ->take(3)
+                ->get(['id', 'title', 'body', 'created_at', 'created_by', 'expires_at']) // Add expires_at
                 ->map(function ($announcement) {
                     return [
                         'id' => $announcement->id,
@@ -186,6 +189,7 @@ class DashboardController extends Controller
                         'body' => $announcement->body,
                         'created_at' => $announcement->created_at,
                         'created_by' => $announcement->creator->name ?? 'Unknown',
+                        'expires_at' => $announcement->expires_at, // Include expires_at
                     ];
                 });
 
@@ -277,14 +281,15 @@ class DashboardController extends Controller
 
                 // 📢 Latest announcements (class-specific + global)
                 $classIds = $students->pluck('class_id')->unique();
-                $announcements = Announcement::with('creator:id,name')
+                $announcements = Announcement::active() // Add this line to filter out expired announcements
+                    ->with('creator:id,name')
                     ->where(function ($query) use ($classIds) {
                         $query->whereIn('class_id', $classIds)
                             ->orWhereNull('class_id'); // Include global announcements
                     })
                     ->latest()
-                    ->take(5)
-                    ->get(['id', 'title', 'body', 'created_at', 'created_by'])
+                    ->take(3)
+                    ->get(['id', 'title', 'body', 'created_at', 'created_by', 'expires_at']) // Add expires_at
                     ->map(function ($announcement) {
                         return [
                             'id' => $announcement->id,
@@ -292,6 +297,7 @@ class DashboardController extends Controller
                             'body' => $announcement->body,
                             'created_at' => $announcement->created_at,
                             'created_by' => $announcement->creator->name ?? 'Unknown',
+                            'expires_at' => $announcement->expires_at, // Include expires_at in the response
                         ];
                     });
 
