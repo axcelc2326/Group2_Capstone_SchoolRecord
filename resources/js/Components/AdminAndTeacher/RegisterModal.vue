@@ -30,7 +30,7 @@
             <div
               v-if="show"
               ref="modalContent"
-              class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
+              class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg p-8 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all"
               @click.stop
             >
               <!-- Gradient overlay for visual depth -->
@@ -44,45 +44,164 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
                   </div>
-                  <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Register New Parent</h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Email and password will be auto-generated</p>
+                  <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Register Parent & Student</h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Parent credentials will be auto-generated</p>
                 </div>
 
-                <!-- Name Field -->
-                <div class="space-y-2">
-                  <InputLabel for="name" value="Full Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
-                  <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
-                    </div>
-                    <TextInput
-                      id="name"
-                      v-model="form.name"
-                      type="text"
-                      class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
-                      placeholder="Enter full name (e.g., John Doe)"
-                      autocomplete="name"
-                      required
-                    />
-                  </div>
-                  <InputError class="mt-1" :message="form.errors.name" />
+                <!-- Parent Information Section -->
+                <div class="space-y-4">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">Parent Information</h3>
                   
-                  <!-- Info Box -->
-                  <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <div class="flex items-start space-x-2">
-                      <svg class="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      <div class="text-sm text-blue-700 dark:text-blue-300">
-                        <p class="font-medium mb-1">Auto-generated credentials:</p>
-                        <ul class="space-y-1 text-xs">
-                          <li><strong>Email:</strong> firstname@gmail.com</li>
-                          <li><strong>Password:</strong> First 3 letters + _2025</li>
-                          <li class="text-blue-600 dark:text-blue-400 mt-2">Example: "John Doe" → john@gmail.com / Joh_2025</li>
-                        </ul>
+                  <!-- Parent Name Field -->
+                  <div class="space-y-2">
+                    <InputLabel for="name" value="Parent Full Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
                       </div>
+                      <TextInput
+                        id="name"
+                        v-model="form.name"
+                        type="text"
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Enter parent full name (e.g., John Doe)"
+                        autocomplete="name"
+                        required
+                      />
+                    </div>
+                    <InputError class="mt-1" :message="form.errors.name" />
+                  </div>
+                </div>
+
+                <!-- Student Information Section -->
+                <div class="space-y-4">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">Student Information</h3>
+                  
+                  <!-- Student Name Fields -->
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- First Name -->
+                    <div class="space-y-2">
+                      <InputLabel for="student_first_name" value="First Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                      <TextInput
+                        id="student_first_name"
+                        v-model="form.student_first_name"
+                        type="text"
+                        class="block w-full px-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="First name"
+                        required
+                      />
+                      <InputError class="mt-1" :message="form.errors.student_first_name" />
+                    </div>
+
+                    <!-- Middle Name -->
+                    <div class="space-y-2">
+                      <InputLabel for="student_middle_name" value="Middle Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                      <TextInput
+                        id="student_middle_name"
+                        v-model="form.student_middle_name"
+                        type="text"
+                        class="block w-full px-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Middle name (optional)"
+                      />
+                      <InputError class="mt-1" :message="form.errors.student_middle_name" />
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="space-y-2">
+                      <InputLabel for="student_last_name" value="Last Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                      <TextInput
+                        id="student_last_name"
+                        v-model="form.student_last_name"
+                        type="text"
+                        class="block w-full px-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                        placeholder="Last name"
+                        required
+                      />
+                      <InputError class="mt-1" :message="form.errors.student_last_name" />
+                    </div>
+                  </div>
+
+                  <!-- LRN and Gender -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- LRN -->
+                    <div class="space-y-2">
+                      <InputLabel for="student_lrn" value="LRN (12 digits)" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                      <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                          </svg>
+                        </div>
+                        <TextInput
+                          id="student_lrn"
+                          v-model="form.student_lrn"
+                          type="text"
+                          class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
+                          placeholder="000000000000"
+                          maxlength="12"
+                          required
+                        />
+                      </div>
+                      <InputError class="mt-1" :message="form.errors.student_lrn" />
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="space-y-2">
+                      <InputLabel for="student_gender" value="Gender" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                      <select
+                        id="student_gender"
+                        v-model="form.student_gender"
+                        class="block w-full px-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200"
+                        required
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                      <InputError class="mt-1" :message="form.errors.student_gender" />
+                    </div>
+                  </div>
+
+                  <!-- Class Selection -->
+                  <div class="space-y-2">
+                    <InputLabel for="class_id" value="Class" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                    <div class="relative group">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                      </div>
+                      <select 
+                        id="class_id"
+                        v-model="form.class_id" 
+                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-all duration-200" 
+                        required
+                      >
+                        <option value="" disabled>Select a class</option>
+                        <option v-for="cls in classes" :key="cls.id" :value="cls.id">
+                          {{ cls.name }} (Grade {{ cls.grade_level }})
+                        </option>
+                      </select>
+                    </div>
+                    <InputError class="mt-1" :message="form.errors.class_id" />
+                  </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div class="flex items-start space-x-3">
+                    <svg class="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="text-sm text-blue-700 dark:text-blue-300">
+                      <p class="font-medium mb-2">Auto-generated parent credentials:</p>
+                      <ul class="space-y-1 text-xs">
+                        <li><strong>Email:</strong> firstname@gmail.com</li>
+                        <li><strong>Password:</strong> First 3 letters + _2025</li>
+                        <li class="text-blue-600 dark:text-blue-400 mt-2">Example: "John Doe" → john@gmail.com / Joh_2025</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -105,7 +224,7 @@
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                       </svg>
-                      <span>Register Parent</span>
+                      <span>Register Parent & Student</span>
                     </template>
                   </div>
                 </PrimaryButton>
@@ -138,21 +257,34 @@ import TextInput from '@/Components/TextInput.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 import Swal from 'sweetalert2'
 
-defineProps(['show'])
+defineProps({
+  show: Boolean,
+  classes: {
+    type: Array,
+    default: () => []
+  }
+})
+
 const emit = defineEmits(['close'])
 
 const modalContent = ref(null)
 
 const form = useForm({
   name: '',
+  student_first_name: '',
+  student_middle_name: '',
+  student_last_name: '',
+  student_lrn: '',
+  student_gender: '',
+  class_id: '',
 })
 
 const register = () => {
   form.post(route('parents.store'), {
     onSuccess: () => {
       Swal.fire({
-        title: 'Parent Registered!',
-        text: 'The parent has been successfully added to the system.',
+        title: 'Success!',
+        text: 'Parent and Student have been successfully registered.',
         icon: 'success',
         background: '#1f2937',
         color: '#f9fafb',
@@ -172,7 +304,7 @@ const register = () => {
         },
         buttonsStyling: false,
         confirmButtonText: 'OK',
-        timer: 3000,
+        timer: 4000,
         timerProgressBar: true,
         didOpen: (popup) => {
           popup.addEventListener('mouseenter', Swal.stopTimer)
@@ -186,7 +318,7 @@ const register = () => {
     onError: () => {
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to register parent. Please check the input fields and try again.',
+        text: 'Failed to register. Please check all input fields and try again.',
         icon: 'error',
         background: '#1f2937',
         color: '#f9fafb',

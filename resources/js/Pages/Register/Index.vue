@@ -512,7 +512,8 @@ const deleteParent = (parentId) => {
 
   <!-- Modals -->
   <RegisterModal 
-    :show="showRegisterModal" 
+    :show="showRegisterModal"
+    :classes="props.classes"
     @close="showRegisterModal = false"
   />
   <ManageParentModal

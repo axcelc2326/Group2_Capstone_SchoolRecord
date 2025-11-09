@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class ParentController extends Controller
 {
@@ -88,36 +89,65 @@ class ParentController extends Controller
 
     public function store(Request $request)
     {
+        // Validate both parent and student data
         $validated = $request->validate([
+            // Parent field
             'name' => 'required|string|max:255',
+            
+            // Student fields
+            'student_first_name' => 'required|string|max:255',
+            'student_middle_name' => 'nullable|string|max:255',
+            'student_last_name' => 'required|string|max:255',
+            'student_lrn' => 'required|digits:12|unique:students,lrn',
+            'student_gender' => 'required|in:male,female',
+            'class_id' => 'required|exists:classes,id',
         ]);
 
-        // Extract first word from full name (preserve original case)
-        $firstName = explode(' ', trim($validated['name']))[0];
-        
-        // Generate email: firstname@gmail.com (lowercase for email)
-        $email = strtolower($firstName) . '@gmail.com';
-        
-        // Generate password: first 3 letters + _2025 (keeps original case)
-        $password = substr($firstName, 0, 3) . '_2025';
+        // Start database transaction to ensure both operations succeed or fail together
+        DB::beginTransaction();
 
-        // Check if email already exists and make it unique if needed
-        $baseEmail = $email;
-        $counter = 1;
-        while (User::where('email', $email)->exists()) {
-            $email = str_replace('@gmail.com', $counter . '@gmail.com', $baseEmail);
-            $counter++;
+        try {
+            // Create Parent Account (your original logic)
+            $firstName = explode(' ', trim($validated['name']))[0];
+            $email = strtolower($firstName) . '@gmail.com';
+            $password = substr($firstName, 0, 3) . '_2025';
+
+            // Check if email already exists and make it unique if needed
+            $baseEmail = $email;
+            $counter = 1;
+            while (User::where('email', $email)->exists()) {
+                $email = str_replace('@gmail.com', $counter . '@gmail.com', $baseEmail);
+                $counter++;
+            }
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $email,
+                'password' => bcrypt($password),
+            ]);
+
+            $user->assignRole('parent');
+
+            // Create Student Record linked to this parent
+            Student::create([
+                'first_name' => $validated['student_first_name'],
+                'middle_name' => $validated['student_middle_name'],
+                'last_name' => $validated['student_last_name'],
+                'lrn' => $validated['student_lrn'],
+                'gender' => $validated['student_gender'],
+                'class_id' => $validated['class_id'],
+                'parent_id' => $user->id, // Use the created parent's ID
+                'approved_by_teacher' => true,
+            ]);
+
+            DB::commit();
+
+            return back()->with('success', 'Parent and Student registered successfully! Parent Email: ' . $email . ' | Password: ' . $password);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Registration failed: ' . $e->getMessage());
         }
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $email,
-            'password' => bcrypt($password),
-        ]);
-
-        $user->assignRole('parent');
-
-        return back()->with('success', 'Parent registered successfully! Email: ' . $email . ' | Password: ' . $password);
     }
 
     public function update(Request $request, User $parent)
