@@ -14,7 +14,8 @@ import {
   School,
   ChevronLeft,
   ChevronRight,
-  LineChart
+  LineChart,
+  Eye
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -73,7 +74,7 @@ const getDonutChartOptions = (classData, idx) => ({
               const values = Object.values(classData.subject_averages || {});
               if (values.length === 0) return '0%';
               const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
-              return avg.toFixed(1) + '%';
+              return Math.round(avg) + '%'; // Removed decimal
             }
           }
         }
@@ -91,7 +92,7 @@ const getDonutChartOptions = (classData, idx) => ({
   tooltip: {
     theme: 'dark',
     y: {
-      formatter: (val) => val.toFixed(1) + '%'
+      formatter: (val) => Math.round(val) + '%' // Removed decimal
     }
   }
 });
@@ -155,7 +156,7 @@ const getAreaChartOptions = (classData, idx) => ({
   tooltip: {
     theme: 'dark',
     y: {
-      formatter: (val) => val.toFixed(1) + '%'
+      formatter: (val) => Math.round(val) + '%' // Removed decimal
     }
   }
 });
@@ -210,7 +211,7 @@ const getBarChartOptions = (classData, idx) => ({
   tooltip: {
     theme: 'dark',
     y: {
-      formatter: (val) => val.toFixed(1) + '%'
+      formatter: (val) => Math.round(val) + '%' // Removed decimal
     }
   },
   dataLabels: {
@@ -387,7 +388,7 @@ const hasValidChartData = (classData) => {
                               <!-- Class name and grade level -->
                               <h2 class="text-2xl font-bold text-white mb-1 flex items-center gap-2">
                                 <School class="w-6 h-6 text-white" />
-                                Grade {{ classData.grade_level }} Section - {{ classData.class_name }}
+                                Grade {{ classData.grade_level }} - {{ classData.class_name }}
                               </h2>
 
                               <!-- Stats -->
@@ -405,6 +406,15 @@ const hasValidChartData = (classData) => {
                           </div>
                          
                           <div class="flex items-center gap-4">
+                              <!-- View Students Button -->
+                              <button
+                                  @click="viewClassStudents(classData.class_id)"
+                                  class="backdrop-blur-sm bg-white/15 hover:bg-white/25 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow border border-white/20 hover:border-white/30 flex items-center gap-2"
+                              >
+                                  <Eye class="w-4 h-4" />
+                                  View Students
+                              </button>
+                              
                               <!-- Overall Average -->
                               <div class="text-right">
                                   <div class="text-3xl font-bold text-white mb-1">
@@ -443,7 +453,7 @@ const hasValidChartData = (classData) => {
                                       <div class="text-white/70 text-xs mb-1">Top Subject</div>
                                       <div class="font-medium text-white text-sm mb-1">{{ classData.top_subject || 'N/A' }}</div>
                                       <div class="text-blue-300 text-xs">
-                                          {{ classData.subject_averages && classData.top_subject ? classData.subject_averages[classData.top_subject] : '0' }}% Average
+                                          {{ classData.subject_averages && classData.top_subject ? Math.round(classData.subject_averages[classData.top_subject]) : '0' }}% Average <!-- Removed decimal -->
                                       </div>
                                   </div>
                               </div>
@@ -457,7 +467,7 @@ const hasValidChartData = (classData) => {
                                       <div class="text-white/70 text-xs mb-1">Focus Area</div>
                                       <div class="font-medium text-white text-sm mb-1">{{ classData.low_subject || 'N/A' }}</div>
                                       <div class="text-amber-300 text-xs">
-                                          {{ classData.subject_averages && classData.low_subject ? classData.subject_averages[classData.low_subject] : '0' }}% Average
+                                          {{ classData.subject_averages && classData.low_subject ? Math.round(classData.subject_averages[classData.low_subject]) : '0' }}% Average <!-- Removed decimal -->
                                       </div>
                                   </div>
                               </div>
@@ -550,7 +560,7 @@ const hasValidChartData = (classData) => {
                                   
                                   <div class="flex items-center justify-between">
                                       <div class="text-2xl font-bold text-white">
-                                          {{ (average || 0)}}%
+                                          {{ Math.round(average || 0) }}% <!-- Removed decimal -->
                                       </div>
                                       <div :class="['px-2 py-1 rounded text-xs font-medium border', getPerformanceLevel(average || 0).color]">
                                           {{ getPerformanceLevel(average || 0).label }}

@@ -92,6 +92,7 @@ Route::middleware(['auth', 'role:teacher', 'verified'])->group(function () {
     
     // Teachers Analytics
     Route::get('/teacher/analytics', [AnalyticsController::class, 'teacherAnalytics'])->name('teacher.analytics');
+    Route::get('/teacher/analytics/class/{class}/students', [AnalyticsController::class, 'showTeacherClassStudents'])->name('analytics.teacher.class.students');
 
     // SF5 Download (School Form 5)
     Route::get('/sf5/form', [SF5Controller::class, 'showForm'])->name('sf5.form');

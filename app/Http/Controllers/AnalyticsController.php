@@ -244,4 +244,49 @@ class AnalyticsController extends Controller
             'summary'   => $summary,
         ]);
     }
+
+    public function showTeacherClassStudents($classId)
+    {
+        $user = auth()->user();
+        
+        // ✅ Get the specific class that belongs to the teacher
+        $class = ClassModel::with([
+            'students.user',
+            'students.grades',
+            'students.gradeRemarks',
+            'students.parent',
+        ])
+        ->where('teacher_id', $user->id)
+        ->where('id', $classId)
+        ->firstOrFail();
+
+        $students = $class->students->map(function ($student) {
+            $name = optional($student->parent)->fname
+                ? trim($student->parent->fname . ' ' . $student->parent->lname)
+                : trim($student->first_name . ' ' . $student->last_name);
+
+            // ✅ Latest computed remark
+            $latestRemark = $student->gradeRemarks->sortByDesc('created_at')->first();
+
+            // ✅ Fallback if final_average not yet stored
+            $computedAverage = round($student->grades->avg('grade') ?? 0);
+
+            return [
+                'id' => $student->id,
+                'name' => $name,
+                'class_name' => $student->class->name ?? 'N/A',
+                'final_average' => $latestRemark->final_average ?? $computedAverage,
+                'remarks' => $latestRemark->remarks ?? 'In Progress',
+            ];
+        })->sortByDesc('final_average')->values()->all();
+
+        return Inertia::render('Analytics/TeacherClassStudents', [
+            'class' => [
+                'id' => $class->id,
+                'name' => $class->name,
+                'grade_level' => $class->grade_level,
+            ],
+            'students' => $students,
+        ]);
+    }
 }

@@ -10,6 +10,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  class_names: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const topThree = computed(() => props.students.slice(0, 3))
@@ -99,7 +103,7 @@ const getClassBadgeColor = (className) => {
 </script>
 
 <template>
-  <Head title="Student Rankings" />
+  <Head :title="`Grade ${grade_level} Students - My Classes`" />
 
   <AuthenticatedLayout>
     <template #header>
@@ -107,10 +111,10 @@ const getClassBadgeColor = (className) => {
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-3xl font-bold text-white">
-              Student Rankings
+              My Students Ranking
             </h2>
             <p class="text-white/70 mt-1">
-              Grade {{ grade_level }} Students
+              Grade {{ grade_level }} - {{ class_names.join(', ') || 'My Classes' }}
             </p>
           </div>
           <LineChart class="w-8 h-8 text-white/60" />
@@ -120,21 +124,37 @@ const getClassBadgeColor = (className) => {
 
     <div class="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       <!-- Header Actions -->
-      <div class="flex justify-between items-center">
-        <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-2">
-          <span class="text-white/80 text-sm">{{ students.length }} Students</span>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Student Count -->
+          <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg px-4 py-2">
+            <span class="text-white/80 text-sm">{{ students.length }} Students</span>
+          </div>
+          
+          <!-- Class Names -->
+          <div 
+            v-for="className in class_names" 
+            :key="className"
+            class="backdrop-blur-sm rounded-lg px-3 py-2 border"
+            :class="getClassBadgeColor(className)"
+          >
+            <div class="flex items-center gap-1.5">
+              <School class="w-3 h-3" />
+              <span class="text-xs font-medium">{{ className }}</span>
+            </div>
+          </div>
         </div>
         
         <button
-          @click="$inertia.get(route('analytics.index'))"
+          @click="$inertia.get(route('teacher.analytics'))"
           class="backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 flex items-center gap-2"
         >
           <ArrowLeft class="w-4 h-4" />
-          Back to Analytics
+          Back to My Analytics
         </button>
       </div>
 
-      <!-- Stats Summary -->
+      <!-- Teacher Stats Summary -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4" v-if="students.length > 0">
         <div class="backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg p-4">
           <div class="flex items-center justify-between">
@@ -153,7 +173,7 @@ const getClassBadgeColor = (className) => {
             <div>
               <p class="text-white/70 text-sm">Promoted</p>
               <p class="text-2xl font-bold text-green-300 mt-1">
-                {{ students.filter(s => s.remarks?.toLowerCase().includes('promoted') || s.remarks?.toLowerCase().includes('passed')).length }}
+                {{ students.filter(s => s.remarks?.toLowerCase().includes('promoted')).length }}
               </p>
             </div>
             <Trophy class="w-8 h-8 text-green-300" />
@@ -177,7 +197,7 @@ const getClassBadgeColor = (className) => {
             <div>
               <p class="text-white/70 text-sm">Retained</p>
               <p class="text-2xl font-bold text-red-300 mt-1">
-                {{ students.filter(s => s.remarks?.toLowerCase().includes('retained') || s.remarks?.toLowerCase().includes('failed')).length }}
+                {{ students.filter(s => s.remarks?.toLowerCase().includes('retained')).length }}
               </p>
             </div>
             <School class="w-8 h-8 text-red-300" />
@@ -192,7 +212,7 @@ const getClassBadgeColor = (className) => {
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <Trophy class="w-5 h-5 text-yellow-400 mr-2" />
-              <h3 class="text-xl font-semibold text-white">Top Performers</h3>
+              <h3 class="text-xl font-semibold text-white">Top Performers in My Classes</h3>
             </div>
             <div class="text-sm text-white/60">
               Grade {{ grade_level }}
@@ -266,8 +286,8 @@ const getClassBadgeColor = (className) => {
             <div class="flex items-center space-x-3">
               <Award class="w-5 h-5 text-purple-300" />
               <div>
-                <h3 class="text-lg font-semibold text-white">Complete Rankings</h3>
-                <p class="text-sm text-white/70 mt-1">{{ students.length }} students ranked by final average</p>
+                <h3 class="text-lg font-semibold text-white">My Students Rankings</h3>
+                <p class="text-sm text-white/70 mt-1">{{ students.length }} students across {{ class_names.length }} class{{ class_names.length !== 1 ? 'es' : '' }}</p>
               </div>
             </div>
             <div class="text-sm text-white/60 hidden md:block">
@@ -325,7 +345,7 @@ const getClassBadgeColor = (className) => {
                       </div>
                       <div class="ml-3">
                         <div class="text-sm font-medium text-white">{{ student.name || 'No Name' }}</div>
-                        <div class="text-xs text-white/60">Student</div>
+                        <div class="text-xs text-white/60">My Student</div>
                       </div>
                     </div>
                   </td>
@@ -415,14 +435,14 @@ const getClassBadgeColor = (className) => {
         <!-- Empty State -->
         <div v-else class="text-center py-8">
           <Users class="mx-auto h-10 w-10 text-white/40 mb-3" />
-          <h3 class="text-sm font-medium text-white/80">No Students Found</h3>
-          <p class="mt-1 text-sm text-white/60">There are no students to display for this grade level.</p>
+          <h3 class="text-sm font-medium text-white/80">No Students in Your Classes</h3>
+          <p class="mt-1 text-sm text-white/60">You don't have any students assigned to your classes for Grade {{ grade_level }}.</p>
           <button 
             class="mt-4 inline-flex items-center px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-all duration-200 border border-white/20 hover:border-white/30"
-            @click="$inertia.get(route('students.create'))"
+            @click="$inertia.get(route('teacher.classes.index'))"
           >
-            <Users class="w-4 h-4 mr-2" />
-            Add Students
+            <School class="w-4 h-4 mr-2" />
+            Manage Classes
           </button>
         </div>
       </div>
