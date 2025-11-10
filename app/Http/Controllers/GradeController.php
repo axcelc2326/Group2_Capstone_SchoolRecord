@@ -9,6 +9,7 @@ use App\Models\GradeRemark; // ✅ Import it here
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GradeController extends Controller
 {
@@ -147,5 +148,18 @@ class GradeController extends Controller
         return Inertia::render('Parent/ViewGrades', [
             'students' => $students,
         ]);
+    }
+
+    // Generate Student PDF
+    public function generatePdf($id)
+    {
+        // Eager load grades and class (section)
+        $student = Student::with(['grades.subject', 'class'])->findOrFail($id);
+
+        // Load the PDF view with student data
+        $pdf = Pdf::loadView('students.pdf', compact('student'));
+
+        // Download the PDF with student name in the filename
+        return $pdf->download($student->name . 'StudentGrades.pdf');
     }
 }

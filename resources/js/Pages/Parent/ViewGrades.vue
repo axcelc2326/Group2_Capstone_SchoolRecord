@@ -125,6 +125,10 @@ const summary = computed(() => {
 const getUniqueSubjects = (grades) => {
   return [...new Set(grades.map(g => g.subject))].filter(subject => subject);
 };
+
+const downloadPdf = (studentId) => {
+    window.open(route('student.grades.pdf', studentId), '_blank');
+};
 </script>
 
 <template>
@@ -200,6 +204,12 @@ const getUniqueSubjects = (grades) => {
                                   <span>Section - {{ student.class ?? 'N/A' }}</span>
                               </div>
                           </div>
+                            <button
+                                @click="downloadPdf(student.id)"
+                                class="mt-2 px-3 py-2 bg-gradient-to-r from-emerald-500 to-blue-600 text-white rounded-lg text-sm hover:from-emerald-600 hover:to-blue-700 transition shadow-lg"
+                            >
+                                Download PDF
+                            </button>
                       </div>
 
                       <!-- Final Average - Prominent Display -->

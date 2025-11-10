@@ -58,6 +58,7 @@ Route::middleware(['auth', 'role:parent', 'verified'])->group(function () {
 
     // Parent-specific grade viewing
     Route::get('/parent/grades', [GradeController::class, 'viewGrades'])->name('parent.grades');
+    Route::get('/student/{id}/grades/pdf', [GradeController::class, 'generatePdf'])->name('student.grades.pdf');
 
     // Announcements from Admin and Class
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
