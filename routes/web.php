@@ -17,7 +17,8 @@ use App\Http\Controllers\{
     SubjectController,
     SF5Controller,
     HonorRollController,
-    RecordsController
+    RecordsController,
+    ParentAccountController
 };
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -168,6 +169,9 @@ Route::middleware(['auth', 'role:admin|teacher'])->group(function () {
 
     // Pass the data into the Modal
     Route::get('/parents/{parent}/students', [ParentController::class, 'getStudents'])->name('parents.students.index');
+
+    // Generator for parents account
+    Route::get('/teacher/parent-accounts/download-filtered', [ParentAccountController::class, 'downloadFiltered'])->name('parent-accounts.downloadFiltered');
 
     // Register Student into the parent with edit and delete
     Route::post('/parents/{parent}/students', [StudentController::class, 'store'])->name('parents.students.store');

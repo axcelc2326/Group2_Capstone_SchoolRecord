@@ -4,8 +4,10 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import RegisterModal from '@/Components/AdminAndTeacher/RegisterModal.vue'
 import ManageParentModal from '@/Components/AdminAndTeacher/ManageParentModal.vue'
 import ParentActionsModal from '@/Components/AdminAndTeacher/ParentActionsModal.vue'
+import ParentAccountPdf from '@/Components/AdminAndTeacher/ParentAccountPdf.vue'
+import ParentFilterModal from '@/Components/AdminAndTeacher/ParentAccountPdf.vue' // NEW
 import { ref, computed } from 'vue'
-import { Users, Search, Filter, UserPlus, Settings, MoreVertical } from 'lucide-vue-next'
+import { Users, Search, Filter, UserPlus, Settings, MoreVertical, FileText } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
 
 const props = defineProps({
@@ -15,11 +17,15 @@ const props = defineProps({
   totalMadeParents: Number,
 })
 
+// Modal states
 const showRegisterModal = ref(false)
 const showManageModal = ref(false)
 const showActionsModal = ref(false)
+const showPdfModal = ref(false)
+const showFilterModal = ref(false) // NEW
 const selectedParent = ref(null)
 
+// Filters
 const search = ref(props.filters.search || '')
 const selectedClass = ref(props.filters.class_id || '')
 const hasStudents = ref(props.filters.has_students || '')
@@ -60,6 +66,12 @@ const openActionsModal = (parent) => {
   showActionsModal.value = true
 }
 
+// Open PDF modal (for individual parent)
+const openPdfModal = (parent) => {
+  selectedParent.value = parent
+  showPdfModal.value = true
+}
+
 // Handle actions from the unified modal
 const handleParentAction = (action) => {
   if (!selectedParent.value) return
@@ -71,11 +83,14 @@ const handleParentAction = (action) => {
     case 'delete':
       deleteParent(selectedParent.value.id)
       break
+    case 'generate-pdf':
+      openPdfModal(selectedParent.value)
+      break
   }
   showActionsModal.value = false
 }
 
-// Toggle active/inactive status with modern SweetAlert design
+// Toggle active/inactive status
 const toggleStatus = (id) => {
   router.put(route('parents.toggle-status', id), {}, {
     preserveScroll: true,
@@ -130,7 +145,7 @@ const toggleStatus = (id) => {
   })
 }
 
-// Automatically delete parent (no confirmation prompt)
+// Delete parent
 const deleteParent = (parentId) => {
   router.delete(route('parents.destroy', parentId), {
     preserveScroll: true,
@@ -320,6 +335,17 @@ const deleteParent = (parentId) => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Generate PDF Button -->
+      <div class="flex justify-end">
+        <button
+          @click="showFilterModal = true"
+          class="backdrop-blur-sm bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-100 px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-3 hover:shadow-lg hover:shadow-green-500/10"
+        >
+          <FileText class="w-5 h-5" />
+          Generate Account PDF
+        </button>
       </div>
 
       <!-- Parents Table Card -->
@@ -529,6 +555,19 @@ const deleteParent = (parentId) => {
     :parent="selectedParent"
     @close="showActionsModal = false"
     @action="handleParentAction"
+  />
+  <ParentAccountPdf
+    v-if="selectedParent"
+    :show="showPdfModal"
+    :parent="selectedParent"
+    :classes="props.classes"
+    @close="showPdfModal = false"
+  />
+  <!-- NEW: Filter Modal for PDF Generation -->
+  <ParentFilterModal
+    :show="showFilterModal"
+    :classes="props.classes"
+    @close="showFilterModal = false"
   />
 </template>
 
