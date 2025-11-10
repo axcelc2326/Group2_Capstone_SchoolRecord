@@ -47,18 +47,11 @@
             </thead>
             <tbody>
                 @foreach($parents as $index => $parent)
-                    @php
-                        // Extract first word from full name (preserve original case)
-                        $firstName = explode(' ', trim($parent->name))[0];
-                        
-                        // Generate password: first 3 letters + _2025 (keeps original case)
-                        $password = substr($firstName, 0, 3) . '_2025';
-                    @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $parent->name }}</td>
                         <td>{{ $parent->email }}</td>
-                        <td><strong>{{ $password }}</strong></td>
+                        <td><strong>{{ $parent->generated_password ?? 'N/A' }}</strong></td>
                         <td>
                             <span style="color: {{ $parent->status === 'active' ? 'green' : 'red' }}; font-weight: bold;">
                                 {{ ucfirst($parent->status) }}

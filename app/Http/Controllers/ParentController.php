@@ -124,6 +124,7 @@ class ParentController extends Controller
                 'name' => $validated['name'],
                 'email' => $email,
                 'password' => bcrypt($password),
+                'generated_password' => $password, // Store the plain password
             ]);
 
             $user->assignRole('parent');
