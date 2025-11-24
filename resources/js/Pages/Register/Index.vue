@@ -4,7 +4,6 @@ import { Head, Link, router } from '@inertiajs/vue3'
 import RegisterModal from '@/Components/AdminAndTeacher/RegisterModal.vue'
 import ManageParentModal from '@/Components/AdminAndTeacher/ManageParentModal.vue'
 import ParentActionsModal from '@/Components/AdminAndTeacher/ParentActionsModal.vue'
-import ParentAccountPdf from '@/Components/AdminAndTeacher/ParentAccountPdf.vue'
 import ParentFilterModal from '@/Components/AdminAndTeacher/ParentAccountPdf.vue' // NEW
 import { ref, computed } from 'vue'
 import { Users, Search, Filter, UserPlus, Settings, MoreVertical, FileText } from 'lucide-vue-next'
@@ -21,7 +20,6 @@ const props = defineProps({
 const showRegisterModal = ref(false)
 const showManageModal = ref(false)
 const showActionsModal = ref(false)
-const showPdfModal = ref(false)
 const showFilterModal = ref(false) // NEW
 const selectedParent = ref(null)
 
@@ -555,13 +553,6 @@ const deleteParent = (parentId) => {
     :parent="selectedParent"
     @close="showActionsModal = false"
     @action="handleParentAction"
-  />
-  <ParentAccountPdf
-    v-if="selectedParent"
-    :show="showPdfModal"
-    :parent="selectedParent"
-    :classes="props.classes"
-    @close="showPdfModal = false"
   />
   <!-- NEW: Filter Modal for PDF Generation -->
   <ParentFilterModal

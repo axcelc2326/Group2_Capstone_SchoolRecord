@@ -89,12 +89,8 @@ class ParentController extends Controller
 
     public function store(Request $request)
     {
-        // Validate both parent and student data
+        // Validate student data only (parent name is auto-generated)
         $validated = $request->validate([
-            // Parent field
-            'name' => 'required|string|max:255',
-            
-            // Student fields
             'student_first_name' => 'required|string|max:255',
             'student_middle_name' => 'nullable|string|max:255',
             'student_last_name' => 'required|string|max:255',
@@ -107,10 +103,19 @@ class ParentController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create Parent Account (your original logic)
-            $firstName = explode(' ', trim($validated['name']))[0];
-            $email = strtolower($firstName) . '@gmail.com';
-            $password = substr($firstName, 0, 3) . '_2025';
+            // Create Parent Account with format "Parent {student_last_name}"
+            $parentName = 'Parent ' . $validated['student_last_name'];
+            
+            // Get first word of student's first name
+            $firstNameFirstWord = explode(' ', trim($validated['student_first_name']))[0];
+            
+            // Clean names by removing special characters and spaces
+            $cleanLastName = preg_replace('/[^a-zA-Z0-9]/', '', $validated['student_last_name']);
+            $cleanFirstName = preg_replace('/[^a-zA-Z0-9]/', '', $firstNameFirstWord);
+            
+            // Generate email: last_name + _ + first_word_of_first_name
+            $email = strtolower($cleanLastName) . '_' . strtolower($cleanFirstName) . '@gmail.com';
+            $password = substr($validated['student_last_name'], 0, 3) . '_2025';
 
             // Check if email already exists and make it unique if needed
             $baseEmail = $email;
@@ -121,10 +126,10 @@ class ParentController extends Controller
             }
 
             $user = User::create([
-                'name' => $validated['name'],
+                'name' => $parentName,
                 'email' => $email,
                 'password' => bcrypt($password),
-                'generated_password' => $password, // Store the plain password
+                'generated_password' => $password,
             ]);
 
             $user->assignRole('parent');
@@ -137,7 +142,7 @@ class ParentController extends Controller
                 'lrn' => $validated['student_lrn'],
                 'gender' => $validated['student_gender'],
                 'class_id' => $validated['class_id'],
-                'parent_id' => $user->id, // Use the created parent's ID
+                'parent_id' => $user->id,
                 'approved_by_teacher' => true,
             ]);
 

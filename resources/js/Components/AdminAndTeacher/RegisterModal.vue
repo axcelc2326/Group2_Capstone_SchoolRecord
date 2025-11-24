@@ -48,33 +48,6 @@
                   <p class="text-sm text-gray-600 dark:text-gray-400">Parent credentials will be auto-generated</p>
                 </div>
 
-                <!-- Parent Information Section -->
-                <div class="space-y-4">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">Parent Information</h3>
-                  
-                  <!-- Parent Name Field -->
-                  <div class="space-y-2">
-                    <InputLabel for="name" value="Parent Full Name" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
-                    <div class="relative group">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                      </div>
-                      <TextInput
-                        id="name"
-                        v-model="form.name"
-                        type="text"
-                        class="block w-full pl-10 pr-3 py-3 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
-                        placeholder="Enter parent full name (e.g., John Doe)"
-                        autocomplete="name"
-                        required
-                      />
-                    </div>
-                    <InputError class="mt-1" :message="form.errors.name" />
-                  </div>
-                </div>
-
                 <!-- Student Information Section -->
                 <div class="space-y-4">
                   <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">Student Information</h3>
@@ -198,9 +171,15 @@
                     <div class="text-sm text-blue-700 dark:text-blue-300">
                       <p class="font-medium mb-2">Auto-generated parent credentials:</p>
                       <ul class="space-y-1 text-xs">
-                        <li><strong>Email:</strong> firstname@gmail.com</li>
-                        <li><strong>Password:</strong> First 3 letters + _2025</li>
-                        <li class="text-blue-600 dark:text-blue-400 mt-2">Example: "John Doe" → john@gmail.com / Joh_2025</li>
+                        <li><strong>Parent Name:</strong> Parent [Student Last Name]</li>
+                        <li><strong>Email:</strong> [Student LastName]_[Student FirstName]@gmail.com</li>
+                        <li><strong>Password:</strong> First 3 letters of LastName + _2025</li>
+                        <li class="text-blue-600 dark:text-blue-400 mt-2">
+                          Example: Student "Juan Carlos Reyes" →<br>
+                          Parent Name: Parent Reyes<br>
+                          Email: reyes_juan@gmail.com<br>
+                          Password: Rey_2025
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -270,7 +249,6 @@ const emit = defineEmits(['close'])
 const modalContent = ref(null)
 
 const form = useForm({
-  name: '',
   student_first_name: '',
   student_middle_name: '',
   student_last_name: '',
